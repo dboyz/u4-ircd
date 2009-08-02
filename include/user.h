@@ -54,4 +54,12 @@ class User
 	*  newnick - The new nick.
 	*/
 	int ChangeNick(const std::string& newnick);
+
+	/* Sends a numeric message to the user.
+	*  Parameters:
+	*  numeric - The numeric to send.
+	*  text - The text to send in conjunction with the numeric.
+	*  ... - Any number of parameters.
+	*/
+	int SendNumeric(int numeric, const std::string& text, ...);
 };

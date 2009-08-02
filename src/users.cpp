@@ -19,3 +19,20 @@
 
 void User::Quit(const std::string& reason)
 { }
+
+int User::ChangeNick(const std::string& newnick)
+{
+	if (!this->isValidNick(newnick.c_str())
+	{
+		this->SendNumeric(ERR_ERRONEOUSNICK, "%s :Erroneous nickname", newnick.c_str());
+		return -1;
+	}
+	else
+	{
+		this->SendRaw(":%s!%s@%s NICK :%s", this->nick.c_str(), this->ident.c_str(), this->host.c_str(), newnick.c_str());
+
+		/* TODO: Add the NICK propagations (nick changes to channels, etc)
+		*  --David Kingston
+		*/
+	}
+}

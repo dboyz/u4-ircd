@@ -48,4 +48,10 @@ class User
 	*  reason - The reason to quit the user.
 	*/
 	void Quit(const std::string& reason);
+
+	/* Changes the user's nick with the specified parameter.
+	*  Parameters:
+	*  newnick - The new nick.
+	*/
+	int ChangeNick(const std::string& newnick);
 };

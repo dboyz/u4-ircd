@@ -46,11 +46,6 @@ int User::ChangeNick(const std::string& newnick)
 
 int User::SendNumeric(int numeric, const std::string& text, ...)
 {
-	va_list args;
-	static char buf[BUFSIZE];
-	va_start(args, text);
-	vsnprintf(buf, sizeof(buf), text, args);
-	va_end(args);
 
 	if (text == NULL)
 	{
@@ -58,6 +53,12 @@ int User::SendNumeric(int numeric, const std::string& text, ...)
 	}
 	else
 	{
+		va_list args;
+		static char buf[BUFSIZE];
+		va_start(args, text);
+		vsnprintf(buf, sizeof(buf), text, args);
+		va_end(args);
+
 		this->SendRaw(":%s!%s@%s %d %s :%s", this->nick.c_str(), this->ident.c_str(), this->host.c_str(), numeric, this->user.c_str(), buf);
 		return 0;
 	}

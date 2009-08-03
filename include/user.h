@@ -15,8 +15,15 @@
 *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <iostream>
+
 class User
 {
+ private:
+	/* Is the user an oper, not taking into consideration any other
+	*  privliges?
+	*/
+	bool isOper;
  public:
 	/* The nick of the IRC user. */
 	std::string nick;
@@ -36,12 +43,7 @@ class User
 	/* A doubly linked list of the channels the IRC user is currently
 	*  in.
 	*/
-	std::list in_channels;
-
-	/* Is the user an oper, not taking into consideration any other
-	*  privliges?
-	*/
-	bool isOper = false;
+//	std::list in_channels;
 
 	/* Quit's a user with the specified kill message.
 	*  Parameters:
@@ -61,10 +63,19 @@ class User
 	*  text - The text to send in conjunction with the numeric.
 	*  ... - Any number of parameters.
 	*/
-	int SendNumeric(int numeric, const std::string& text, ...);
+	int SendNumeric(int numeric, const char* text, ...);
 
 	/* Returns false if parameter is not an RFC qualified nick,
 	*  If it is, return true.
+	*  Parameters:
+	*  nick - The nick to check.
 	*/
 	bool isValidNick(const std::string& nick);
+
+	/* Sends a raw string to the user.
+	*  Parameters:
+	*  text - The text to send.
+	*  ... - Any number of parameters.
+	*/
+	int SendRaw(const std::string& text, ...);
 };

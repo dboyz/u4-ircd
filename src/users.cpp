@@ -16,21 +16,26 @@
 */
 
 #include "user.h"
+#include "numerics.h"
+#include "internal.h"
+#include <iostream>
+#include <cstdarg>
+#include <cstdio>
 
 void User::Quit(const std::string& reason)
 { }
 
 int User::ChangeNick(const std::string& newnick)
 {
-	if (newnick == NULL)
+	if (newnick.c_str() == 0)
 	{
 		return -1;
 	}
 	else
 	{
-		if (!this->isValidNick(newnick.c_str())
+		if (this->isValidNick(newnick.c_str()) == 0)
 		{
-			this->SendNumeric(ERR_ERRONEOUSNICK, "%s :Erroneous nickname", newnick.c_str());
+			this->SendNumeric(ERR_ERRONEUSNICKNAME, "%s :Erroneous nickname", newnick.c_str());
 			return -1;
 		}
 		else
@@ -44,10 +49,10 @@ int User::ChangeNick(const std::string& newnick)
 	}
 }
 
-int User::SendNumeric(int numeric, const std::string& text, ...)
+int User::SendNumeric(int numeric, const char* text, ...)
 {
 
-	if (text == NULL)
+	if (text || numeric == 0)
 	{
 		return -1;
 	}
@@ -59,36 +64,13 @@ int User::SendNumeric(int numeric, const std::string& text, ...)
 		vsnprintf(buf, sizeof(buf), text, args);
 		va_end(args);
 
-		this->SendRaw(":%s!%s@%s %d %s :%s", this->nick.c_str(), this->ident.c_str(), this->host.c_str(), numeric, this->user.c_str(), buf);
+		this->SendRaw(":%s!%s@%s %d %s :%s", this->nick.c_str(), this->ident.c_str(), this->host.c_str(), numeric, this->nick.c_str(), buf);
 		return 0;
 	}
 }
 
 bool User::isValidNick(const std::string& nick)
-{
-	if (nick == NULL)
-	{
-		return false;
-	}
-	else
-	{
-		unsigned int p = 0;
-		std::string i;
+{ }
 
-		for (i = nick; *i; i++, p++)
-		{
-			if ((*i >= 'A') && (*i <= '}'))
-			{
-				continue;
-			}
-			else if ((((*i >= '0') && (*i <= '9')) || (*i == '-')) && (i > n))
-			{
-				continue;
-			}
-			else
-			{
-				return false;
-			}
-		}
-	}
-}
+int User::SendRaw(const std::string& text, ...)
+{ }

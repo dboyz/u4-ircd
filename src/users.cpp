@@ -63,3 +63,32 @@ int User::SendNumeric(int numeric, const std::string& text, ...)
 		return 0;
 	}
 }
+
+bool User::isValidNick(const std::string& nick)
+{
+	if (nick == NULL)
+	{
+		return false;
+	}
+	else
+	{
+		unsigned int p = 0;
+		std::string i;
+
+		for (i = nick; *i; i++, p++)
+		{
+			if ((*i >= 'A') && (*i <= '}'))
+			{
+				continue;
+			}
+			else if ((((*i >= '0') && (*i <= '9')) || (*i == '-')) && (i > n))
+			{
+				continue;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+}

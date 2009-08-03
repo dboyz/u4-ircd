@@ -62,4 +62,9 @@ class User
 	*  ... - Any number of parameters.
 	*/
 	int SendNumeric(int numeric, const std::string& text, ...);
+
+	/* Returns false if parameter is not an RFC qualified nick,
+	*  If it is, return true.
+	*/
+	bool isValidNick(const std::string& nick);
 };

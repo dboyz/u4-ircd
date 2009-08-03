@@ -47,6 +47,7 @@ int User::ChangeNick(const std::string& newnick)
 			*/
 		}
 	}
+	return 0;
 }
 
 int User::SendNumeric(int numeric, const char* text, ...)
@@ -70,7 +71,11 @@ int User::SendNumeric(int numeric, const char* text, ...)
 }
 
 bool User::isValidNick(const std::string& nick)
-{ }
+{
+	return true;
+}
 
 int User::SendRaw(const std::string& text, ...)
-{ }
+{
+	return 0;
+}

@@ -115,7 +115,7 @@ void User::SendMOTD(void)
 	{
 		for (files::iterator i = conf->MOTDFile.begin(); i != conf->MOTDFile.end(); i++)
 		{
-			this->SendNumeric(RPL_MOTD, "%s", i->c_str());
+			this->SendNumeric(RPL_MOTD, ":- %s", i->c_str());
 			this->SendNumeric(RPL_ENDOFMOTD, "End of /MOTD");
 		}
 	}

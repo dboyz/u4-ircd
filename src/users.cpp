@@ -22,6 +22,12 @@
 #include <cstdarg>
 #include <cstdio>
 
+User::User()
+{ }
+
+User::~User()
+{ }
+
 void User::Quit(const std::string& reason)
 { }
 

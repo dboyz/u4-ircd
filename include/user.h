@@ -25,6 +25,12 @@ class User
 	*/
 	bool isOper;
  public:
+	/* Constructor */
+	User();
+
+	/* Deconstructor */
+	~User();
+
 	/* The nick of the IRC user. */
 	std::string nick;
 

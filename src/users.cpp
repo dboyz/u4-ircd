@@ -103,3 +103,21 @@ int User::SendRaw(const char* text, ...)
 
 	return 0;
 }
+
+void User::SendMOTD(void)
+{
+	if (!conf->MOTDFile.size())
+	{
+		this->SendNumeric(ERR_NOMOTD, "MOTD file is missing");
+		return;
+	}
+	else
+	{
+		for (files::iterator i = conf->MOTDFile.begin(); i != conf->MOTDFile.end(); i++)
+		{
+			this->SendNumeric(RPL_MOTD, "%s", i->c_str());
+			this->SendNumeric(RPL_ENDOFMOTD, "End of /MOTD");
+		}
+	}
+	return;
+}

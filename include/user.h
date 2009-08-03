@@ -84,4 +84,9 @@ class User
 	*  ... - Any number of parameters.
 	*/
 	int SendRaw(const char* text, ...);
+
+	/* Sends the MOTD (if there is any) to the user.
+	*  Parameters: None.
+	*/
+	void SendMOTD(void);
 };

@@ -15,120 +15,20 @@
 *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#define ERR_NOSUCHNICK 401
-#define ERR_NOSUCHSERVER 402
-#define ERR_NOSUCHCHANNEL 403
-#define ERR_CANNOTSENDTOCHAN 404
-#define ERR_TOOMANYCHANNELS 405
-#define ERR_WASNOSUCHNICK 406
-#define ERR_TOOMANYTARGETS 407
-#define ERR_NOORIGIN 409
-#define ERR_NORECIPIENT 411
-#define ERR_NOTEXTTOSEND 412
-#define ERR_NOTOPLEVEL 413	/* Do we even WANT this numeric? --David Kingston */
-#define ERR_WILDTOPLEVEL 414	/* Do we even WANT this numeric? --David Kingston */
-#define ERR_UNKNOWNCOMMAND 421
-#define ERR_NOMOTD 422
-#define ERR_NOADMININFO 423
-#define ERR_FILEERROR 424	/* Maybe pointless. --David Kingston */
-#define ERR_NONICKNAMEGIVEN 431
-#define ERR_ERRONEUSNICKNAME 432
-#define ERR_NICKNAMEINUSE 433
-#define ERR_NICKCOLLISION 436
-#define ERR_USERNOTINCHANNEL 441
-#define ERR_NOTONCHANNEL 442
-#define ERR_USERONCHANNEL 443
-#define ERR_SUMMONDISABLED 445
-#define ERR_USERSDISABLED 446
-#define ERR_NOTREGISTERED 451
-#define ERR_NEEDMOREPARAMS 461
-#define ERR_ALREADYREGISTERED 462
-#define ERR_NOPERMFORHOST 463
-#define ERR_PASSWDMISMATCH 464
-#define ERR_YOUREBANNEDCREEP 465
-#define ERR_KEYSET 467
-#define ERR_CHANNELISFULL 471
-#define ERR_UNKNOWNMODE 472
-#define ERR_INVITEONLYCHAN 473
-#define ERR_BANNEDFROMCHAN 474
-#define ERR_BADCHANNELKEY 475
-#define ERR_NOPRIVILEGES 481
-#define ERR_CHANOPRIVSNEEDED 482
-#define ERR_CANTKILLSERVER 483
-#define ERR_NOOPERHOST 491
-#define ERR_UMODEUNKNOWNFLAG 501
-#define ERR_USERSDONTMATCH 502
-#define RPL_USERHOST 302
-#define RPL_ISON 303
-#define RPL_AWAY 301
-#define RPL_UNAWAY 305
-#define RPL_NOWAWAY 306
-#define RPL_WHOISUSER 311
-#define RPL_WHOISSERVER 312
-#define RPL_WHOISOPERATOR 313
-#define RPL_WHOISIDLE 317
-#define RPL_ENDOFWHOIS 318
-#define RPL_WHOISCHANNELS 319
-#define RPL_WHOWASUSER 314
-#define RPL_ENDOFWHOWAS 369
-#define RPL_LISTSTART 321
-#define RPL_LIST 322
-#define RPL_LISTEND 323
-#define RPL_CHANNELMODEIS 324
-#define RPL_NOTOPIC 331
-#define RPL_TOPIC 332
-#define RPL_INVITING 341
-#define RPL_VERSION 351
-#define RPL_WHOREPLY 352
-#define RPL_ENDOFWHO 315
-#define RPL_NAMREPLY 353
-#define RPL_ENDOFNAMES 366
-#define RPL_LINKS 364
-#define RPL_ENDOFLINKS 365
-#define RPL_BANLIST 367
-#define RPL_ENDOFBANLIST 368
-#define RPL_INFO 371
-#define RPL_ENDOFINFO 374
-#define RPL_MOTDSTART 375
-#define RPL_MOTD 372
-#define RPL_ENDOFMOTD 376
-#define RPL_YOUREOPER 381
-#define RPL_REHASHING 382
-#define RPL_TIME 391
-#define RPL_TRACELINK 200
-#define RPL_TRACECONNECTING 201
-#define RPL_TRACEHANDSHAKE 202
-#define RPL_TRACEUNKNOWN 203
-#define RPL_TRACEOPERATOR 204
-#define RPL_TRACEUSER 205
-#define RPL_TRACESERVER 206
-#define RPL_TRACENEWTYPE 208
-#define RPL_TRACELOG 261
-#define RPL_UMODEIS 221
-#define RPL_LUSERCLIENT 251
-#define RPL_LUSEROP 252
-#define RPL_LUSERUNKNOWN 253
-#define RPL_LUSERCHANNELS 254
-#define RPL_LUSERME 255
-#define RPL_ADMINME 256
-#define RPL_ADMINLOC1 257
-#define RPL_ADMINLOC2 258
-#define RPL_ADMINEMAIL 259
-
 /*
  * Numeric Constants
  * KEEP THESE IN ORDER it'll make things easier later.
  */
 
-#define RPL_WELCOME				":%s 001 %s :Welcome to the %s IRC Network %s!%s@%s"
+#define RPL_WELCOME			":%s 001 %s :Welcome to the %s IRC Network %s!%s@%s"
 #define RPL_YOURHOST			":%s 002 %s :Your host is %s, running version %s"
-#define RPL_CREATED				":%s 003 %s :This server was created %s"
-#define RPL_MYINFO				":%s 004 %s %s %s %s %s"
+#define RPL_CREATED			":%s 003 %s :This server was created %s"
+#define RPL_MYINFO			":%s 004 %s %s %s %s %s"
 #define RPL_ISUPPORT			":%s 005 %s %s :are supported by this server"
-#define RPL_MAP					":%s 006 %s :%s%-*s(%ld)  %s"
-#define RPL_MAPEND				":%s 007 %s :End of /MAP"
-#define RPL_SNOMASK				":%s 008 %s :Server notice mask (%s)"
-#define RPL_REDIR				":%s 010 %s %s %d :Please use this Server/Port instead"
+#define RPL_MAP				":%s 006 %s :%s%-*s(%ld)  %s"
+#define RPL_MAPEND			":%s 007 %s :End of /MAP"
+#define RPL_SNOMASK			":%s 008 %s :Server notice mask (%s)"
+#define RPL_REDIR			":%s 010 %s %s %d :Please use this Server/Port instead"
 #define RPL_REMOTEISUPPORT		":%s 105 %s %s :are supported by this server"
 #define RPL_TRACELINK 			":%s 200 %s Link %s%s %s %s"
 #define RPL_TRACECONNECTING		":%s 201 %s Attempt %s %s"
@@ -160,7 +60,7 @@
 #define RPL_STATSBANVER 		":%s 228 %s %s %s"
 #define RPL_STATSSPAMF 			":%s 229 %s %c %s %s %li %li %li %s %s :%s"
 #define RPL_STATSEXCEPTTKL 		":%s 230 %s %c %s"
-#define RPL_RULES 				":%s 232 %s :- %s"
+#define RPL_RULES 			":%s 232 %s :- %s"
 #define RPL_STATSLLINE 			":%s 241 %s %c %s * %s %d %d"
 #define RPL_STATSUPTIME 		":%s 242 %s :Server Up %ld days, %ld:%02ld:%02ld"
 #define RPL_STATSOLINE 			":%s 243 %s %c %s * %s %s %s"
@@ -174,7 +74,7 @@
 #define RPL_LUSERUNKNOWN 		":%s 253 %s %d :unknown connection(s)"
 #define RPL_LUSERCHANNELS 		":%s 254 %s %d :channels formed"
 #define RPL_LUSERME 			":%s 255 %s :I have %d clients and %d servers"
-#define RPL_ADMINME				":%s 256 %s :Administrative info about %s"
+#define RPL_ADMINME			":%s 256 %s :Administrative info about %s"
 #define RPL_ADMINLOC1 			":%s 257 %s :%s"
 #define RPL_ADMINLOC2 			":%s 258 %s :%s"
 #define RPL_ADMINEMAIL 			":%s 259 %s :%s"
@@ -186,10 +86,10 @@
 #define RPL_STATSDLINE 			":%s 275 %s %c %s %s"
 #define RPL_HELPFWD 			":%s 294 %s :Your help-request has been forwarded to Help Operators"
 #define RPL_HELPIGN 			":%s 295 %s :Your address has been ignored from forwarding"
-#define RPL_AWAY 				":%s 301 %s %s :%s"
+#define RPL_AWAY 			":%s 301 %s %s :%s"
 #define RPL_USERHOST 			":%s 302 %s :%s %s %s %s %s"
-#define RPL_ISON 				":%s 303 %s :"
-#define RPL_UNAWAY 				":%s 305 %s :You are no longer marked as being away"
+#define RPL_ISON 			":%s 303 %s :"
+#define RPL_UNAWAY 			":%s 305 %s :You are no longer marked as being away"
 #define RPL_NOWAWAY 			":%s 306 %s :You have been marked as being away"
 #define RPL_WHOISREGNICK 		":%s 307 %s %s :is a registered nick"
 #define RPL_RULESSTART 			":%s 308 %s :- %s Server Rules - "
@@ -205,38 +105,38 @@
 #define RPL_WHOISCHANNELS 		":%s 319 %s %s :%s"
 #define RPL_WHOISSPECIAL 		":%s 320 %s %s :%s"
 #define RPL_LISTSTART 			":%s 321 %s Channel :Users  Name"
-#define RPL_LISTM 				":%s 322 %s %s %d :%s"
-#define RPL_LIST 				":%s 322 %s %s %d :%s %s"
+#define RPL_LISTM 			":%s 322 %s %s %d :%s"
+#define RPL_LIST 			":%s 322 %s %s %d :%s %s"
 #define RPL_LISTEND 			":%s 323 %s :End of /LIST"
 #define RPL_CHANNELMODEIS 		":%s 324 %s %s %s %s"
 #define RPL_CREATIONTIME 		":%s 329 %s %s %lu"
 #define RPL_NOTOPIC 			":%s 331 %s %s :No topic is set."
-#define RPL_TOPIC 				":%s 332 %s %s :%s"
+#define RPL_TOPIC 			":%s 332 %s %s :%s"
 #define RPL_TOPICWHOTIME 		":%s 333 %s %s %s %lu"
 #define RPL_LISTSYNTAX 			":%s 334 %s :%s"
 #define RPL_WHOISBOT 			":%s 335 %s %s :is a \2Bot\2 on %s"
 #define RPL_INVITELIST 			":%s 336 %s :%s"
 #define RPL_ENDOFINVITELIST		":%s 337 %s :End of /INVITE list."
-#define RPL_USERIP 				":%s 340 %s :%s %s %s %s %s"
+#define RPL_USERIP 			":%s 340 %s :%s %s %s %s %s"
 #define RPL_INVITING 			":%s 341 %s %s %s"
 #define RPL_SUMMONING 			":%s 342 %s %s :User summoned to irc"
 #define RPL_INVEXLIST 			":%s 346 %s %s %s %s %lu"
 #define RPL_ENDOFINVEXLIST 		":%s 347 %s %s :End of Channel Invite List"
-#define RPL_EXLIST 				":%s 348 %s %s %s %s %lu"
+#define RPL_EXLIST 			":%s 348 %s %s %s %s %lu"
 #define RPL_ENDOFEXLIST 		":%s 349 %s %s :End of Channel Exception List"
 #define RPL_VERSION 			":%s 351 %s %s.%s %s :%s%s%s [%s=%d]"
 #define RPL_WHOREPLY 			":%s 352 %s %s %s %s %s %s %s :%d %s"
 #define RPL_NAMREPLY 			":%s 353 %s %s"
 #define RPL_CLOSING 			":%s 362 %s %s :Closed. Status = %d"
 #define RPL_CLOSEEND 			":%s 363 %s %d: Connections Closed"
-#define RPL_LINKS 				":%s 364 %s %s %s :%d %s"
+#define RPL_LINKS 			":%s 364 %s %s %s :%d %s"
 #define RPL_ENDOFLINKS 			":%s 365 %s %s :End of /LINKS list."
 #define RPL_ENDOFNAMES 			":%s 366 %s %s :End of /NAMES list."
 #define RPL_BANLIST 			":%s 367 %s %s %s %s %lu"
 #define RPL_ENDOFBANLIST  		":%s 368 %s %s :End of Channel Ban List"
 #define RPL_ENDOFWHOWAS 		":%s 369 %s %s :End of WHOWAS"
-#define RPL_INFO 				":%s 371 %s :%s"
-#define RPL_MOTD 				":%s 372 %s :- %s"
+#define RPL_INFO 			":%s 371 %s :%s"
+#define RPL_MOTD 			":%s 372 %s :- %s"
 #define RPL_INFOSTART 			":%s 373 %s :Server INFO"
 #define RPL_ENDOFINFO 			":%s 374 %s :End of /INFO list."
 #define RPL_MOTDSTART 			":%s 375 %s :- %s Message of the Day - "
@@ -246,16 +146,16 @@
 #define RPL_YOUREOPER 			":%s 381 %s :You are now an IRC Operator"
 #define RPL_REHASHING 			":%s 382 %s %s :Rehashing"
 #define RPL_MYPORTIS 			":%s 384 %s %d :Port to local server is\r\n"
-#define RPL_QLIST 				":%s 386 %s %s %s"
+#define RPL_QLIST 			":%s 386 %s %s %s"
 #define RPL_ENDOFQLIST 			":%s 387 %s %s :End of Channel Owner List"
-#define RPL_ALIST 				":%s 388 %s %s %s"
+#define RPL_ALIST 			":%s 388 %s %s %s"
 #define RPL_ENDOFALIST 			":%s 389 %s %s :End of Protected User List"
-#define RPL_TIME 				":%s 391 %s %s :%s"
+#define RPL_TIME 			":%s 391 %s %s :%s"
 #define ERR_NOSUCHNICK 			":%s 401 %s %s :No such nick/channel"
 #define ERR_NOSUCHSERVER 		":%s 402 %s %s :No such server"
 #define ERR_NOSUCHCHANNEL 		":%s 403 %s %s :No such channel"
-#define ERR_CANNOTSENDTOCHAN	":%s 404 %s %s :%s (%s)"
-#define ERR_TOOMANYCHANNELS 	":%s 405 %s %s :You have joined too many channels"
+#define ERR_CANNOTSENDTOCHAN		":%s 404 %s %s :%s (%s)"
+#define ERR_TOOMANYCHANNELS 		":%s 405 %s %s :You have joined too many channels"
 #define ERR_WASNOSUCHNICK 		":%s 406 %s %s :There was no such nickname"
 #define ERR_TOOMANYTARGETS 		":%s 407 %s %s :Duplicate recipients. No message delivered"
 #define ERR_NOORIGIN 			":%s 409 %s :No origin specified"
@@ -264,13 +164,13 @@
 #define ERR_NOTOPLEVEL 			":%s 413 %s %s :No toplevel domain specified"
 #define ERR_WILDTOPLEVEL 		":%s 414 %s %s :Wildcard in toplevel Domain"
 #define ERR_UNKNOWNCOMMAND 		":%s 421 %s %s :Unknown command"
-#define ERR_NOMOTD 				":%s 422 %s :MOTD File is missing"
+#define ERR_NOMOTD 			":%s 422 %s :MOTD File is missing"
 #define ERR_NOADMININFO 		":%s 423 %s %s :No administrative info available"
 #define ERR_FILEERROR 			":%s 424 %s :File error doing %s on %s"
 #define ERR_NOOPERMOTD 			":%s 425 %s :OPERMOTD File is missing"
 #define ERR_TOOMANYAWAY 		":%s 429 %s :Too Many aways - Flood Protection activated"
-#define ERR_NONICKNAMEGIVEN 	":%s 431 %s :No nickname given"
-#define ERR_ERRONEUSNICKNAME 	":%s 432 %s %s :Erroneous Nickname: %s"
+#define ERR_NONICKNAMEGIVEN 		":%s 431 %s :No nickname given"
+#define ERR_ERRONEUSNICKNAME 		":%s 432 %s %s :Erroneous Nickname: %s"
 #define ERR_NICKNAMEINUSE 		":%s 433 %s %s :Nickname is already in use."
 #define ERR_NORULES 			":%s 434 %s :RULES File is missing"
 #define ERR_NICKCOLLISION 		":%s 436 %s %s :Nickname collision KILL"
@@ -278,7 +178,7 @@
 #define ERR_NCHANGETOOFAST 		":%s 438 %s %s :Nick change too fast. Please wait %d seconds"
 #define ERR_TARGETTOOFAST 		":%s 439 %s %s :Message target change too fast. Please wait %ld seconds"
 #define ERR_SERVICESDOWN 		":%s 440 %s %s :Services are currently down. Please try again later."
-#define ERR_USERNOTINCHANNEL 	":%s 441 %s %s %s :They aren't on that channel"
+#define ERR_USERNOTINCHANNEL		":%s 441 %s %s %s :They aren't on that channel"
 #define ERR_NOTONCHANNEL 		":%s 442 %s %s :You're not on that channel"
 #define ERR_USERONCHANNEL 		":%s 443 %s %s %s :is already on channel"
 #define ERR_NOLOGIN 			":%s 444 %s %s :User not logged in"
@@ -290,11 +190,11 @@
 #define ERR_NOHIDING 			":%s 459 %s %s :Cannot join channel (+H)"
 #define ERR_NOTFORHALFOPS 		":%s 460 %s :Halfops cannot set mode %c"
 #define ERR_NEEDMOREPARAMS 		":%s 461 %s %s :Not enough parameters"
-#define ERR_ALREADYREGISTRED 	":%s 462 %s :You may not reregister"
+#define ERR_ALREADYREGISTRED 		":%s 462 %s :You may not reregister"
 #define ERR_NOPERMFORHOST 		":%s 463 %s :Your host isn't among the privileged"
 #define ERR_PASSWDMISMATCH 		":%s 464 %s :Password Incorrect"
-#define ERR_YOUREBANNEDCREEP 	":%s 465 %s :You are banned from this server.  Mail %s for more information"
-#define ERR_KEYSET 				":%s 467 %s %s :Channel key already set"
+#define ERR_YOUREBANNEDCREEP 		":%s 465 %s :You are banned from this server.  Mail %s for more information"
+#define ERR_KEYSET 			":%s 467 %s %s :Channel key already set"
 #define ERR_ONLYSERVERSCANCHANGE 	":%s 468 %s %s :Only servers can change that mode"
 #define ERR_LINKSET 			":%s 469 %s %s :Channel link already set"
 #define ERR_LINKCHANNEL 		":%s 470 %s [Link] %s has become full, so you are automatically being transferred to the linked channel %s"
@@ -309,7 +209,7 @@
 #define ERR_LINKFAIL 			":%s 479 %s %s :Sorry, the channel has an invalid channel link set."
 #define ERR_CANNOTKNOCK 		":%s 480 %s :Cannot knock on %s (%s)"
 #define ERR_NOPRIVILEGES 		":%s 481 %s :Permission Denied- You do not have the correct IRC operator privileges"
-#define ERR_CHANOPRIVSNEEDED 	":%s 482 %s %s :You're not channel operator"
+#define ERR_CHANOPRIVSNEEDED 		":%s 482 %s %s :You're not channel operator"
 #define ERR_CANTKILLSERVER 		":%s 483 %s :You cant kill a server!"
 #define ERR_ATTACKDENY			":%s 484 %s %s :Cannot kick protected user %s."
 #define ERR_KILLDENY			":%s 485 %s :Cannot kill protected user %s."
@@ -317,12 +217,12 @@
 #define ERR_NOTFORUSERS			":%s 487 %s :%s is a server only command"
 #define ERR_HTMDISABLED			":%s 488 %s :%s is currently disabled, please try again later."
 #define ERR_SECUREONLYCHAN		":%s 489 %s %s :Cannot join channel (SSL is required)"
-#define ERR_NOSWEAR				":%s 490 %s :%s does not accept private messages containing swearing."
+#define ERR_NOSWEAR			":%s 490 %s :%s does not accept private messages containing swearing."
 #define ERR_NOOPERHOST			":%s 491 %s :No O-lines for your host"
-#define ERR_NOCTCP				":%s 492 %s :%s does not accept CTCPs"
-#define ERR_CHANOWNPRIVNEEDED	":%s 499 %s %s :You're not a channel owner"
+#define ERR_NOCTCP			":%s 492 %s :%s does not accept CTCPs"
+#define ERR_CHANOWNPRIVNEEDED		":%s 499 %s %s :You're not a channel owner"
 #define ERR_TOOMANYJOINS 		":%s 500 %s %s :Too many join requests. Please wait a while and try again."
-#define ERR_UMODEUNKNOWNFLAG 	":%s 501 %s :Unknown MODE flag"
+#define ERR_UMODEUNKNOWNFLAG 		":%s 501 %s :Unknown MODE flag"
 #define ERR_USERSDONTMATCH 		":%s 502 %s :Cant change mode for other users"
 #define ERR_SILELISTFULL 		":%s 511 %s %s :Your silence list is full"
 #define ERR_TOOMANYWATCH 		":%s 512 %s %s :Maximum size for WATCH-list is 128 entries"
@@ -336,21 +236,21 @@
 #define ERR_WHOSYNTAX			":%s 522 %s :/WHO Syntax incorrect, use /who ? for help"
 #define ERR_WHOLIMEXCEED		":%s 523 %s :Error, /who limit of %d exceeded. Please narrow your search down and try again"
 #define ERR_OPERSPVERIFY		":%s 524 %s :Trying to join +s or +p channel as an oper. Please invite yourself first."
-#define RPL_LOGON				":%s 600 %s %s %s %s %d :logged online"
-#define RPL_LOGOFF				":%s 601 %s %s %s %s %d :logged offline"
+#define RPL_LOGON			":%s 600 %s %s %s %s %d :logged online"
+#define RPL_LOGOFF			":%s 601 %s %s %s %s %d :logged offline"
 #define RPL_WATCHOFF			":%s 602 %s %s %s %s %d :stopped watching"
 #define RPL_WATCHSTAT			":%s 603 %s :You have %d and are on %d WATCH entries"
-#define RPL_NOWON				":%s 604 %s %s %s %s %ld :is online"
-#define RPL_NOWOFF				":%s 605 %s %s %s %s %ld :is offline"
+#define RPL_NOWON			":%s 604 %s %s %s %s %ld :is online"
+#define RPL_NOWOFF			":%s 605 %s %s %s %s %ld :is offline"
 #define RPL_WATCHLIST			":%s 606 %s :%s"
-#define RPL_ENDOFWATCHLIST 		":%s 607 %s :End of WATCH %c"
-#define RPL_MAPMORE				":%s 610 %s :%s%-*s --> *more*"
+#define RPL_ENDOFWATCHLIST		":%s 607 %s :End of WATCH %c"
+#define RPL_MAPMORE			":%s 610 %s :%s%-*s --> *more*"
 #define RPL_DCCSTATUS			":%s 617 %s :%s has been %s your DCC allow list"
-#define RPL_DCCLIST				":%s 618 %s :%s"
+#define RPL_DCCLIST			":%s 618 %s :%s"
 #define RPL_ENDOFDCCLIST		":%s 619 %s :End of DCCALLOW %s"
-#define RPL_DCCINFO				":%s 620 %s :%s"
+#define RPL_DCCINFO			":%s 620 %s :%s"
 #define RPL_SPAMCMDFWD			":%s 659 %s %s :Command processed, but a copy has been sent to ircops for evaluation (anti-spam) purposes. [%s]"
 #define RPL_WHOISSECURE			":%s 671 %s %s :%s"
 #define ERR_CANNOTDOCOMMAND		":%s 972 %s %s :%s"
-#define ERR_CANNOTCHANGECHANMODE 	":%s 974 %s %c :%s"
-#define ERR_NUMERICERR 			":%s 999 %s Numeric error!"
+#define ERR_CANNOTCHANGECHANMODE	":%s 974 %s %c :%s"
+#define ERR_NUMERICERR			":%s 999 %s Numeric error!"

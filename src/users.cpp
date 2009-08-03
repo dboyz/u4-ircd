@@ -27,13 +27,13 @@ void User::Quit(const std::string& reason)
 
 int User::ChangeNick(const std::string& newnick)
 {
-	if (newnick.c_str() == 0)
+	if (newnick.c_str() == NULL)
 	{
 		return -1;
 	}
 	else
 	{
-		if (this->isValidNick(newnick.c_str()) == 0)
+		if (!this->isValidNick(newnick.c_str()))
 		{
 			this->SendNumeric(ERR_ERRONEUSNICKNAME, "%s :Erroneous nickname", newnick.c_str());
 			return -1;
@@ -53,7 +53,7 @@ int User::ChangeNick(const std::string& newnick)
 int User::SendNumeric(int numeric, const char* text, ...)
 {
 
-	if (text || numeric == 0)
+	if (text == NULL || !numeric)
 	{
 		return -1;
 	}

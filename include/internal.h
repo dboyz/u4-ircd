@@ -15,4 +15,9 @@
 *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#define BUFSIZE 4096	/* Possibly a bit too big. --David Kingston */
+
+/* Defines the BUFSIZE to be used in some functions,
+*  mainly for extra parameter handling, feel free
+*  to use this.
+*/
+#define BUFSIZE 512

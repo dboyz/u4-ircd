@@ -71,7 +71,6 @@ int User::ChangeNick(const std::string& newnick)
 
 int User::SendNumeric(int numeric, const char* text, ...)
 {
-
 	if (text == NULL || !numeric)
 	{
 		return -1;

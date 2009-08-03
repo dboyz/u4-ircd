@@ -77,5 +77,5 @@ class User
 	*  text - The text to send.
 	*  ... - Any number of parameters.
 	*/
-	int SendRaw(const std::string& text, ...);
+	int SendRaw(const char* text, ...);
 };

@@ -75,7 +75,13 @@ bool User::isValidNick(const std::string& nick)
 	return true;
 }
 
-int User::SendRaw(const std::string& text, ...)
+int User::SendRaw(const char* text, ...)
 {
+	va_list args;
+	static char buf[BUFSIZE];
+	va_start(args, text);
+	vsnprintf(buf, sizeof(buf), text, args);
+	va_end(args);
+
 	return 0;
 }

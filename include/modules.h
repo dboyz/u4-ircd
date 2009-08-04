@@ -35,4 +35,9 @@ enum ModuleTypes
 	VENDOR
 };
 
+/*
+ * The parent class of all modules.
+ */
+class Module;
+
 #endif

@@ -66,14 +66,6 @@ class User
 	*/
 	int ChangeNick(const std::string& newnick);
 
-	/* Sends a numeric message to the user.
-	*  Parameters:
-	*  numeric - The numeric to send.
-	*  text - The text to send in conjunction with the numeric.
-	*  ... - Any number of parameters.
-	*/
-	int SendNumeric(int numeric, const char* text, ...);
-
 	/* Returns false if parameter is not an RFC qualified nick,
 	*  If it is, return true.
 	*  Parameters:

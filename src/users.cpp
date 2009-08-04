@@ -73,33 +73,6 @@ int User::ChangeNick(const std::string& newnick)
 	return 0;
 }
 
-/*
- * Is this depreciated with all the numerics defined as string constants?
- * It also doesn't appear to have the correct numeric format...
- * Correct numeric format is :<server> <numeric> <target> <other params|:text>
- * - Stealth
- *
- * It can be modified to send the proper format. -- David Kingston
- */
-int User::SendNumeric(int numeric, const char* text, ...)
-{
-	if (text == NULL || !numeric)
-	{
-		return -1;
-	}
-	else
-	{
-		va_list args;
-		static char buf[BUFSIZE];
-		va_start(args, text);
-		vsnprintf(buf, sizeof(buf), text, args);
-		va_end(args);
-
-		this->SendRaw(":%s!%s@%s %d %s :%s", this->nick.c_str(), this->ident.c_str(), this->host.c_str(), numeric, this->nick.c_str(), buf);
-		MODULARIZE_FUNCTION(I_OnSendNumeric, OnSendNumeric(numeric, buf));
-		return 0;
-	}
-}
 
 bool User::isValidNick(const std::string& nick)
 {

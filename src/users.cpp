@@ -33,6 +33,7 @@ void User::Quit(const std::string& reason)
 	if (reason.c_str() == NULL)
 	{
 		this->SendRaw(":%s!%s@%s QUIT", this->nick.c_str(), this->ident.c_str(), this->host.c_str());
+		MODULARIZE_FUNCTION(I_OnUserQuit, OnUserQuit());
 
 		/* TODO: Add QUIT propagations to channels and such.
 		*  -- David Kingston
@@ -41,6 +42,7 @@ void User::Quit(const std::string& reason)
 	else
 	{
 		this->SendRaw(":%s!%s@%s QUIT :%s", this->nick.c_str(), this->ident.c_str(), this->host.c_str(), reason.c_str());
+		MODULARIZE_FUNCTION(I_OnUserQuit, OnUserQuit(reason.c_str());
 	}
 }
 
@@ -55,11 +57,13 @@ int User::ChangeNick(const std::string& newnick)
 		if (!this->isValidNick(newnick.c_str()))
 		{
 			this->SendNumeric(ERR_ERRONEUSNICKNAME, "%s :Erroneous nickname", newnick.c_str());
+			MODULARIZE_FUNCTION(I_OnBadNickChange, OnBadNickChange(newnick.c_str());
 			return -1;
 		}
 		else
 		{
 			this->SendRaw(":%s!%s@%s NICK :%s", this->nick.c_str(), this->ident.c_str(), this->host.c_str(), newnick.c_str());
+			MODULARIZE_FUNCTION(I_OnNickChange, OnNickChange(newnick.c_str());
 
 			/* TODO: Add the NICK propagations (nick changes to channels, etc)
 			*  --David Kingston
@@ -84,12 +88,14 @@ int User::SendNumeric(int numeric, const char* text, ...)
 		va_end(args);
 
 		this->SendRaw(":%s!%s@%s %d %s :%s", this->nick.c_str(), this->ident.c_str(), this->host.c_str(), numeric, this->nick.c_str(), buf);
+		MODULARIZE_FUNCTION(I_OnSendNumeric, OnSendNumeric(numeric, buf));
 		return 0;
 	}
 }
 
 bool User::isValidNick(const std::string& nick)
 {
+	MODULARIZE_FUNCTION(I_OnValidNickCheck, OnValidNickCheck(nick.c_str());
 	return true;
 }
 
@@ -101,6 +107,8 @@ int User::SendRaw(const char* text, ...)
 	vsnprintf(buf, sizeof(buf), text, args);
 	va_end(args);
 
+	MODULARIZE_FUNCTION(I_OnSendRaw, OnSendRaw(buf));
+
 	return 0;
 }
 
@@ -109,6 +117,7 @@ void User::SendMOTD(void)
 	if (!conf->MOTDFile.size())
 	{
 		this->SendNumeric(ERR_NOMOTD, "MOTD file is missing");
+		MODULARIZE_FUNCTION(I_OnFailedMOTD, OnFailedMOTD());
 		return;
 	}
 	else
@@ -119,6 +128,8 @@ void User::SendMOTD(void)
 			this->SendNumeric(RPL_MOTD, ":- %s %s", __DATE__, __TIME__);
 			this->SendNumeric(RPL_MOTD, ":- %s", i->c_str());
 			this->SendNumeric(RPL_ENDOFMOTD, "End of /MOTD");
+
+			MODULARIZE_FUNCTION(I_OnMOTDSend, OnMOTDSend());
 		}
 	}
 	return;

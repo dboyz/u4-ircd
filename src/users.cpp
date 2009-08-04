@@ -56,7 +56,7 @@ int User::ChangeNick(const std::string& newnick)
 	{
 		if (!this->isValidNick(newnick.c_str()))
 		{
-			this->SendNumeric(ERR_ERRONEUSNICKNAME, "%s :Erroneous nickname", newnick.c_str());
+			this->SendRaw(ERR_ERRONEUSNICKNAME, conf->ServerName.c_str(), newnick.c_str());
 			MODULARIZE_FUNCTION(I_OnBadNickChange, OnBadNickChange(newnick.c_str());
 			return -1;
 		}
@@ -73,6 +73,12 @@ int User::ChangeNick(const std::string& newnick)
 	return 0;
 }
 
+/*
+ * Is this depreciated with all the numerics defined as string constants?
+ * It also doesn't appear to have the correct numeric format...
+ * Correct numeric format is :<server> <numeric> <target> <other params|:text>
+ * - Stealth
+ */
 int User::SendNumeric(int numeric, const char* text, ...)
 {
 	if (text == NULL || !numeric)

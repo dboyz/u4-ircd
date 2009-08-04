@@ -143,3 +143,5 @@ void User::SendMOTD(void)
 	}
 	return;
 }
+
+/* CIA test. */

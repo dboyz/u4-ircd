@@ -28,7 +28,7 @@
  */
 class SocketEventHandler
 {
-public:
+ public:
 	/*
 	 * Maybe a type of event can be passed... but in any case,
 	 * the handleEvent() function would have to double-check
@@ -38,7 +38,7 @@ public:
 };
 
 /*
- * The point of SocketEngine is to facilitate listen()ing for 
+ * The point of SocketEngine is to facilitate listen()ing for
  * connections and handling received data.
  */
 
@@ -50,7 +50,7 @@ protected:
 	 * becomes a portable, default SocketEngine)
 	 */
 	SocketEngine();
-	
+
 	/*
 	 * A datatype to store necessary info
 	 */
@@ -76,29 +76,29 @@ protected:
 	 */
 	virtual void monitorSocket(SocketInfo& info) = 0;
 	virtual void unmonitorSocket(SocketInfo& info) = 0;
-public:
+ public:
 	/*
 	 * Pass this the module that will act as the SocketEngine.
 	 */
 	SocketEngine *create(Module& module);
-	
+
 	/*
 	 * Adds a socket to be monitored and an associated event handler.
 	 * This will add the information to the this->sockets list and
-	 * follow up by calling module-specific code. 
+	 * follow up by calling module-specific code.
 	 *
 	 * The socket will be monitored by the time this method returns.
 	 * As soon as monitoring is in place, the handler will be awoken;
-	 * it should check for events that may have happened while 
+	 * it should check for events that may have happened while
 	 * monitoring was being initialized.
 	 *
 	 * handler must be constructed using new, as removeSocket
 	 * will run the descructer and delete it.
 	 */
 	void addSocket(int socket, SocketEventHandler *handler);
-	
+
 	/*
-	 * Stops monitoring socket. This causes the associated 
+	 * Stops monitoring socket. This causes the associated
 	 * SocketEventHandler to be deleted/freed
 	 */
 	void removeSocket(int socket);

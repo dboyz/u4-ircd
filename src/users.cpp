@@ -78,6 +78,8 @@ int User::ChangeNick(const std::string& newnick)
  * It also doesn't appear to have the correct numeric format...
  * Correct numeric format is :<server> <numeric> <target> <other params|:text>
  * - Stealth
+ *
+ * It can be modified to send the proper format. -- David Kingston
  */
 int User::SendNumeric(int numeric, const char* text, ...)
 {
@@ -130,6 +132,7 @@ void User::SendMOTD(void)
 	{
 		this->SendRaw(RPL_MOTDSTART, conf->ServerName.c_str(), this->nick.c_str());
 		this->SendRaw(RPL_MOTD, conf->ServerName.c_str(), this->nick.c_str(). __DATE__, __TIME__);
+
 		for (files::iterator i = conf->MOTDFile.begin(); i != conf->MOTDFile.end(); i++)
 		{
 			this->SendRaw(RPL_MOTD, conf->ServerName.c_str(), this->nick.c_str(), i->c_str());

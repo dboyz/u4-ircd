@@ -122,18 +122,18 @@ void User::SendMOTD(void)
 {
 	if (!conf->MOTDFile.size())
 	{
-		this->SendNumeric(ERR_NOMOTD, "MOTD file is missing");
+		this->SendNumeric(ERR_NOMOTD, conf->ServerName.c_str(), this->nick.cstr());
 		MODULARIZE_FUNCTION(I_OnFailedMOTD, OnFailedMOTD());
 		return;
 	}
 	else
 	{
+		this->SendRaw(RPL_MOTDSTART, conf->ServerName.c_str(), this->nick.c_str());
+		this->SendRaw(RPL_MOTD, conf->ServerName.c_str(), this->nick.c_str(). __DATE__, __TIME__);
 		for (files::iterator i = conf->MOTDFile.begin(); i != conf->MOTDFile.end(); i++)
 		{
-			this->SendNumeric(RPL_MOTDSTART, ":- %s Message of the Day -", conf->ServerName.c_str());
-			this->SendNumeric(RPL_MOTD, ":- %s %s", __DATE__, __TIME__);
-			this->SendNumeric(RPL_MOTD, ":- %s", i->c_str());
-			this->SendNumeric(RPL_ENDOFMOTD, "End of /MOTD");
+			this->SendRaw(RPL_MOTD, conf->ServerName.c_str(), this->nick.c_str(), i->c_str());
+			this->SendRaw(RPL_ENDOFMOTD, conf->ServerName.c_str(), this->nick.c_str());
 
 			MODULARIZE_FUNCTION(I_OnMOTDSend, OnMOTDSend());
 		}

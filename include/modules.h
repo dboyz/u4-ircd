@@ -15,6 +15,9 @@
 *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef _UNREALIRCD_MODULES_H
+#define _UNREALIRCD_MODULES_H
+
 enum ModuleTypes
 {
 	/* If a module type is STATIC, it CANNOT be unloaded by ANY
@@ -31,3 +34,5 @@ enum ModuleTypes
 	*/
 	VENDOR
 };
+
+#endif

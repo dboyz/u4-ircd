@@ -15,6 +15,9 @@
 *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef _UNREALIRCD_USER_H
+#define _UNREALIRCD_USER_H
+
 #include <iostream>
 
 class User
@@ -90,3 +93,5 @@ class User
 	*/
 	void SendMOTD(void);
 };
+
+#endif

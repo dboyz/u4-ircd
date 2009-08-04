@@ -15,9 +15,13 @@
 *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef _UNREALIRCD_INTERNAL_H
+#define _UNREALIRCD_INTERNAL_H
 
 /* Defines the BUFSIZE to be used in some functions,
 *  mainly for extra parameter handling, feel free
 *  to use this.
 */
 #define BUFSIZE 512
+
+#endif

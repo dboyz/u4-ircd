@@ -34,4 +34,5 @@ pkginclude_HEADERS = \
 
 unrealircd_SOURCES = \
 	src/channels.cpp \
-	src/users.cpp
+	src/users.cpp \
+	src/socketengine.cpp

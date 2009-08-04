@@ -20,7 +20,7 @@
 
 #include "modules.h"
 
-#include <list>
+#include <vector>
 
 /*
  * This class is used to define different actions for when
@@ -80,7 +80,7 @@ protected:
 	/*
 	 * Pass this the module that will act as the SocketEngine.
 	 */
-	SocketEngine *create(Module& module);
+	static SocketEngine *create(Module& module) throws;
 
 	/*
 	 * Adds a socket to be monitored and an associated event handler.

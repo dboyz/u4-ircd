@@ -62,7 +62,7 @@ protected:
 	/*
 	 * Stores all monitored sockets
 	 */
-	std::list<SocketInfo> sockets;
+	std::vector<SocketInfo> sockets;
 
 	/*
 	 * Methods to be called by the underlying module

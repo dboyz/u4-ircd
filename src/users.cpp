@@ -122,7 +122,7 @@ void User::SendMOTD(void)
 {
 	if (!conf->MOTDFile.size())
 	{
-		this->SendNumeric(ERR_NOMOTD, conf->ServerName.c_str(), this->nick.cstr());
+		this->SendRaw(ERR_NOMOTD, conf->ServerName.c_str(), this->nick.cstr());
 		MODULARIZE_FUNCTION(I_OnFailedMOTD, OnFailedMOTD());
 		return;
 	}

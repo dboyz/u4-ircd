@@ -15,7 +15,7 @@
 *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "socketengine.cpp"
+#include "socketengine.h"
 
 SocketEngine
 SocketEngine::create(Module& module)

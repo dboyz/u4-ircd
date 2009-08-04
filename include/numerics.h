@@ -15,6 +15,9 @@
 *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef _UNREALIRCD_NUMERICS_H
+#define _UNREALIRCD_NUMERICS_H
+
 /*
  * Numeric Constants
  * KEEP THESE IN ORDER it'll make things easier later.
@@ -254,3 +257,5 @@
 #define ERR_CANNOTDOCOMMAND		":%s 972 %s %s :%s"
 #define ERR_CANNOTCHANGECHANMODE	":%s 974 %s %c :%s"
 #define ERR_NUMERICERR			":%s 999 %s Numeric error!"
+
+#endif

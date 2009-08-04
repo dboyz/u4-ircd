@@ -21,11 +21,8 @@ bool Channel::isValidChannel(const std::string& channame)
 	{
 		return false;
 	}
-	else
-	{
-		MODULARIZE_FUNCTION(I_OnValidChannelCheck, OnValidChannelCheck(channame.c_str());
-		return true;
-	}
+	MODULARIZE_FUNCTION(I_OnValidChannelCheck, OnValidChannelCheck(channame.c_str()) );
+	return true;
 }
 
 int Channel::KickUser(User * from, User * to, const std::string& reason)
@@ -34,8 +31,5 @@ int Channel::KickUser(User * from, User * to, const std::string& reason)
 	{
 		return -1;
 	}
-	else
-	{
-		MODULARIZE_FUNCTION(I_OnUserKick, OnUserKick(from, to, reason.c_str());
-	}
+	MODULARIZE_FUNCTION(I_OnUserKick, OnUserKick(from, to, reason.c_str());
 }

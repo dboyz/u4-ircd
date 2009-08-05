@@ -66,17 +66,17 @@ extern "C"
  * to store the name and a function which returns a nice, shiny
  * (like KVIRC) object for us.
  */
-class ModularObjectInstantiater
+class ModularObjectInstantiator
 {
 private:
 	std::string name;
 public:
-	ModularObjectInstantiater(std::string name);
+	ModularObjectInstantiator(std::string name);
 	
 	/* Encapsulation -- or no encapsulation? */
 	const std::string getName();
 	virtual void *instantiateObject() = 0;
-}
+};
 
 /*
  * The parent class of all modules.
@@ -101,7 +101,7 @@ private:
 	 * for the use of getObject(); -- to store objectInstantiators
 	 * to allow us to instantiate arbitrary objects
 	 */
-	std::vector<ModularObjectInstantiater> instantiaters;
+	std::vector<ModularObjectInstantiator*> instantiators;
 
 protected:
 	/*
@@ -133,9 +133,12 @@ protected:
 	 * for use by the Module::getObject() method. Modules
 	 * have no need to unexport objects.
 	 *
+	 * You must use new to instantiate the loader, we'll
+	 * delete it for you.
+	 *
 	 * returns false on error
 	 */
-	bool exportObject(ModularObjectInstantiater& loader);
+	bool exportObject(ModularObjectInstantiator* loader);
 
 public:
 	Module();
@@ -166,6 +169,6 @@ public:
 	 * Unloads a module. Will fail if the module is STATIC.
 	 */
 	void close();
-}
+};
 
 #endif

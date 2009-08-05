@@ -17,6 +17,8 @@
 
 #include "modules.h"
 
+#include <iostream>
+
 extern "C"
 {
 	#include <dlfcn.h>
@@ -25,14 +27,14 @@ extern "C"
 /*
  * ModularObjectInstantiater
  */
-ModularObjectInstantiater::ModularObjectInstantiater(std::string name)
+ModularObjectInstantiator::ModularObjectInstantiator(std::string name)
 {
 	this->name = name;
 }
 
 /* Encapsulation -- or no encapsulation? */
-std::string
-ModularObjectInstantiater::getName()
+const std::string
+ModularObjectInstantiator::getName()
 {
 	return name;
 }
@@ -42,15 +44,15 @@ ModularObjectInstantiater::getName()
  */
 
 bool
-Module::exportObject(ModularObjectInstantiator loader)
+Module::exportObject(ModularObjectInstantiator* loader)
 {
-	for(std::vector<ModularObjectInstantiator>::iterator i = instantiators.begin; i != instantiators.end; i ++)
-		if(loader.getName() == i->getName())
+	for(std::vector<ModularObjectInstantiator*>::iterator i = instantiators.begin(); i != instantiators.end(); i ++)
+		if(loader->getName() == (*i)->getName())
 		{
-			std::err << "Module" << name << "Attempted to export different version of " << (i->getName()) << std::endl;
+			std::cerr << "Module" << name << "Attempted to export different version of " << (*i)->getName() << std::endl;
 			return false;
 		}
-	instantiaters.push_back(loader);
+	instantiators.push_back(loader);
 	return true;
 }
 
@@ -67,7 +69,7 @@ load(std::string moduleSpec)
 	 * No lazy linking: we want to die with an undefined symbol
 	 * as early as possible.
 	 */
-	void *dl_handle = dlopen(moduleSpec, RTLD_NOW);
+	void *dl_handle = dlopen(moduleSpec.c_str(), RTLD_NOW);
 	if(!dl_handle)
 		(*(int *)0) ++;
 	/*
@@ -80,7 +82,6 @@ load(std::string moduleSpec)
 /*
  * dl_handle is initialized by load()
  */
-Module
 Module::Module()
 	: dl_handle(NULL)
 {

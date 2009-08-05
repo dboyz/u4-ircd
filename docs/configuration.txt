@@ -15,13 +15,39 @@ Name of the network this server belongs to.
 Stored in conf->NetName
 
 
-LISTEN BLOCK
+
+LOADMODULE
+loadmodule <modulename>
+Loads the specified module. Unreal will append a suffix if 
+set::module-suffix is specified.
+
+
+
+LISTEN BLOCK (required)
 Open ports for clients and servers to connect to.
 listen::bind-ip
 IP to bind to. Setting this to * will bind to all IPs available.
 
-listen::port
+listen::port (required)
 Port to listen on.
+
+
+
+ADMIN BLOCK
+Server administrative info
+
+admin::name (required)
+The name of the server administrator.
+Stored in conf->AdminName
+
+admin::nick (required)
+The nickname of the server administrator
+Stored in conf->AdminNick
+
+admin::email (required)
+Administrative email for this server.
+Stored in conf->AdminEmail
+
 
 
 ALLOW BLOCK
@@ -54,6 +80,12 @@ allow::ssl (optional)
 Require matching users to be connected with SSL.
 
 
+
 SET BLOCK
-set::email-address
+set::email-address (required)
 Admin email address. Sent to users when they are banned from the server.
+Stored in conf->Email
+
+set::module-suffix (optional)
+The suffix to be automatically appended to the end of module names.
+Stored in conf->ModuleSuffix

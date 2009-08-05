@@ -62,6 +62,10 @@ allow::pingfreq (required)
 The number of seconds between PINGs from the server. Something between 90 and
 180 is recommended.
 
+allow::maxchannelsperuser (recommended)
+Maximum number of channels a user may be in at one time. If this is not set or
+is 0, a user may be in an unlimited amount of channels.
+
 allow::maxperip (recommended)
 Maximum allowed connections per IP. Not setting this or setting this to 0 will
 make an unlimited number of connections possible from a single host.
@@ -89,3 +93,33 @@ Stored in conf->Email
 set::module-suffix (optional)
 The suffix to be automatically appended to the end of module names.
 Stored in conf->ModuleSuffix
+
+set::static-quit (optional)
+Disable the ability for clients to send their own quit message.
+Stored in conf->StaticQuit
+
+set::prefix-quit (optional)
+Sets a prefix for all quit messages.
+Stored in conf->PrefixQuit
+
+set::allow-userhost-change (optional)
+Valid options are never, always, not-on-channels, and force-rejoin.
+Defines the action to be taken when a client changes their user@host.
+Stored in conf->UHChange
+
+set::flat-map (optional)
+Defines how MAP should be sent to users. When set to yes, the map is flat.
+Stored in conf->FlatMap (boolean)
+
+set::dont-resolve (optional)
+If set to yes, hosts of connecting clients will not be resolved.
+Stored in conf->ResolveHosts (boolean)
+
+set::default-bantime (recommended)
+Defines the default bantime for server bans.
+Stored in conf->DefBanTime (as seconds)
+
+set::maxbantime (recommended)
+Sets the maximum bantime for server bans. Services are exempt. This value must
+be greater than or equal to set::default-bantime.
+Stored in conf->MaxBanTime (as seconds)

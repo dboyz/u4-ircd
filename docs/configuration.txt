@@ -1,0 +1,59 @@
+ME BLOCK
+Defines basic information about your IRC server.
+
+me::name (required)
+The name of the server. This must be a fully qualified domain name
+(example: irc.example.com)
+Stored in conf->ServerName
+
+me::description (required)
+This is the description of the server.
+Stored in conf->ServerDesc
+
+me::network (required)
+Name of the network this server belongs to.
+Stored in conf->NetName
+
+
+LISTEN BLOCK
+Open ports for clients and servers to connect to.
+listen::bind-ip
+IP to bind to. Setting this to * will bind to all IPs available.
+
+listen::port
+Port to listen on.
+
+
+ALLOW BLOCK
+Defines who may connect to your server, and options for matching connections.
+You may have as many of these as desired.
+
+allow::from::userhost (required)
+This defines who is allowed to connect to the server. An allow block may have
+as many of these as desiered.
+
+allow::pingfreq (required)
+The number of seconds between PINGs from the server. Something between 90 and
+180 is recommended.
+
+allow::maxperip (recommended)
+Maximum allowed connections per IP. Not setting this or setting this to 0 will
+make an unlimited number of connections possible from a single host.
+
+allow::maxclients (optional)
+A soft limit of how many clients may be connected matching this allow block.
+
+allow::password (optional)
+A password required to connect. If the password is incorrect, the IRCd will
+attempt to match the user to other allow blocks.
+
+allow::useip (optional)
+Do not do DNS lookups for users matching this allow.
+
+allow::ssl (optional)
+Require matching users to be connected with SSL.
+
+
+SET BLOCK
+set::email-address
+Admin email address. Sent to users when they are banned from the server.

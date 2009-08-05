@@ -101,7 +101,7 @@ private:
 	 * for the use of getObject(); -- to store objectInstantiators
 	 * to allow us to instantiate arbitrary objects
 	 */
-	std::vector<ModularObjectInstantiater> instantiaters
+	std::vector<ModularObjectInstantiater> instantiaters;
 
 protected:
 	/*
@@ -135,12 +135,12 @@ protected:
 	 *
 	 * returns false on error
 	 */
-	bool exportObject(ModularObjectInstantiater loader);
-	
+	bool exportObject(ModularObjectInstantiater& loader);
+
 public:
 	Module();
 	/*
-	 * Loads module specified by moduleSpec. This prepares 
+	 * Loads module specified by moduleSpec. This prepares
 	 * the configuration engine to feed the module, but it
 	 * isn't started until start() is called.
 	 *

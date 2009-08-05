@@ -13,3 +13,40 @@ Legend:
 [~] Get a socket engine going (select() first?)
 [ ] Create 3.2-style numeric sending (see src/s_err.c in 3.2)
 [ ] Main core (waiting for more developers to arrive)
+[ ] Commands needed in the core:
+    [ ] ADMIN
+    [ ] AWAY
+    [ ] CLOSE
+    [ ] GLINE
+    [ ] INVITE
+    [ ] ISON
+    [ ] JOIN   
+    [ ] KICK
+    [ ] KILL
+    [ ] KNOCK
+    [ ] LINKS
+    [ ] LIST
+    [ ] LUSERS
+    [ ] MAP
+    [ ] MODE
+    [ ] MODULES
+    [ ] MOTD
+    [ ] NAMES
+    [ ] NICK
+    [ ] NOTICE
+    [ ] OPER
+    [ ] PART
+    [ ] PASS
+    [ ] PING
+    [ ] PONG
+    [ ] PRIVMSG
+    [ ] QUIT
+    [ ] REHASH
+    [ ] TOPIC
+    [ ] USER
+    [ ] VERSION
+    [ ] WHO
+    [ ] WHOIS
+    [ ] WHOWAS
+    [ ] WATCH
+    [ ] ZLINE

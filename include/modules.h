@@ -24,7 +24,7 @@
 enum ModuleTypes
 {
 	/* If a module type is STATIC, it CANNOT be unloaded by ANY
-	*  means.
+	*  means. We should use this for core modules. --David Kingston
 	*/
 	STATIC,
 	/* If a module type is NOTVENDOR, it is treated as any other

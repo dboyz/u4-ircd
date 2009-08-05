@@ -11,7 +11,8 @@ Legend:
 
 [~] Work on user management (use std::string for simple things (nicks, gecos's, etc))
 [~] Get a socket engine going (select() first?)
-[ ] Create 3.2-style numeric sending (see src/s_err.c in 3.2)
+[X] Create 3.2-style numeric sending (see src/s_err.c in 3.2)
+[ ] Make sure each function has a Pre-Event and regular event associated with it.
 [ ] Main core (waiting for more developers to arrive)
 [ ] Commands needed in the core:
     [ ] ADMIN

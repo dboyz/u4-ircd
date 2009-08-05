@@ -42,6 +42,7 @@ Legend:
     [ ] PRIVMSG
     [ ] QUIT
     [ ] REHASH
+    [ ] SILENCE
     [ ] TOPIC
     [ ] USER
     [ ] VERSION

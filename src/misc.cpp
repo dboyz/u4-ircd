@@ -19,7 +19,6 @@
 
 std::string ConvertIntToString(int value)
 {
-	std::stringstream s;
-	s << value;
+	std::stringstream s << value;
 	return s.str();
 }

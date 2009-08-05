@@ -62,6 +62,9 @@ load(std::string moduleSpec)
 	 * TODO: expand this to support guessing filename suffixes.
 	 * Mabye we should force a filenameing convention on users :-D
 	 *
+	 * Stealth thinks maybe there should be a conf->DefaultModuleSuffix
+	 * for modules. Users may then set .so or .dll and get lazy :D
+	 *
 	 * No lazy linking: we want to die with an undefined symbol
 	 * as early as possible.
 	 */
@@ -70,7 +73,7 @@ load(std::string moduleSpec)
 		(*(int *)0) ++;
 	/*
 	 * ...
-	 * I shouldn't implement any more of my module interface until 
+	 * I shouldn't implement any more of my module interface until
 	 * it gets approval and is argued about in #unreal-devel
 	 */
 }

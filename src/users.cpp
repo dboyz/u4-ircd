@@ -80,12 +80,12 @@ bool User::isValidNick(const std::string& nick)
 	return true;
 }
 
-int User::SendRaw(const char* text, ...)
+int User::SendRaw(const std::string& text, ...)
 {
 	va_list args;
 	static char buf[BUFSIZE];
-	va_start(args, text);
-	vsnprintf(buf, sizeof(buf), text, args);
+	va_start(args, text.c_str());
+	vsnprintf(buf, sizeof(buf), text.c_str(), args);
 	va_end(args);
 
 	MODULARIZE_FUNCTION(I_OnPreSendRaw, OnPreSendRaw(buf));

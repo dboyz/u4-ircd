@@ -84,9 +84,14 @@ int User::SendRaw(const std::string& text, ...)
 {
 	va_list args;
 	static char buf[BUFSIZE];
-	va_start(args, text.c_str());
-	vsnprintf(buf, sizeof(buf), text.c_str(), args);
+	size_t desired_length;
+	
+	va_start(args, text);
+	desired_length = vsnprintf(buf, sizeof(buf), text.c_str(), args);
 	va_end(args);
+
+	if(desired_length >= BUFSIZE) /* desired_length excludes the NULL terminator */
+		std::cerr << __FILE__ << ":" << __LINE__ << "Sending truncated message" << std::endl;
 
 	MODULARIZE_FUNCTION(I_OnPreSendRaw, OnPreSendRaw(buf));
 	MODULARIZE_FUNCTION(I_OnSendRaw, OnSendRaw(buf));

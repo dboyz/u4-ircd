@@ -88,6 +88,7 @@ int User::SendRaw(const char* text, ...)
 	vsnprintf(buf, sizeof(buf), text, args);
 	va_end(args);
 
+	MODULARIZE_FUNCTION(I_OnPreSendRaw, OnPreSendRaw(buf));
 	MODULARIZE_FUNCTION(I_OnSendRaw, OnSendRaw(buf));
 
 	return 0;

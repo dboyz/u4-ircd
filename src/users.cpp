@@ -87,14 +87,44 @@ int User::SendRaw(const std::string& text, ...)
 	size_t desired_length;
 	
 	va_start(args, text);
-	desired_length = vsnprintf(buf, sizeof(buf), text.c_str(), args);
+	desired_length = vsnprintf(buf, BUFSIZE - 1, text.c_str(), args);
 	va_end(args);
 
-	if(desired_length >= BUFSIZE) /* desired_length excludes the NULL terminator */
+	/*
+	 * desired_length excludes the NULL terminator that snprintf places at the
+	 * end of the text it copies.
+	 */
+	if(desired_length > BUFSIZE - 2)
+	{
 		std::cerr << __FILE__ << ":" << __LINE__ << "Sending truncated message" << std::endl;
+		desired_length = BUFSIZE - 2;
+	}
+	
+	
+	/*
+	 * The last two bytes of buf that are sent will be '\0' and then an uninitialized char.
+	 * We reset it to "\r\n". We also place a NULL after "\r\n"
+	 */
+	buf[desired_length] = '\r';
+	buf[desired_length + 1] = '\n';
 
-	MODULARIZE_FUNCTION(I_OnPreSendRaw, OnPreSendRaw(buf));
-	MODULARIZE_FUNCTION(I_OnSendRaw, OnSendRaw(buf));
+	/* 
+	 * now desired_length refers to the number of bytes to send to
+	 * the client.
+	 */
+	desired_length += 2;
+	/* 
+	 * This hook may post-process the message. Currently, it is limited to
+	 * editing buf[0 through BUFSIZE]. It must edit desired_length and deal 
+	 * with "\n\r" if it changes the length of the message.
+	 */
+	MODULARIZE_FUNCTION(I_OnPreSendRaw, OnPreSendRaw(buf, &desired_length));
+	/*
+	 * This hook must actually send the message (without
+	 * sending the NULL terminator). (NULL terminator allows the size of
+	 * buf to be determined).
+	 */
+	MODULARIZE_FUNCTION(I_OnSendRaw, OnSendRaw(buf, desired_length));
 
 	return 0;
 }

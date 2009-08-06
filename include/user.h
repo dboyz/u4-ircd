@@ -78,7 +78,7 @@ class User
 	*  text - The text to send.
 	*  ... - Any number of parameters.
 	*/
-	int SendRaw(const char* text, ...);
+	int SendRaw(const std::string& text, ...);
 
 	/* Sends the MOTD (if there is any) to the user.
 	*  Parameters: None.

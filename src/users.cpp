@@ -118,16 +118,16 @@ void User::SendMOTD(void)
 	return;
 }
 
-void User::SendAdmin(void)
+void User::SendAdminInfo(void)
 {
-	MODULARIZE_FUNCTION(I_OnPreADMINSend, OnPreADMINSend());
+	MODULARIZE_FUNCTION(I_OnPreSendAdminInfo, OnPreSendAdminInfo());
 
 	this->SendRaw(RPL_ADMINME, conf->ServerName.c_str(), this->nick.c_str(), conf->ServerName.c_str());
 	this->SendRaw(RPL_ADMINNAME, conf->ServerName.c_str(), this->nick.c_str(), conf->AdminName.c_str());
 	this->SendRaw(RPL_ADMINNICK, conf->ServerName.c_str(), this->nick.c_str(), conf->AdminNick.c_str());
 	this->SendRaw(RPL_ADMINEMAIL, conf->ServerName.c_str(), this->nick.c_str(), conf->AdminEmail.c_str());
 
-	MODULARIZE_FUNCTION(I_OnADMINSend, OnADMINSend());
+	MODULARIZE_FUNCTION(I_OnSendAdminInfo, OnSendAdminInfo());
 
 	return;
 }

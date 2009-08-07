@@ -142,7 +142,7 @@ void User::SendMOTD(void)
 		this->SendRaw(RPL_MOTDSTART, conf->ServerName.c_str(), this->nick.c_str());
 		this->SendRaw(RPL_MOTD, conf->ServerName.c_str(), this->nick.c_str(). __DATE__, __TIME__);
 
-		for (files::iterator i = conf->MOTDFile.begin(); i != conf->MOTDFile.end(); i++)
+		for (files::const_iterator i = conf->MOTDFile.begin(); i != conf->MOTDFile.end(); i++)
 		{
 			this->SendRaw(RPL_MOTD, conf->ServerName.c_str(), this->nick.c_str(), i->c_str());
 			this->SendRaw(RPL_ENDOFMOTD, conf->ServerName.c_str(), this->nick.c_str());

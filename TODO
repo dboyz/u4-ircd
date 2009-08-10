@@ -14,6 +14,7 @@ Legend:
 [X] Create 3.2-style numeric sending (see src/s_err.c in 3.2)
 [ ] Make sure each function has a Pre-Event and regular event associated with it.
 [ ] Main core (waiting for more developers to arrive)
+[ ] Configuration parser (3.2-style, core directives are in doc/configuration.txt)
 [ ] Commands needed in the core:
     [ ] ADMIN
     [ ] AWAY

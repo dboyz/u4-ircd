@@ -129,3 +129,8 @@ Sets the maximum nick length that clients can use. This may not be greater
 than 50. If a value over 50 is specified, 50 will be used. Opers may not
 override this value.
 Stored in conf->NickLen
+
+set::chanlen (required)
+Sets the maximum channel length that may be used. This may not be greater than
+50, which includes #. If a value over 50 is specified, 50 will be used.
+Stored in conf->ChanLen

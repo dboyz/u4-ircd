@@ -66,7 +66,7 @@ extern "C"
 class ModularObject
 {
   
-}
+};
 
 /*
  * The parent class of all objects which are able to

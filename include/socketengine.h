@@ -60,6 +60,7 @@ public:
  */
 
 class SocketEngine
+: ModularObject
 {
 private:
 	/*

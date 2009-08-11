@@ -58,6 +58,17 @@ extern "C"
 }
 
 /*
+ * The parent class of all ModularObjects that can be instantiated 
+ * by ModularObjectInstantiator.
+ * Any methods needed in here may be added later. Currently, this
+ * is just because dynamic_cast<>() can't convert void* to Object*
+ */
+class ModularObject
+{
+  
+}
+
+/*
  * The parent class of all objects which are able to
  * instantiate an object for the use of Module::getObject().
  *
@@ -75,7 +86,7 @@ public:
 	
 	/* Encapsulation -- or no encapsulation? */
 	const std::string getName();
-	virtual void *instantiateObject() = 0;
+	virtual ModularObject *instantiateObject() = 0;
 };
 
 /*
@@ -163,7 +174,7 @@ public:
 	 * Gets an object that this module provides. This is, for example
 	 * used by SocketEngine::create()
 	 */
-	void *getObject(std::string);
+	ModularObject *getObject(std::string);
 	
 	/*
 	 * Unloads a module. Will fail if the module is STATIC.

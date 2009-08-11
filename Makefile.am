@@ -27,6 +27,7 @@ bin_PROGRAMS = unrealircd
 pkginclude_HEADERS = \
 	include/config.h \
 	include/internal.h \
+	include/misc.h \
 	include/modules.h \
 	include/numerics.h \
 	include/socketengine.h \

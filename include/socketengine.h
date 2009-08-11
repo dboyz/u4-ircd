@@ -21,6 +21,8 @@
 #include "modules.h"
 
 #include <vector>
+#include <stdexcept>
+#include <typeinfo>
 
 /*
  * This class is used to define different actions for when
@@ -38,12 +40,40 @@ class SocketEventHandler
 };
 
 /*
+ * For SocketEngine
+ * A datatype to store necessary information about
+ * a monitored socket.
+ */
+class SocketInfo
+{
+public:
+	int socket;
+	SocketEventHandler *handler;
+	
+	SocketInfo(int socket, SocketEventHandler *handler);
+};
+
+
+/*
  * The point of SocketEngine is to facilitate listen()ing for
  * connections and handling received data.
  */
 
 class SocketEngine
 {
+private:
+	/*
+	 * tells if a given socket is registered with the SocketEngine
+	 */
+	bool SocketInfoRegistered(int socket);
+	
+	/* 
+	 * Gets a SocketInfo from std::vector<SocketInfo> sockets
+	 * based on the socket.
+	 */
+	SocketInfo &getSocketInfo(int socket) throw(std::runtime_error);
+	
+	
 protected:
 	/*
 	 * Only children may be instantiated (unless if this class
@@ -51,14 +81,6 @@ protected:
 	 */
 	SocketEngine();
 
-	/*
-	 * A datatype to store necessary info
-	 */
-	struct SocketInfo
-	{
-		int socket;
-		SocketEventHandler *handler;
-	};
 	/*
 	 * Stores all monitored sockets
 	 */
@@ -68,7 +90,7 @@ protected:
 	 * Methods to be called by the underlying module
 	 * when something happens to a socket.
 	 */
-	void runEventHandler(int socket);
+	void runEventHandler(int socket) throw(std::runtime_error);
 	void runEventHandler(SocketInfo& socket);
 
 	/*
@@ -80,7 +102,7 @@ protected:
 	/*
 	 * Pass this the module that will act as the SocketEngine.
 	 */
-	static SocketEngine *create(Module& module) throws;
+	static SocketEngine *create(Module& module) throw (std::bad_cast);
 
 	/*
 	 * Adds a socket to be monitored and an associated event handler.

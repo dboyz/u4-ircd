@@ -15,13 +15,11 @@
 *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "misc.h"
+#ifndef _UNREALIRCD_MISC_H
+#define _UNREALIRCD_MISC_H
 
-#include <sstream>
+#include <string>
 
-std::string ConvertIntToString(int value)
-{
-	std::stringstream s;
-	s << value;
-	return s.str();
-}
+std::string ConvertIntToString(int value);
+
+#endif

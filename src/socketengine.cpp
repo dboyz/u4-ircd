@@ -16,7 +16,7 @@
 */
 
 #include "socketengine.h"
-
+#include "misc.h"
 
 SocketInfo::SocketInfo(int socket_, SocketEventHandler *handler_)
 	: socket(socket_), 

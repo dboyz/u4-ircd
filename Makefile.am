@@ -25,6 +25,7 @@ bin_PROGRAMS = unrealircd
 # this is pkginclude because these headers are needed
 # by modules that will be compiled against UnrealIRCd-CPP
 pkginclude_HEADERS = \
+	include/channel.h \
 	include/config.h \
 	include/internal.h \
 	include/misc.h \

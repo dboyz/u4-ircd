@@ -15,23 +15,26 @@
 *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "channel.h"
+#ifndef _UNREALIRCD_CHANNEL_H
+#define _UNREALIRCD_CHANNEL_H
 
-bool Channel::isValidChannel(const std::string& channame)
-{
-	if (channame.c_str() == NULL)
-	{
-		return false;
-	}
-	MODULARIZE_FUNCTION(I_OnValidChannelCheck, OnValidChannelCheck(channame.c_str()) );
-	return true;
-}
+#include "user.h"
 
-int Channel::KickUser(User * from, User * to, const std::string& reason)
+#include <string>
+
+class Channel
 {
-	if (!from || !to || reason.c_str() == NULL)
-	{
-		return -1;
-	}
-	MODULARIZE_FUNCTION(I_OnUserKick, OnUserKick(from, to, reason.c_str());
-}
+public:
+	/*
+	 * returns true if this channel name is allowed on this
+	 * server. Uses I_OnValidChannelCheck hook.
+	 */
+	bool isValidChannel(const std::string& channame);
+	
+	/*
+	 * kicks user from channel. Uses I_OnUserKick hook.
+	 */
+	int KickUser(User *from, User *to, const std::string& reason);
+};
+
+#endif

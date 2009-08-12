@@ -40,6 +40,16 @@ ModularObjectInstantiator::getName()
 }
 
 /*
+ * ModularObject
+ */
+void
+ModularObject::forceRTTIGeneration()
+{
+}
+
+
+
+/*
  * Module
  */
 

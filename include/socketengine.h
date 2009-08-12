@@ -59,8 +59,8 @@ public:
  * connections and handling received data.
  */
 
-class SocketEngine
-: ModularObject
+class SocketEngine 
+	: public ModularObject
 {
 private:
 	/*

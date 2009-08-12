@@ -65,7 +65,12 @@ extern "C"
  */
 class ModularObject
 {
-  
+private:
+	/*
+	 * An object apparently needs a virtual method
+	 * before RTTI is generated for it by the compiler.
+	 */
+	virtual void forceRTTIGeneration();
 };
 
 /*

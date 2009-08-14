@@ -38,6 +38,18 @@ enum ModuleTypes
 	VENDOR
 };
 
+/* Module enums for the MODULARIZE_FUNCTION macro.
+*  You may add the I_* here if you make a new hook.
+*/
+
+enum ModuleHooks
+{
+	I_OnValidChannelCheck,
+	I_OnMOTDSend,
+	I_OnFailedMOTD,
+	I_OnSendRaw
+};
+
 /*
  * Every module must have these C-style functions. The let us probe it
  * without needing to deal with mangled junk.

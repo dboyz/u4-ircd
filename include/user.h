@@ -84,6 +84,11 @@ class User
 	*  Parameters: None.
 	*/
 	void SendMOTD(void);
+
+	/* Sends the ADMIN information to the user.
+	*  Parameters: None.
+	*/
+	void SendAdminInfo(void);
 };
 
 #endif

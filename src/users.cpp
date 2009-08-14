@@ -85,7 +85,7 @@ int User::SendRaw(const std::string& text, ...)
 	va_list args;
 	static char buf[BUFSIZE];
 	size_t desired_length;
-	
+
 	va_start(args, text);
 	desired_length = vsnprintf(buf, BUFSIZE - 1, text.c_str(), args);
 	va_end(args);
@@ -99,8 +99,8 @@ int User::SendRaw(const std::string& text, ...)
 		std::cerr << __FILE__ << ":" << __LINE__ << "Sending truncated message" << std::endl;
 		desired_length = BUFSIZE - 2;
 	}
-	
-	
+
+
 	/*
 	 * The last two bytes of buf that are sent will be '\0' and then an uninitialized char.
 	 * We reset it to "\r\n". We also place a NULL after "\r\n"
@@ -108,14 +108,14 @@ int User::SendRaw(const std::string& text, ...)
 	buf[desired_length] = '\r';
 	buf[desired_length + 1] = '\n';
 
-	/* 
+	/*
 	 * now desired_length refers to the number of bytes to send to
 	 * the client.
 	 */
 	desired_length += 2;
-	/* 
+	/*
 	 * This hook may post-process the message. Currently, it is limited to
-	 * editing buf[0 through BUFSIZE]. It must edit desired_length and deal 
+	 * editing buf[0 through BUFSIZE]. It must edit desired_length and deal
 	 * with "\n\r" if it changes the length of the message.
 	 */
 	MODULARIZE_FUNCTION(I_OnPreSendRaw, OnPreSendRaw(buf, &desired_length));
@@ -140,6 +140,7 @@ void User::SendMOTD(void)
 	else
 	{
 		this->SendRaw(RPL_MOTDSTART, conf->ServerName.c_str(), this->nick.c_str());
+		// We need to fix the DATE and TIME in this. -- Stealth
 		this->SendRaw(RPL_MOTD, conf->ServerName.c_str(), this->nick.c_str(). __DATE__, __TIME__);
 
 		for (files::const_iterator i = conf->MOTDFile.begin(); i != conf->MOTDFile.end(); i++)

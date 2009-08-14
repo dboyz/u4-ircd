@@ -18,6 +18,7 @@
 #include "user.h"
 #include "numerics.h"
 #include "internal.h"
+#include "modules.h"
 #include <iostream>
 #include <cstdarg>
 #include <cstdio>

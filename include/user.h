@@ -83,7 +83,7 @@ class User
 	/* Sends the MOTD (if there is any) to the user.
 	*  Parameters: None.
 	*/
-	void SendMOTD(void);
+	int SendMOTD(void);
 
 	/* Sends the ADMIN information to the user.
 	*  Parameters: None.

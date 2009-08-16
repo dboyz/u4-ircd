@@ -142,7 +142,7 @@ void User::SendMOTD(void)
 	{
 		this->SendRaw(RPL_MOTDSTART, conf->ServerName.c_str(), this->nick.c_str());
 		// We need to fix the DATE and TIME in this. -- Stealth
-		this->SendRaw(RPL_MOTD, conf->ServerName.c_str(), this->nick.c_str(). __DATE__, __TIME__);
+		this->SendRaw(RPL_MOTD, conf->ServerName.c_str(), this->nick.c_str(), __DATE__, __TIME__);
 
 		for (files::const_iterator i = conf->MOTDFile.begin(); i != conf->MOTDFile.end(); i++)
 		{

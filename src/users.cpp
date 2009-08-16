@@ -130,13 +130,13 @@ int User::SendRaw(const std::string& text, ...)
 	return 0;
 }
 
-void User::SendMOTD(void)
+int User::SendMOTD(void)
 {
 	if (!conf->MOTDFile.size())
 	{
 		this->SendRaw(ERR_NOMOTD, conf->ServerName.c_str(), this->nick.c_str());
 		MODULARIZE_FUNCTION(I_OnFailedMOTD, OnFailedMOTD());
-		return;
+		return -1;
 	}
 	else
 	{
@@ -152,7 +152,7 @@ void User::SendMOTD(void)
 			MODULARIZE_FUNCTION(I_OnMOTDSend, OnMOTDSend());
 		}
 	}
-	return;
+	return 0;
 }
 
 void User::SendAdminInfo(void)

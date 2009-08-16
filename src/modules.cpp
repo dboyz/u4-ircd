@@ -59,7 +59,7 @@ Module::exportObject(ModularObjectInstantiator* loader)
 	for(std::vector<ModularObjectInstantiator*>::iterator i = instantiators.begin(); i != instantiators.end(); i ++)
 		if(loader->getName() == (*i)->getName())
 		{
-			std::cerr << "Module" << name << "Attempted to export different version of " << (*i)->getName() << std::endl;
+			std::cerr << "Module " << name << " attempted to export different version of " << (*i)->getName() << std::endl;
 			return false;
 		}
 	instantiators.push_back(loader);

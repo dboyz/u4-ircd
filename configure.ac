@@ -15,7 +15,7 @@
 #   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-AC_PREREQ([2.63])
+AC_PREREQ([2.13])
 AC_INIT([unraelircd-cpp], [0.1], [http://bugs.unrealircd.org/])
 AC_CONFIG_SRCDIR([src/users.cpp])
 AC_CONFIG_HEADERS([include/config.h])

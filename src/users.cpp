@@ -29,8 +29,12 @@ User::User()
 User::~User()
 { }
 
-void User::Quit(const std::string& reason)
+int User::Quit(const std::string& reason)
 {
+	if (reason.c_str() == NULL)
+	{
+		return -1;
+	}
 	this->SendRaw(":%s!%s@%s QUIT :%s", this->nick.c_str(), this->ident.c_str(), this->host.c_str(), reason.c_str());
 	MODULARIZE_FUNCTION(I_OnUserQuit, OnUserQuit(reason.c_str());
 }
@@ -41,36 +45,39 @@ int User::ChangeNick(const std::string& newnick)
 	{
 		return -1;
 	}
-	else
-	{
-		if (!this->isValidNick(newnick.c_str()))
-		{
-			this->SendRaw(ERR_ERRONEUSNICKNAME, conf->ServerName.c_str(), newnick.c_str());
-			MODULARIZE_FUNCTION(I_OnBadNickChange, OnBadNickChange(newnick.c_str());
-			return -1;
-		}
-		else
-		{
-			this->SendRaw(":%s!%s@%s NICK :%s", this->nick.c_str(), this->ident.c_str(), this->host.c_str(), newnick.c_str());
-			MODULARIZE_FUNCTION(I_OnNickChange, OnNickChange(newnick.c_str());
 
-			/* TODO: Add the NICK propagations (nick changes to channels, etc)
-			*  --David Kingston
-			*/
-		}
+	if (!this->isValidNick(newnick.c_str()))
+	{
+		this->SendRaw(ERR_ERRONEUSNICKNAME, conf->ServerName.c_str(), newnick.c_str());
+		MODULARIZE_FUNCTION(I_OnBadNickChange, OnBadNickChange(newnick.c_str());
+		return -1;
 	}
+	this->SendRaw(":%s!%s@%s NICK :%s", this->nick.c_str(), this->ident.c_str(), this->host.c_str(), newnick.c_str());
+	MODULARIZE_FUNCTION(I_OnNickChange, OnNickChange(newnick.c_str());
+
+	/* TODO: Add the NICK propagations (nick changes to channels, etc)
+	*  --David Kingston
+	*/
 	return 0;
 }
 
 
 bool User::isValidNick(const std::string& nick)
 {
+	if (nick.c_str() == NULL)
+	{
+		return false;
+	}
 	MODULARIZE_FUNCTION(I_OnValidNickCheck, OnValidNickCheck(nick.c_str());
 	return true;
 }
 
 int User::SendRaw(const std::string& text, ...)
 {
+	if (text.c_str() == NULL)
+	{
+		return -1;
+	}
 	va_list args;
 	static char buf[BUFSIZE];
 	size_t desired_length;
@@ -126,19 +133,15 @@ int User::SendMOTD(void)
 		MODULARIZE_FUNCTION(I_OnFailedMOTD, OnFailedMOTD());
 		return -1;
 	}
-	else
+	this->SendRaw(RPL_MOTDSTART, conf->ServerName.c_str(), this->nick.c_str());
+	// We need to fix the DATE and TIME in this. -- Stealth
+	this->SendRaw(RPL_MOTD, conf->ServerName.c_str(), this->nick.c_str(), __DATE__, __TIME__);
+
+	for (files::const_iterator i = conf->MOTDFile.begin(); i != conf->MOTDFile.end(); i++)
 	{
-		this->SendRaw(RPL_MOTDSTART, conf->ServerName.c_str(), this->nick.c_str());
-		// We need to fix the DATE and TIME in this. -- Stealth
-		this->SendRaw(RPL_MOTD, conf->ServerName.c_str(), this->nick.c_str(), __DATE__, __TIME__);
-
-		for (files::const_iterator i = conf->MOTDFile.begin(); i != conf->MOTDFile.end(); i++)
-		{
-			this->SendRaw(RPL_MOTD, conf->ServerName.c_str(), this->nick.c_str(), i->c_str());
-			this->SendRaw(RPL_ENDOFMOTD, conf->ServerName.c_str(), this->nick.c_str());
-
-			MODULARIZE_FUNCTION(I_OnMOTDSend, OnMOTDSend());
-		}
+		this->SendRaw(RPL_MOTD, conf->ServerName.c_str(), this->nick.c_str(), i->c_str());
+		this->SendRaw(RPL_ENDOFMOTD, conf->ServerName.c_str(), this->nick.c_str());
+		MODULARIZE_FUNCTION(I_OnMOTDSend, OnMOTDSend());
 	}
 	return 0;
 }

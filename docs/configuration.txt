@@ -50,41 +50,54 @@ Stored in conf->AdminEmail
 
 
 
-ALLOW BLOCK
+CLASS BLOCK
 Defines who may connect to your server, and options for matching connections.
 You may have as many of these as desired.
 
-allow::from::userhost (required)
-This defines who is allowed to connect to the server. An allow block may have
+class::name (required)
+The name of this class block.
+
+class::order (required)
+The numerical order of class blocks. When a client connects, Unreal will try
+to match that client to a class block in the order specified, (starting with 
+1). This number must be unique!
+
+class::from::userhost (required)
+This defines who is allowed to connect to the server. An class block may have
 as many of these as desiered.
 
-allow::pingfreq (required)
+class::pingfreq (required)
 The number of seconds between PINGs from the server. Something between 90 and
 180 is recommended.
 
-allow::pingout (required)
+class::pingout (required)
 How long after a PING is sent for the client to respond before disconnection.
 
-allow::maxchannelsperuser (recommended)
+class::maxchannelsperuser (recommended)
 Maximum number of channels a user may be in at one time. If this is not set or
 is 0, a user may be in an unlimited amount of channels.
 
-allow::maxperip (recommended)
+class::maxperip (recommended)
 Maximum allowed connections per IP. Not setting this or setting this to 0 will
 make an unlimited number of connections possible from a single host.
 
-allow::maxclients (optional)
-A soft limit of how many clients may be connected matching this allow block.
+class::maxclients (optional)
+A soft limit of how many clients may be connected matching this class block.
 
-allow::password (optional)
+class::password (optional)
 A password required to connect. If the password is incorrect, the IRCd will
-attempt to match the user to other allow blocks.
+not attempt to match the user to other class blocks unless wrongpasscont is
+defined.
 
-allow::useip (optional)
-Do not do DNS lookups for users matching this allow.
+class::wrongpasscont (optional)
+Allows continuing to match class blocks if the password is incorrect. No value
+needs to be present for this.
 
-allow::ssl (optional)
-Require matching users to be connected with SSL.
+class::useip (optional)
+Do not do DNS lookups for users matching this class.
+
+class::ssl (optional)
+Require matching users to be connected with SSL. Requires a loaded SSL module.
 
 
 

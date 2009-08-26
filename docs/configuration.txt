@@ -153,6 +153,11 @@ set::prefix-quit (optional)
 Sets a prefix for all quit messages.
 Stored in conf->PrefixQuit
 
+set::default-quit (optional)
+Send this when a client does not specify a quit message. If this is not
+specified, "Client exited" will be used.
+Stored in conf->DefaultQuit
+
 set::allow-userhost-change (optional)
 Valid options are never, always, not-on-channels, and force-rejoin.
 Defines the action to be taken when a client changes their user@host.

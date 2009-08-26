@@ -31,20 +31,8 @@ User::~User()
 
 void User::Quit(const std::string& reason)
 {
-	if (reason.c_str() == NULL)
-	{
-		this->SendRaw(":%s!%s@%s QUIT", this->nick.c_str(), this->ident.c_str(), this->host.c_str());
-		MODULARIZE_FUNCTION(I_OnUserQuit, OnUserQuit());
-
-		/* TODO: Add QUIT propagations to channels and such.
-		*  -- David Kingston
-		*/
-	}
-	else
-	{
-		this->SendRaw(":%s!%s@%s QUIT :%s", this->nick.c_str(), this->ident.c_str(), this->host.c_str(), reason.c_str());
-		MODULARIZE_FUNCTION(I_OnUserQuit, OnUserQuit(reason.c_str());
-	}
+	this->SendRaw(":%s!%s@%s QUIT :%s", this->nick.c_str(), this->ident.c_str(), this->host.c_str(), reason.c_str());
+	MODULARIZE_FUNCTION(I_OnUserQuit, OnUserQuit(reason.c_str());
 }
 
 int User::ChangeNick(const std::string& newnick)

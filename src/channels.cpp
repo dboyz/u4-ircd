@@ -19,7 +19,7 @@
 
 bool Channel::isValidChannel(const std::string& channame)
 {
-	if (channame.c_str() == NULL)
+	if (channame.empty())
 	{
 		return false;
 	}
@@ -29,7 +29,7 @@ bool Channel::isValidChannel(const std::string& channame)
 
 int Channel::KickUser(User * from, User * to, const std::string& reason)
 {
-	if (!from || !to || reason.c_str() == NULL)
+	if (!from || !to || reason.empty())
 	{
 		return -1;
 	}

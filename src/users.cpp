@@ -31,7 +31,7 @@ User::~User()
 
 int User::Quit(const std::string& reason)
 {
-	if (reason.c_str() == NULL)
+	if (reason.empty())
 	{
 		return -1;
 	}
@@ -41,12 +41,12 @@ int User::Quit(const std::string& reason)
 
 int User::ChangeNick(const std::string& newnick)
 {
-	if (newnick.c_str() == NULL)
+	if (newnick.empty())
 	{
 		return -1;
 	}
 
-	if (!this->isValidNick(newnick.c_str()))
+	if (!this->isValidNick(newnick))
 	{
 		this->SendRaw(ERR_ERRONEUSNICKNAME, conf->ServerName.c_str(), newnick.c_str());
 		MODULARIZE_FUNCTION(I_OnBadNickChange, OnBadNickChange(newnick.c_str());
@@ -64,7 +64,7 @@ int User::ChangeNick(const std::string& newnick)
 
 bool User::isValidNick(const std::string& nick)
 {
-	if (nick.c_str() == NULL)
+	if (nick.empty())
 	{
 		return false;
 	}
@@ -74,7 +74,7 @@ bool User::isValidNick(const std::string& nick)
 
 int User::SendRaw(const std::string& text, ...)
 {
-	if (text.c_str() == NULL)
+	if (text.empty())
 	{
 		return -1;
 	}

@@ -18,6 +18,8 @@
 #ifndef _UNREALIRCD_USER_H
 #define _UNREALIRCD_USER_H
 
+#include "ircd.h"
+
 #include <iostream>
 
 class User
@@ -27,9 +29,11 @@ class User
 	*  privliges?
 	*/
 	bool isOper;
+
+	IRCd *ircd;
  public:
 	/* Constructor */
-	User();
+	User(IRCd *ircd);
 
 	/* Deconstructor */
 	~User();

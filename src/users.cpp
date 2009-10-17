@@ -19,23 +19,25 @@
 #include "numerics.h"
 #include "internal.h"
 #include "modules.h"
+#include "conf.h"
+
 #include <iostream>
 #include <cstdarg>
 #include <cstdio>
 
-User::User()
-{ }
+User::User(IRCd *IRCd)
+	: ircd(IRCd)
+{
+}
 
 User::~User()
-{ }
-
-int User::Quit(const std::string& reason)
 {
-	if (reason.empty())
-	{
-		return -1;
-	}
-	this->SendRaw(":%s!%s@%s QUIT :%s", this->nick.c_str(), this->ident.c_str(), this->host.c_str(), reason.c_str());
+}
+
+void User::Quit(const std::string& reason)
+{
+	this->SendRaw(":%s!%s@%s QUIT :%s", this->nick.c_str(), this->ident.c_str(), 
+		      this->host.c_str(), reason.empty() ? "client exited" : reason.c_str());
 	MODULARIZE_FUNCTION(I_OnUserQuit, OnUserQuit(reason.c_str()));
 }
 
@@ -48,7 +50,7 @@ int User::ChangeNick(const std::string& newnick)
 
 	if (!this->isValidNick(newnick))
 	{
-		this->SendRaw(ERR_ERRONEUSNICKNAME, conf->ServerName.c_str(), newnick.c_str());
+		this->SendRaw(ERR_ERRONEUSNICKNAME, ircd->conf->ServerName.c_str(), newnick.c_str());
 		MODULARIZE_FUNCTION(I_OnBadNickChange, OnBadNickChange(newnick.c_str()));
 		return -1;
 	}
@@ -127,20 +129,20 @@ int User::SendRaw(const std::string& text, ...)
 
 int User::SendMOTD(void)
 {
-	if (!conf->MOTDFile.size())
+	if (!ircd->conf->MOTDFiles.size())
 	{
-		this->SendRaw(ERR_NOMOTD, conf->ServerName.c_str(), this->nick.c_str());
+		this->SendRaw(ERR_NOMOTD, ircd->conf->ServerName.c_str(), this->nick.c_str());
 		MODULARIZE_FUNCTION(I_OnFailedMOTD, OnFailedMOTD());
 		return -1;
 	}
-	this->SendRaw(RPL_MOTDSTART, conf->ServerName.c_str(), this->nick.c_str());
+	this->SendRaw(RPL_MOTDSTART, ircd->conf->ServerName.c_str(), this->nick.c_str());
 	// We need to fix the DATE and TIME in this. -- Stealth
-	this->SendRaw(RPL_MOTD, conf->ServerName.c_str(), this->nick.c_str(), __DATE__, __TIME__);
+	this->SendRaw(RPL_MOTD, ircd->conf->ServerName.c_str(), this->nick.c_str(), __DATE__, __TIME__);
 
-	for (files::const_iterator i = conf->MOTDFile.begin(); i != conf->MOTDFile.end(); i++)
+	for (std::vector<std::string>::const_iterator i = ircd->conf->MOTDFiles.begin(); i != ircd->conf->MOTDFiles.end(); i++)
 	{
-		this->SendRaw(RPL_MOTD, conf->ServerName.c_str(), this->nick.c_str(), i->c_str());
-		this->SendRaw(RPL_ENDOFMOTD, conf->ServerName.c_str(), this->nick.c_str());
+		this->SendRaw(RPL_MOTD, ircd->conf->ServerName.c_str(), this->nick.c_str(), i->c_str());
+		this->SendRaw(RPL_ENDOFMOTD, ircd->conf->ServerName.c_str(), this->nick.c_str());
 		MODULARIZE_FUNCTION(I_OnMOTDSend, OnMOTDSend());
 	}
 	return 0;
@@ -150,10 +152,10 @@ void User::SendAdminInfo(void)
 {
 	MODULARIZE_FUNCTION(I_OnPreSendAdminInfo, OnPreSendAdminInfo());
 
-	this->SendRaw(RPL_ADMINME, conf->ServerName.c_str(), this->nick.c_str(), conf->ServerName.c_str());
-	this->SendRaw(RPL_ADMINNAME, conf->ServerName.c_str(), this->nick.c_str(), conf->AdminName.c_str());
-	this->SendRaw(RPL_ADMINNICK, conf->ServerName.c_str(), this->nick.c_str(), conf->AdminNick.c_str());
-	this->SendRaw(RPL_ADMINEMAIL, conf->ServerName.c_str(), this->nick.c_str(), conf->AdminEmail.c_str());
+	this->SendRaw(RPL_ADMINME, ircd->conf->ServerName.c_str(), this->nick.c_str(), ircd->conf->ServerName.c_str());
+	this->SendRaw(RPL_ADMINNAME, ircd->conf->ServerName.c_str(), this->nick.c_str(), ircd->conf->AdminName.c_str());
+	this->SendRaw(RPL_ADMINNICK, ircd->conf->ServerName.c_str(), this->nick.c_str(), ircd->conf->AdminNick.c_str());
+	this->SendRaw(RPL_ADMINEMAIL, ircd->conf->ServerName.c_str(), this->nick.c_str(), ircd->conf->AdminEmail.c_str());
 
 	MODULARIZE_FUNCTION(I_OnSendAdminInfo, OnSendAdminInfo());
 

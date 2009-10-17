@@ -24,7 +24,7 @@
   The IRCd object through which all data about the server can be accessed (mostly indirectly).
  */
 
-class Config;
+class Conf;
 
 class IRCd
 {
@@ -34,7 +34,7 @@ public:
 
 	void die();
 
-	Config *conf;
+	Conf *conf;
 protected:
 private:
 };

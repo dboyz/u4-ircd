@@ -51,22 +51,31 @@ enum ModuleHooks
 };
 
 /*
- * Every module must have these C-style functions. The let us probe it
- * without needing to deal with mangled junk.
+ * Every module must have ths C-style function. This lets us probe it
+ * without needing to deal with mangled functions, etc.
  */
 extern "C" 
 {
+	/*
+	  The data the probing function must provide.
+	 */
+	struct unreal_modinfo {
+		unsigned int unrealversion;
+
+		/*
+		 * This is a pointer to a function the must return a pointer to
+		 * a Module object. This module must register all hooks and objects 
+		 * it provides before returning from this function.
+		 */
+		void *instantiate();
+	};
+
 	/* 
 	 * This function returns a string with enough information
 	 * to tell us if it is compatible with this compilation of
-	 * UnrealIRCD-CPP
+	 * UnrealIRCD-CPP and to then instantiate its module class.
 	 */
-	typedef char *unreal_mod_getinfo();
-	/*
-	 * This function returns a pointer to a Module object
-	 * which must be cast to a Module object.
-	 */
-	typedef void *unreal_mod_instantiate();
+	typedef struct unreal_modinfo *unreal_mod_getinfo();
 }
 
 /*
@@ -132,6 +141,9 @@ private:
 	std::vector<ModularObjectInstantiator*> instantiators;
 
 protected:
+	Module();
+	virtual ~Module();
+	
 	/*
 	 * This is for the module to set itself up. This is only to
 	 * be called by Module::load().
@@ -169,7 +181,6 @@ protected:
 	bool exportObject(ModularObjectInstantiator* loader);
 
 public:
-	Module();
 	/*
 	 * Loads module specified by moduleSpec. This prepares
 	 * the configuration engine to feed the module, but it

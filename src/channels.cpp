@@ -16,6 +16,7 @@
 */
 
 #include "channel.h"
+#include "modules.h"
 
 bool Channel::isValidChannel(const std::string& channame)
 {
@@ -33,5 +34,5 @@ int Channel::KickUser(User * from, User * to, const std::string& reason)
 	{
 		return -1;
 	}
-	MODULARIZE_FUNCTION(I_OnUserKick, OnUserKick(from, to, reason.c_str());
+	MODULARIZE_FUNCTION(I_OnUserKick, OnUserKick(from, to, reason.c_str()));
 }

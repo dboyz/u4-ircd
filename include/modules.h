@@ -24,6 +24,11 @@
 
 #define UNREAL_MODULE_ABI_VERSION 1
 
+/*
+  Stub to allow compilation. This macro's necessity is not decided upon.
+ */
+#define MODULARIZE_FUNCTION(hook,call)
+
 enum ModuleTypes
 {
 	/* If a module type is STATIC, it CANNOT be unloaded by ANY

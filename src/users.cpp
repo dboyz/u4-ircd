@@ -36,7 +36,7 @@ int User::Quit(const std::string& reason)
 		return -1;
 	}
 	this->SendRaw(":%s!%s@%s QUIT :%s", this->nick.c_str(), this->ident.c_str(), this->host.c_str(), reason.c_str());
-	MODULARIZE_FUNCTION(I_OnUserQuit, OnUserQuit(reason.c_str());
+	MODULARIZE_FUNCTION(I_OnUserQuit, OnUserQuit(reason.c_str()));
 }
 
 int User::ChangeNick(const std::string& newnick)
@@ -49,11 +49,11 @@ int User::ChangeNick(const std::string& newnick)
 	if (!this->isValidNick(newnick))
 	{
 		this->SendRaw(ERR_ERRONEUSNICKNAME, conf->ServerName.c_str(), newnick.c_str());
-		MODULARIZE_FUNCTION(I_OnBadNickChange, OnBadNickChange(newnick.c_str());
+		MODULARIZE_FUNCTION(I_OnBadNickChange, OnBadNickChange(newnick.c_str()));
 		return -1;
 	}
 	this->SendRaw(":%s!%s@%s NICK :%s", this->nick.c_str(), this->ident.c_str(), this->host.c_str(), newnick.c_str());
-	MODULARIZE_FUNCTION(I_OnNickChange, OnNickChange(newnick.c_str());
+	MODULARIZE_FUNCTION(I_OnNickChange, OnNickChange(newnick.c_str()));
 
 	/* TODO: Add the NICK propagations (nick changes to channels, etc)
 	*  --David Kingston
@@ -68,7 +68,7 @@ bool User::isValidNick(const std::string& nick)
 	{
 		return false;
 	}
-	MODULARIZE_FUNCTION(I_OnValidNickCheck, OnValidNickCheck(nick.c_str());
+	MODULARIZE_FUNCTION(I_OnValidNickCheck, OnValidNickCheck(nick.c_str()));
 	return true;
 }
 

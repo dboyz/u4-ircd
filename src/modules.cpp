@@ -16,6 +16,7 @@
  */
 
 #include "modules.h"
+#include "misc.h"
 
 #include <iostream>
 
@@ -59,7 +60,7 @@ Module::exportObject(ModularObjectInstantiator* loader)
 	for(std::vector<ModularObjectInstantiator*>::iterator i = instantiators.begin(); i != instantiators.end(); i ++)
 		if(loader->getName() == (*i)->getName())
 		{
-			std::cerr << "Module " << name << " attempted to export different version of " << (*i)->getName() << std::endl;
+			std::cerr << "Module " << moduleSpec << " attempted to export different version of " << (*i)->getName() << std::endl;
 			return false;
 		}
 	instantiators.push_back(loader);
@@ -67,8 +68,14 @@ Module::exportObject(ModularObjectInstantiator* loader)
 }
 
 Module&
-load(std::string moduleSpec)
+Module::load(std::string moduleSpec) throw(std::runtime_error)
 {
+	void *dl_handle;
+	unreal_mod_getinfo *infofunc;
+	struct unreal_modinfo *modinfo;
+	
+	Module *newmodule;
+	
 	/*
 	 * TODO: expand this to support guessing filename suffixes.
 	 * Mabye we should force a filenameing convention on users :-D
@@ -79,14 +86,36 @@ load(std::string moduleSpec)
 	 * No lazy linking: we want to die with an undefined symbol
 	 * as early as possible.
 	 */
-	void *dl_handle = dlopen(moduleSpec.c_str(), RTLD_NOW);
+	dl_handle = dlopen(moduleSpec.c_str(), RTLD_NOW);
 	if(!dl_handle)
 		(*(int *)0) ++;
+
+	infofunc = (unreal_mod_getinfo*) dlsym(dl_handle, "unreal_mod_getinfo");
+
+	modinfo = infofunc();
+	if(!modinfo)
+		throw std::runtime_error("module ``" + moduleSpec + "'' returned NULL from unreal_mod_getinfo()");
+
+	if(UNREAL_MODULE_ABI_VERSION != modinfo->unreal_module_abi_version)
+		throw std::runtime_error("module ``" + moduleSpec + "'' has incompatible MODULE_ABI_VERSION; " 
+					 + ConvertIntToString(UNREAL_MODULE_ABI_VERSION) + " != " 
+					 + ConvertIntToString(modinfo->unreal_module_abi_version));
+
+	newmodule = (Module *) modinfo->instantiate();
+	
 	/*
-	 * ...
-	 * I shouldn't implement any more of my module interface until
-	 * it gets approval and is argued about in #unreal-devel
+	  initialize our info about the module:
 	 */
+	newmodule->moduleSpec = moduleSpec;
+	newmodule->dl_handle = dl_handle;
+
+	newmodule->initialize();
+
+	/*
+	  TODO: after the module is successfully initialized, it is added to the list of loaded modules
+	  so that this list can be enumerated later and to facilitate removal
+	 */
+	
 }
 
 /*

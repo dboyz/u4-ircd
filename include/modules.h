@@ -20,6 +20,9 @@
 
 #include <vector>
 #include <string>
+#include <stdexcept>
+
+#define UNREAL_MODULE_ABI_VERSION 1
 
 enum ModuleTypes
 {
@@ -60,7 +63,7 @@ extern "C"
 	  The data the probing function must provide.
 	 */
 	struct unreal_modinfo {
-		unsigned int unrealversion;
+		unsigned int unreal_module_abi_version;
 
 		/*
 		 * This is a pointer to a function the must return a pointer to
@@ -122,9 +125,9 @@ class Module
 {
 private:
 	/*
-	 * The name this module is referred to as:
+	 * The name this module is referred to as in the loadmodule "" config command:
 	 */
-	std::string name;
+	std::string moduleSpec;
 	
 	/*
 	 * The pointer returned by dlopen or LoadLibrary. For
@@ -153,8 +156,10 @@ protected:
 	 *
 	 * TODO: should an IRCd object be passed to initilize or will that
 	 * be a global variable?
+	 *
+	 * must only throw std::runtime_error because is called from Module::load()
 	 */
-	virtual void initialize() = 0;
+	virtual void initialize() throw(std::runtime_error) = 0;
 
 	/*
 	 * Cleans up a module to prepare it for closing. This is 
@@ -189,7 +194,7 @@ public:
 	 * This may fail if the module is incompatible with this
 	 * compilation of UnrealIRCD-CPP
 	 */
-	static Module& load(std::string moduleSpec);
+	static Module& load(std::string moduleSpec) throw(std::runtime_error);
 
 	/*
 	 * This activates a module.

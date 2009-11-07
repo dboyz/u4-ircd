@@ -27,7 +27,7 @@
 
 int main(int argc, char *argv[])
 {
-	char *optstring = "hf:";
+	char optstring[] = "hf:";
 	char curopt;
 
 	std::string config_path = "unreal++.conf";

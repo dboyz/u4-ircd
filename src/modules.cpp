@@ -22,7 +22,8 @@
 
 extern "C"
 {
-	#include <dlfcn.h>
+#include <ltdl.h>
+#include <dlfcn.h>
 }
 
 /*
@@ -70,7 +71,7 @@ Module::exportObject(ModularObjectInstantiator* loader)
 Module&
 Module::load(std::string moduleSpec) throw(std::runtime_error)
 {
-	void *dl_handle;
+	lt_dlhandle handle;
 	unreal_mod_getinfo *infofunc;
 	struct unreal_modinfo *modinfo;
 	
@@ -86,11 +87,14 @@ Module::load(std::string moduleSpec) throw(std::runtime_error)
 	 * No lazy linking: we want to die with an undefined symbol
 	 * as early as possible.
 	 */
-	dl_handle = dlopen(moduleSpec.c_str(), RTLD_NOW);
-	if(!dl_handle)
+	handle = lt_dlopen(moduleSpec.c_str());
+	if(!handle)
+	{
+		std::cerr << "Error opening module with lt_dlopen: " << lt_dlerror() << std::endl;
 		(*(int *)0) ++;
+	}
 
-	infofunc = (unreal_mod_getinfo*) dlsym(dl_handle, "unreal_mod_getinfo");
+	infofunc = (unreal_mod_getinfo*) lt_dlsym(handle, "unreal_mod_getinfo");
 
 	modinfo = infofunc();
 	if(!modinfo)
@@ -107,7 +111,7 @@ Module::load(std::string moduleSpec) throw(std::runtime_error)
 	  initialize our info about the module:
 	 */
 	newmodule->moduleSpec = moduleSpec;
-	newmodule->dl_handle = dl_handle;
+	newmodule->ltdl_handle = handle;
 
 	newmodule->initialize();
 
@@ -119,9 +123,9 @@ Module::load(std::string moduleSpec) throw(std::runtime_error)
 }
 
 /*
- * dl_handle is initialized by load()
+ * ltdl_handle is initialized by load()
  */
 Module::Module()
-	: dl_handle(NULL)
+	: ltdl_handle(NULL)
 {
 }

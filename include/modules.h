@@ -22,6 +22,11 @@
 #include <string>
 #include <stdexcept>
 
+extern "C"
+{
+#include <ltdl.h>
+}
+
 #define UNREAL_MODULE_ABI_VERSION 1
 
 /*
@@ -140,7 +145,7 @@ private:
 	 * 
 	 * Initialized by load();
 	 */
-	void *dl_handle;
+	lt_dlhandle ltdl_handle;
 
 	/*
 	 * for the use of getObject(); -- to store objectInstantiators

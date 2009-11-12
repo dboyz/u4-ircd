@@ -34,6 +34,10 @@ ModularObjectInstantiator::ModularObjectInstantiator(std::string name)
 	this->name = name;
 }
 
+ModularObjectInstantiator::~ModularObjectInstantiator()
+{
+}
+
 /* Encapsulation -- or no encapsulation? */
 const std::string
 ModularObjectInstantiator::getName()
@@ -49,7 +53,9 @@ ModularObject::forceRTTIGeneration()
 {
 }
 
-
+ModularObject::~ModularObject()
+{
+}
 
 /*
  * Module

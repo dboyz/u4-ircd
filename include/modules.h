@@ -105,6 +105,9 @@ private:
 	 * before RTTI is generated for it by the compiler.
 	 */
 	virtual void forceRTTIGeneration();
+
+public:
+	virtual ~ModularObject();
 };
 
 /*
@@ -121,6 +124,8 @@ class ModularObjectInstantiator
 private:
 	std::string name;
 public:
+	virtual ~ModularObjectInstantiator();
+
 	ModularObjectInstantiator(std::string name);
 	
 	/* Encapsulation -- or no encapsulation? */

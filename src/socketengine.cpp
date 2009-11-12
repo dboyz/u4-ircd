@@ -100,3 +100,7 @@ SocketEngine::removeSocket(int socket)
 			return;
 		}
 }
+
+SocketEngine::~SocketEngine()
+{
+}

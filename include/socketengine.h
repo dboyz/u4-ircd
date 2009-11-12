@@ -37,6 +37,8 @@ class SocketEventHandler
 	 * that the event happened.
 	 */
 	virtual void handleEvent(int socket) = 0;
+
+	virtual ~SocketEventHandler();
 };
 
 /*

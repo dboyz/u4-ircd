@@ -42,3 +42,4 @@ unrealircd_SOURCES = \
 	src/modules.cpp \
 	src/socketengine.cpp \
 	src/users.cpp
+unrealircd_LDADD = @LTDL_LIBS@

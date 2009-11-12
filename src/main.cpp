@@ -19,11 +19,16 @@
 #include "config.h"
 
 #include <iostream>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <stdio.h>
+
+extern "C"
+{
 #include <errno.h>
+#include <fcntl.h>
+#include <ltdl.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <unistd.h>
+}
 
 int main(int argc, char *argv[])
 {
@@ -68,6 +73,12 @@ int main(int argc, char *argv[])
 			break;
 		}
 
+	if(!lt_dlinit())
+	{
+		std::cerr << "Unable to initialize ltdl: " << lt_dlerror() << std::endl;
+		return 1;
+	}
+
 	errno = 0;
 	config_fd = open(config_path.c_str(), O_RDONLY);
 	if(config_fd == -1)
@@ -81,5 +92,10 @@ int main(int argc, char *argv[])
 
 	std::cerr << "Using config file: ``" << config_path << "''" << std::endl;
 
+	if(!lt_dlexit())
+	{
+		std::cerr << "Unable to deinitialize ltdl: " << lt_dlerror() << std::endl;
+		return 1;
+	}
 	return 0;
 }

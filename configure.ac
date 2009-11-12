@@ -24,7 +24,18 @@ AM_INIT_AUTOMAKE
 # Checks for programs.
 AC_PROG_CXX
 
-# Checks for libraries.
+# Checks for libraries/headers.
+
+# ltdl, one portable way to provide dlopen()
+# for now, this just assumes that the OS will provide
+# a copy of ltdl
+# 
+# copied from http://flameeyes.eu/autotools-mythbuster/libtool/#libtool.plugins.ltdl
+AC_CHECK_HEADER([ltdl.h],
+  [AC_CHECK_LIB([ltdl], [lt_dladdsearchdir],
+    [LIBLTDL=-lltdl], [LIBLTDL=])],
+  [LIBLTDL=])
+AC_SUBST([LTDL_LIBS], [${LIBLTDL}])
 
 # Checks for header files.
 

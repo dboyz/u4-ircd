@@ -1,0 +1,15 @@
+-- Unreal Todo List --
+
+* Add the configuration system, as described here:
+  http://wiki.commx.ws/wiki/Neonbox/Config
+* Add a flag-based log system
+* Add a template-based signal system to trigger events
+* Add a platform-independent module class
+* Add a platform-indepentent thread class w/ mutexes
+* Add an async hostname resolver (v4/v6), utilizing threads
+* Add a socket class
+* Add socket engines for (e)poll, kqueue, dev/poll, select, etc.
+* Add listener class
+* Add the ability to control the file descriptor limit (softlimit) if possible
+* Add sanity checks (for root UID) - an IRCd should *never* run as root
+* etc.

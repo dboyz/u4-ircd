@@ -36,7 +36,7 @@ pkginclude_HEADERS = \
 	include/user.h
 
 unrealircd_SOURCES = \
-	src/channels.cpp \
+	src/channel.cpp \
 	src/main.cpp \
 	src/misc.cpp \
 	src/modules.cpp \

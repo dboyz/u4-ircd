@@ -24,18 +24,9 @@
 
 class User
 {
- private:
-	/* Is the user an oper, not taking into consideration any other
-	*  privliges?
-	*/
-	bool isOper;
-
-	IRCd *ircd;
  public:
-	/* Constructor */
 	User(IRCd *ircd);
 
-	/* Deconstructor */
 	~User();
 
 	/* The nick of the IRC user. */
@@ -80,7 +71,7 @@ class User
 	/* Sends a raw string to the user.
 	*  Parameters:
 	*  text - The text to send.
-	*  ... - Any number of parameters.
+	*  ... - printf-style parameters
 	*/
 	int SendRaw(const std::string& text, ...);
 
@@ -93,6 +84,14 @@ class User
 	*  Parameters: None.
 	*/
 	void SendAdminInfo(void);
+
+ private:
+	/* Is the user an oper, not taking into consideration any other
+	*  privliges?
+	*/
+	bool isOper;
+
+	IRCd *ircd;
 };
 
 #endif

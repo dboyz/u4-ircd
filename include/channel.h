@@ -25,6 +25,9 @@
 class Channel
 {
 public:
+	Channel(std::string& channame);
+
+private:
 	/*
 	 * returns true if this channel name is allowed on this
 	 * server. Uses I_OnValidChannelCheck hook.

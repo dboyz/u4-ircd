@@ -24,6 +24,11 @@
 class Conf
 {
 public:
+	/**
+	   Builds a configuration object from the filename specified in config_path
+	*/
+	Conf(std::string& config_path);
+
 	std::string ServerName;
 	std::vector<std::string> MOTDFiles;
 	std::string AdminName;

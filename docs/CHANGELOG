@@ -1,0 +1,7 @@
+Unreal Changelog
+
+2009-12-03 06:24 UTC  Christian Jurk <commx@commx.ws>
+  * Added UnrealLog class
+  * Added Time class
+  * Modified typedefs for integer types in platform.hpp
+  * Added the ability to nest blocks in configuration files

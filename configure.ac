@@ -17,12 +17,13 @@
 
 AC_PREREQ([2.13])
 AC_INIT([unrealircd-cpp], [0.1], [http://bugs.unrealircd.org/])
-AC_CONFIG_SRCDIR([src/users.cpp])
+AC_CONFIG_SRCDIR([src/main.cpp])
 AC_CONFIG_HEADERS([include/config.h])
 AM_INIT_AUTOMAKE
 
 # Checks for programs.
 AC_PROG_CXX
+AC_PROG_LIBTOOL
 
 # Checks for libraries/headers.
 

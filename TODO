@@ -10,8 +10,8 @@ Legend:
 ===========================================================================
 
 [ ] Get a socket engine going (select() first?)
-[~] Work on user management (use std::string for simple things (nicks, gecos's, etc))
-[X] Create 3.2-style numeric sending (see src/s_err.c in 3.2)
+[ ] Work on user management (use std::string for simple things (nicks, gecos's, etc))
+[ ] Create 3.2-style numeric sending (see src/s_err.c in 3.2)
 [ ] Main core (waiting for more developers to arrive)
 [ ] Configuration parser (3.2-style, core directives are in doc/configuration.txt)
 [ ] Commands needed in the core:

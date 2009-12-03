@@ -1,3 +1,8 @@
+** NOTE **
+Configuration store variables are only suggested and may
+change as time goes on. Do not rely on what is here until
+the directives are added to the configuration parser.
+
 ME BLOCK
 Defines basic information about your IRC server.
 

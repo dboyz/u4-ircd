@@ -43,5 +43,16 @@ unrealircd_SOURCES = \
 	src/module.cpp \
 	src/modules.cpp \
 	src/socketengine.cpp \
-	src/user.cpp
+	src/user.cpp \
+	$(pkginclude_HEADERS)
 unrealircd_LDADD = @LTDL_LIBS@
+
+# http://www.flameeyes.eu/autotools-mythbuster/libtool/index.html#libtool.plugins.dlopen
+
+MODULEDIR=src/modules
+pkglib_LTLIBRARIES = \
+	m_null.la
+
+m_null_la_SOURCES = $(MODULEDIR)/m_null
+m_null_la_LIBADD = $(unrealircd_LDADD)
+m_null_la_LDFLAGS = -module -avoid-version -shared

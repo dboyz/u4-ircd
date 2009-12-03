@@ -18,9 +18,15 @@
 #ifndef _UNREALIRCD_MODULES_H
 #define _UNREALIRCD_MODULES_H
 
+/**
+   This file contains everything a module needs to be created.
+   see src/modules/m_null.cpp for an example of how to make a module.
+ */
+
+#include "module.h"
+
 #include <vector>
 #include <string>
-
 
 #define UNREAL_MODULE_ABI_VERSION 1
 
@@ -119,5 +125,29 @@ public:
 	const std::string getName();
 	virtual ModularObject *instantiateObject() = 0;
 };
+
+
+/**
+  macros for module files:
+ */
+
+/**
+   a module file must call this so that n is the name of the module
+   (without quotes)
+
+   a ## b concatenates two strings in C Preprocessing language
+ */
+#define UNREALIRCD_MODULE(n)						\
+struct unreal_modinfo modinfo_ ## n = {					\
+	.unreal_module_abi_verson = UNREAL_MODULE_ABI_VERSION,		\
+	.instantiate = &m_ ## n::					\
+};									\
+									\
+extern "C" {								\
+	struct unreal_modinfo *unreal_mod_getinfo()			\
+	{								\
+		return &modinfo ## n ;					\
+	}								\
+}
 
 #endif

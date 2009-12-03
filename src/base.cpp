@@ -50,6 +50,19 @@ UnrealBase::UnrealBase(int cnt, char** vec)
 	// load modules
 	initModules();
 
+	/* setup IO service pool */
+	size_t io_pool_size = static_cast<size_t>(
+			config.get("Me/IOPoolSize", "1").toUInt());
+
+	if (ios_pool.size() == 0)
+	{
+		log << UnrealLog::Normal
+			<< "Critical: IOPoolSize is set to 0, exiting. Please increase "
+			   "that value in your server configuration file.";
+	}
+	else if (ios_pool.size() != io_pool_size)
+		ios_pool.resize(io_pool_size);
+
 	// TODO: setup listener (w/ threads ?!)
 
 	if (fork_state_ == Daemon)
@@ -343,5 +356,5 @@ void UnrealBase::printVersion()
  */
 void UnrealBase::run()
 {
-	// TODO: enter the main loop here
+	ios_pool.run();
 }

@@ -15,16 +15,14 @@
 *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "user.h"
-#include "numerics.h"
-#include "internal.h"
-#include "modules.h"
-#include "conf.h"
+#include "user.hpp"
+#include "numerics.hpp"
 
 #include <iostream>
 #include <cstdarg>
 #include <cstdio>
 
+class IRCd;
 User::User(IRCd *IRCd)
 	: ircd(IRCd)
 {

@@ -33,8 +33,8 @@ class UnrealConfig
 {
 public:
 	UnrealConfig();
-	String fileName();
-	String get(const String& key, const String& def);
+	const String& fileName();
+	String get(const String& key, const String& def = String());
 	size_t getLastIndex(const String& key);
 	bool getQuotedContent(String& inp, String& val);
 	String getSeqVal(const String& key, int index, const String& name,

@@ -38,7 +38,7 @@ UnrealConfig::UnrealConfig()
  *
  * @return Configuration filename
  */
-String UnrealConfig::fileName()
+const String& UnrealConfig::fileName()
 {
 	return filename_;
 }

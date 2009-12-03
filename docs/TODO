@@ -10,7 +10,7 @@ Legend: ~ (done)
 ~ Add a list container class
 ~ Add a map container class
 ~ Add a StringList class
-* Add a flag-based log system
+~ Add a flag-based log system
 * Add a template-based signal system to trigger events
 * Add a platform-independent module class
 * Add a platform-indepentent thread class w/ mutexes

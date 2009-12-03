@@ -20,6 +20,9 @@
 #include <cstdlib>
 #include <iostream>
 
+/** global UnrealBase object */
+UnrealBase* unreal = 0;
+
 /**
  * UnrealBase constructor.
  *
@@ -29,6 +32,9 @@
 UnrealBase::UnrealBase(int cnt, char** vec)
 	: fork_state_(Daemon)
 {
+	/* make this UnrealBase globally available */
+	unreal = this;
+
 	for (int i = 0; i < cnt; i++)
 		argv << String(vec[i]);
 
@@ -38,11 +44,33 @@ UnrealBase::UnrealBase(int cnt, char** vec)
 	// start reading the initial config file
 	config.startRead();
 
-	// TODO: log file writer
+	// log file stuff
+	initLog();
 
 	// TODO: load modules
 
 	// TODO: setup listener (w/ threads ?!)
+
+	if (fork_state_ == Daemon)
+	{
+		pid_t fork_pid = fork();
+
+		if (fork_pid == -1)
+		{
+			log << "Fatal: fork() failed.";
+			exit(1);
+		}
+		else if (fork_pid != 0)
+		{
+			log.write(UnrealLog::Debug, "fork() succeed");
+
+			/* update the fork state */
+			fork_state_ = Daemonized;
+
+			/* exit the parent process */
+			exit();
+		}
+	}
 }
 
 /**
@@ -115,6 +143,42 @@ void UnrealBase::exit(int code)
 void UnrealBase::finish()
 {
 	//..
+}
+
+/**
+ * Returns the fork() state.
+ */
+UnrealBase::FState UnrealBase::fstate()
+{
+	return fork_state_;
+}
+
+/**
+ * Initialize the log system.
+ */
+void UnrealBase::initLog()
+{
+	String logfile = config.get("Log/File");
+	String loglevel = config.get("Log/Level", "Normal");
+
+	if (!logfile.empty())
+	{
+		log.setFileName(logfile);
+
+		UnrealLog::LogLevel ll = UnrealLog::Normal;
+		if (loglevel.toLower() == "debug")
+			ll = UnrealLog::Debug;
+
+		log.setLevel(ll);
+
+		if (!log.open())
+		{
+			std::cerr << "Warning: Opening log file \""
+					  << logfile
+					  << "\" failed."
+					  << std::endl;
+		}
+	}
 }
 
 /**

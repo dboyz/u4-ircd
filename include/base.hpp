@@ -20,6 +20,7 @@
 #define _UNREALIRCD_BASE_H
 
 #include "config.hpp"
+#include "log.hpp"
 #include "string.hpp"
 #include "stringlist.hpp"
 
@@ -29,7 +30,7 @@
 class UnrealBase
 {
 public:
-	enum ForkState
+	enum FState
 	{
 		Daemon,			//< server is to be forked
 		Daemonized,		//< server is daemonized
@@ -41,6 +42,7 @@ public:
 	~UnrealBase();
 
 	void exit(int code = 0);
+	FState fstate();
 	void run();
 
 public:
@@ -50,10 +52,14 @@ public:
 	/** configuration */
 	UnrealConfig config;
 
+	/** log system */
+	UnrealLog log;
+
 private:
 	void checkConfig();
 	void checkPermissions();
 	void finish();
+	void initLog();
 	void parseArgv();
 	void printConfig();
 	void printUsage();
@@ -61,7 +67,9 @@ private:
 
 private:
 	/** fork() state */
-	ForkState fork_state_;
+	FState fork_state_;
 };
+
+extern UnrealBase* unreal;
 
 #endif /* _UNREALIRCD_BASE_H */

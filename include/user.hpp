@@ -18,9 +18,11 @@
 #ifndef _UNREALIRCD_USER_H
 #define _UNREALIRCD_USER_H
 
-#include "ircd.h"
+#include "base.hpp"
 
 #include <iostream>
+
+class IRCd;
 
 class User
 {

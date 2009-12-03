@@ -15,8 +15,11 @@
 *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "channel.h"
-#include "modules.h"
+#include "channel.hpp"
+#include "module.hpp"
+#include "user.hpp"
+
+#include <string>
 
 bool Channel::isValidChannel(const std::string& channame)
 {
@@ -24,7 +27,7 @@ bool Channel::isValidChannel(const std::string& channame)
 	{
 		return false;
 	}
-	MODULARIZE_FUNCTION(I_OnValidChannelCheck, OnValidChannelCheck(channame.c_str()) );
+       	MODULARIZE_FUNCTION(I_OnValidChannelCheck, OnValidChannelCheck(channame.c_str()) );
 	return true;
 }
 

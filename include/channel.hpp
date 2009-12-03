@@ -18,7 +18,7 @@
 #ifndef _UNREALIRCD_CHANNEL_H
 #define _UNREALIRCD_CHANNEL_H
 
-#include "user.h"
+#include "user.hpp"
 
 #include <string>
 

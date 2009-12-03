@@ -26,19 +26,19 @@ bin_PROGRAMS = unrealircd
 # by modules that will be compiled against UnrealIRCd-CPP
 pkginclude_HEADERS = \
 	include/base.hpp \
-	include/channel.h \
+	include/channel.hpp \
 	include/config.h \
 	include/list.hpp \
 	include/log.hpp \
 	include/map.hpp \
 	include/module.hpp \
-	include/numerics.h \
+	include/numerics.hpp \
 	include/platform.hpp \
-	include/socketengine.h \
+	include/socketengine.hpp \
 	include/string.hpp \
 	include/stringlist.hpp \
 	include/time.hpp \
-	include/user.h
+	include/user.hpp
 
 unrealircd_SOURCES = \
 	src/base.cpp \

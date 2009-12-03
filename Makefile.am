@@ -25,27 +25,36 @@ bin_PROGRAMS = unrealircd
 # this is pkginclude because these headers are needed
 # by modules that will be compiled against UnrealIRCd-CPP
 pkginclude_HEADERS = \
+	include/base.hpp \
 	include/channel.h \
 	include/config.h \
-	include/internal.h \
-	include/ircd.h \
-	include/misc.h \
-	include/module.h \
-	include/modules.h \
+	include/list.hpp \
+	include/log.hpp \
+	include/map.hpp \
+	include/module.hpp \
 	include/numerics.h \
+	include/platform.hpp \
 	include/socketengine.h \
+	include/string.hpp \
+	include/stringlist.hpp \
+	include/time.hpp \
 	include/user.h
 
 unrealircd_SOURCES = \
+	src/base.cpp \
 	src/channel.cpp \
-	src/main.cpp \
+	src/config.cpp \
 	src/misc.cpp \
 	src/module.cpp \
-	src/modules.cpp \
-	src/socketengine.cpp \
+	src/string.cpp \
+	src/stringlist.cpp \
+	src/time.cpp \
+	src/unreal.cpp \
 	src/user.cpp \
 	$(pkginclude_HEADERS)
-unrealircd_LDADD = @LTDL_LIBS@
+unrealircd_LDADD = @LTDL_LIBS@ -lld
+#unrealircd_CXXFLAGS = -std=c++0x -Wall
+unrealircd_CXXFLAGS = -Wall
 
 # http://www.flameeyes.eu/autotools-mythbuster/libtool/index.html#libtool.plugins.dlopen
 

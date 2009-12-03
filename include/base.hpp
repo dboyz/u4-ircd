@@ -20,7 +20,9 @@
 #define _UNREALIRCD_BASE_H
 
 #include "config.hpp"
+#include "list.hpp"
 #include "log.hpp"
+#include "module.hpp"
 #include "string.hpp"
 #include "stringlist.hpp"
 
@@ -55,11 +57,15 @@ public:
 	/** log system */
 	UnrealLog log;
 
+	/** list with modules */
+	List<UnrealModule*> modules;
+
 private:
 	void checkConfig();
 	void checkPermissions();
 	void finish();
 	void initLog();
+	void initModules();
 	void parseArgv();
 	void printConfig();
 	void printUsage();

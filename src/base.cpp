@@ -47,7 +47,8 @@ UnrealBase::UnrealBase(int cnt, char** vec)
 	// log file stuff
 	initLog();
 
-	// TODO: load modules
+	// load modules
+	initModules();
 
 	// TODO: setup listener (w/ threads ?!)
 
@@ -182,6 +183,37 @@ void UnrealBase::initLog()
 }
 
 /**
+ * Load and initialize modules defined in the configuration files.
+ */
+void UnrealBase::initModules()
+{
+	StringList ml = config.moduleList();
+
+	for (StringList::Iterator miter = ml.begin(); miter != ml.end(); miter++)
+	{
+		UnrealModule* mptr = new UnrealModule(*miter);
+
+		if (!mptr->load())
+		{
+			String errStr = mptr->errorString();
+
+			log.write(UnrealLog::Normal, "Warning: Loading module \"%s\" failed: %s",
+					(*miter).c_str(),
+					errStr.c_str());
+
+			delete mptr;
+		}
+		else
+		{
+			log.write(UnrealLog::Debug, "Loading Module \"%s\"", (*miter).c_str());
+
+			/* add to module list */
+			modules << mptr;
+		}
+	}
+}
+
+/**
  * Go through the argument vector passed to the program during startup
  * and check for options.
  */
@@ -290,7 +322,11 @@ void UnrealBase::printConfig()
  */
 void UnrealBase::printVersion()
 {
-	std::cout << "UnrealIRCd 4.0.0-alpha" << std::endl;
+	std::cout << "UnrealIRCd 4.0.0-alpha, Built "
+			  << __DATE__
+			  << " "
+			  << __TIME__
+			  << std::endl;
 	std::cout << "Copyright (c) 2009 The UnrealIRCd Project" << std::endl;
 	std::cout << "http://www.unrealircd.com" << std::endl << std::endl;
 

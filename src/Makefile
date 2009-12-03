@@ -1,7 +1,7 @@
 TARGET   = ../bin/ircd
 CC       = g++
 CXXFLAGS = -std=c++0x -pipe -O3 -Wall -I../include
-LIBS     =
+LIBS     = -ldl
 SOURCES  = $(wildcard *.cpp)
 OBJECTS  = $(SOURCES:.cpp=.o)
 

@@ -1,0 +1,205 @@
+ME BLOCK
+Defines basic information about your IRC server.
+
+me::name (required)
+The name of the server. This must be a fully qualified domain name
+(example: irc.example.com)
+Stored in conf->ServerName
+
+me::description (required)
+This is the description of the server.
+Stored in conf->ServerDesc
+
+me::network (required)
+Name of the network this server belongs to.
+Stored in conf->NetName
+
+
+
+LOADMODULE
+loadmodule <modulename>
+Loads the specified module. Unreal will append a suffix if 
+set::module-suffix is specified.
+
+
+
+LISTEN BLOCK (required)
+Open ports for clients and servers to connect to.
+listen::bind-ip
+IP to bind to. Setting this to * will bind to all IPs available.
+
+listen::port (required)
+Port to listen on.
+
+
+
+ADMIN BLOCK
+Server administrative info
+
+admin::name (required)
+The name of the server administrator.
+Stored in conf->AdminName
+
+admin::nick (required)
+The nickname of the server administrator
+Stored in conf->AdminNick
+
+admin::email (required)
+Administrative email for this server.
+Stored in conf->AdminEmail
+
+
+
+CLASS BLOCK
+Defines who may connect to your server, and options for matching connections.
+You may have as many of these as desired.
+
+class::name (required)
+The name of this class block.
+
+class::order (required)
+The numerical order of class blocks. When a client connects, Unreal will try
+to match that client to a class block in the order specified, (starting with 
+1). This number must be unique!
+
+class::from::userhost (required)
+This defines who is allowed to connect to the server. An class block may have
+as many of these as desiered.
+
+class::pingfreq (required)
+The number of seconds between PINGs from the server. Something between 90 and
+180 is recommended.
+
+class::pingout (required)
+How long after a PING is sent for the client to respond before disconnection.
+
+class::maxchannelsperuser (recommended)
+Maximum number of channels a user may be in at one time. If this is not set or
+is 0, a user may be in an unlimited amount of channels.
+
+class::maxperip (recommended)
+Maximum allowed connections per IP. Not setting this or setting this to 0 will
+make an unlimited number of connections possible from a single host.
+
+class::maxclients (optional)
+A soft limit of how many clients may be connected matching this class block.
+
+class::password (optional)
+A password required to connect. If the password is incorrect, the IRCd will
+not attempt to match the user to other class blocks unless wrongpasscont is
+defined.
+
+class::wrongpasscont (optional)
+Allows continuing to match class blocks if the password is incorrect. No value
+needs to be present for this.
+
+class::useip (optional)
+Do not do DNS lookups for users matching this class.
+
+class::ssl (optional)
+Require matching users to be connected with SSL. Requires a loaded SSL module.
+
+
+
+OCLASS (recommended)
+Defines oper permissions. You may have as many oclass blocks as desired.
+
+oclass::name (required)
+The name of this oper class.
+
+oclass::commands (required)
+A space-delimited list of commands this oper class is allowed to use. Newline
+and tab characters will be parsed out, so you may put this on multiple lines
+if needed. If you specify this as *, this class will have access to every
+command.
+
+
+
+OTYPE (recommended)
+Defines oper types.
+
+otype::name (required)
+The name of this oper type (displayes in WHOIS).
+
+otype::classes (required)
+List of classes this oper type has access to.
+
+otype::host (optional)
+Host to set opers using this type to.
+
+
+
+OPER (recommended)
+Defines an oper block.
+
+oper::userhost (required)
+The host the person using this block must match.
+
+oper;:password (required)
+The oper's password.
+
+oper::hash (optional)
+Specifies the hash used to mask the password.
+
+oper::type (required)
+This oper's type.
+
+oper::require-ssl (optional)
+Require this oper to be connected with SSL (requires SSL module loaded)
+
+
+
+SET BLOCK
+set::email-address (required)
+Admin email address. Sent to users when they are banned from the server.
+Stored in conf->Email
+
+set::module-suffix (optional)
+The suffix to be automatically appended to the end of module names.
+Stored in conf->ModuleSuffix
+
+set::static-quit (optional)
+Disable the ability for clients to send their own quit message.
+Stored in conf->StaticQuit
+
+set::prefix-quit (optional)
+Sets a prefix for all quit messages.
+Stored in conf->PrefixQuit
+
+set::default-quit (optional)
+Send this when a client does not specify a quit message. If this is not
+specified, "Client exited" will be used.
+Stored in conf->DefaultQuit
+
+set::allow-userhost-change (optional)
+Valid options are never, always, not-on-channels, and force-rejoin.
+Defines the action to be taken when a client changes their user@host.
+Stored in conf->UHChange
+
+set::flat-map (optional)
+Defines how MAP should be sent to users. When set to yes, the map is flat.
+Stored in conf->FlatMap (boolean)
+
+set::dont-resolve (optional)
+If set to yes, hosts of connecting clients will not be resolved.
+Stored in conf->ResolveHosts (boolean)
+
+set::default-bantime (recommended)
+Defines the default bantime for server bans.
+Stored in conf->DefBanTime (as seconds)
+
+set::maxbantime (recommended)
+Sets the maximum bantime for server bans. Services are exempt. This value must
+be greater than or equal to set::default-bantime.
+Stored in conf->MaxBanTime (as seconds)
+
+set::nicklen (required)
+Sets the maximum nick length that clients can use. This may not be greater
+than 50. If a value over 50 is specified, 50 will be used. Opers may not
+override this value.
+Stored in conf->NickLen
+
+set::chanlen (required)
+Sets the maximum channel length that may be used. This may not be greater than
+50, which includes #. If a value over 50 is specified, 50 will be used.
+Stored in conf->ChanLen

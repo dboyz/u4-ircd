@@ -18,6 +18,7 @@
 #ifndef _UNREALIRCD_SOCKETENGINE_H
 #define _UNREALIRCD_SOCKETENGINE_H
 
+#include "module.h"
 #include "modules.h"
 
 #include <vector>

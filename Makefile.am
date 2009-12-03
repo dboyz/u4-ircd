@@ -30,6 +30,7 @@ pkginclude_HEADERS = \
 	include/internal.h \
 	include/ircd.h \
 	include/misc.h \
+	include/module.h \
 	include/modules.h \
 	include/numerics.h \
 	include/socketengine.h \
@@ -39,6 +40,7 @@ unrealircd_SOURCES = \
 	src/channel.cpp \
 	src/main.cpp \
 	src/misc.cpp \
+	src/module.cpp \
 	src/modules.cpp \
 	src/socketengine.cpp \
 	src/user.cpp

@@ -50,7 +50,8 @@ SocketEngine::create(Module& module) throw(std::bad_cast)
 {
 	SocketEngine *newEngine;
 	
-	newEngine = dynamic_cast<SocketEngine*>(module.getObject("SocketEngine"));
+	newEngine = NULL;
+	//newEngine = dynamic_cast<SocketEngine*>(module.getObject("SocketEngine"));
 	if(!newEngine)
 		throw std::bad_cast();
 	

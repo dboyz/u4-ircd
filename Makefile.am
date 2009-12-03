@@ -26,33 +26,29 @@ bin_PROGRAMS = unrealircd
 # by modules that will be compiled against UnrealIRCd-CPP
 pkginclude_HEADERS = \
 	include/base.hpp \
-	include/channel.hpp \
-	include/config.h \
+	include/config.hpp \
+	include/ioservicepool.hpp \
 	include/list.hpp \
 	include/log.hpp \
 	include/map.hpp \
 	include/module.hpp \
 	include/numerics.hpp \
 	include/platform.hpp \
-	include/socketengine.hpp \
 	include/string.hpp \
 	include/stringlist.hpp \
-	include/time.hpp \
-	include/user.hpp
+	include/time.hpp
 
 unrealircd_SOURCES = \
 	src/base.cpp \
-	src/channel.cpp \
 	src/config.cpp \
-	src/misc.cpp \
+	src/ioservicepool.cpp \
 	src/module.cpp \
 	src/string.cpp \
 	src/stringlist.cpp \
 	src/time.cpp \
 	src/unreal.cpp \
-	src/user.cpp \
 	$(pkginclude_HEADERS)
-unrealircd_LDADD = @LTDL_LIBS@ -lld
+unrealircd_LDADD = @LTDL_LIBS@ -ldl
 #unrealircd_CXXFLAGS = -std=c++0x -Wall
 unrealircd_CXXFLAGS = -Wall
 

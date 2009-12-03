@@ -20,6 +20,7 @@
 #define _UNREALIRCD_BASE_H
 
 #include "config.hpp"
+#include "ioservicepool.hpp"
 #include "list.hpp"
 #include "log.hpp"
 #include "module.hpp"
@@ -60,12 +61,16 @@ public:
 	/** list with modules */
 	List<UnrealModule*> modules;
 
+	/** IO service pool */
+	UnrealIOServicePool ios_pool;
+
 private:
 	void checkConfig();
 	void checkPermissions();
 	void finish();
 	void initLog();
 	void initModules();
+
 	void parseArgv();
 	void printConfig();
 	void printUsage();

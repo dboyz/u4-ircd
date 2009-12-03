@@ -16,13 +16,13 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "base.h"
+#include "base.hpp"
 
 int main(int argc, char** argv)
 {
 	UnrealBase unreal(argc, argv);
 
-	unreal.Run();
+	unreal.run();
 
 	return 0;
 }

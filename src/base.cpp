@@ -16,7 +16,9 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "base.h"
+#include "base.hpp"
+#include <cstdlib>
+#include <iostream>
 
 /**
  * UnrealBase constructor.
@@ -25,13 +27,16 @@
  * @param vec Command line argument vector
  */
 UnrealBase::UnrealBase(int cnt, char** vec)
+	: fork_state_(Daemon)
 {
 	for (int i = 0; i < cnt; i++)
-		argv.push_back(std::string(vec));
+		argv << String(vec[i]);
 
-	ParseArgv();
+	// check the command line arguments
+	parseArgv();
 
-	// TODO: configuration reader
+	// start reading the initial config file
+	config.startRead();
 
 	// TODO: log file writer
 
@@ -40,51 +45,186 @@ UnrealBase::UnrealBase(int cnt, char** vec)
 	// TODO: setup listener (w/ threads ?!)
 }
 
+/**
+ * UnrealBase destructor.
+ */
 UnrealBase::~UnrealBase()
 {
-	//XXX: clean allocated stuff here
+	finish();
+}
+
+/**
+ * Configuration file validation check.
+ */
+void UnrealBase::checkConfig()
+{
+	std::cout << "Using file: "
+			  << config.fileName()
+			  << std::endl;
+
+	config.startRead();
+
+	if (config.warnings() > 0)
+	{
+		std::cout << "*** Detected "
+				  << config.warnings()
+				  << " warning(s)."
+				  << std::endl;
+		std::cout << "Please check the warning messages above to resolve "
+				  << "errors in your configuration file and re-run this "
+				  << "check."
+				  << std::endl;
+	}
+	else
+	{
+		std::cout << "*** No warnings were detected when parsing your "
+				  << "configuration file."
+				  << std::endl;
+	}
+
+	exit();
+}
+
+/**
+ * Check user permissions.
+ */
+void UnrealBase::checkPermissions()
+{
+	if (getuid() == 0)
+	{
+		std::cerr << "Fatal: Operation as root is not permitted."
+				  << std::endl;
+		exit(1);
+	}
+}
+
+/**
+ * Terminate program execution.
+ *
+ * @param code If specified, that code is returned to the OS
+ */
+void UnrealBase::exit(int code)
+{
+	finish();
+	std::exit(code);
+}
+
+/**
+ * Free allocated memory, close connections, etc.
+ */
+void UnrealBase::finish()
+{
+	//..
 }
 
 /**
  * Go through the argument vector passed to the program during startup
  * and check for options.
  */
-void UnrealBase::ParseArgv()
+void UnrealBase::parseArgv()
 {
-	std::vector<std::string>::iterator ai = argv.begin();
+	StringList::Iterator sli = argv.begin();
 
-	if (ai != argv.end())
-		ai++; // skip the first entry here
+	if (sli != argv.end())
+		sli++; // skip the first entry here
 
-	for (; ai != argv.end(); ai++)
+	for (; sli != argv.end(); sli++)
 	{
-		if (*ai == "-h" || *ai == "--help")
-			PrintUsage();
-		else if (*ai == "-v" || *ai == "--version")
-			PrintVersion();
+		if (*sli == "-c" || *sli == "--config-file")
+		{
+			if ((sli + 1) == argv.end())
+			{
+				std::cerr << *sli
+						  << ": missing argument"
+						  << std::endl;
+				continue;
+			}
+			else
+			{
+				// update config file name
+				config.setFileName(*++sli);
+				continue;
+			}
+		}
+		else if (*sli == "-C" || *sli == "--check-config")
+		{
+			checkConfig();
+		}
+		else if (*sli == "-h" || *sli == "--help")
+		{
+			printUsage();
+		}
+		else if (*sli == "-i" || *sli == "--interactive")
+		{
+			fork_state_ = Interactive;
+		}
+		else if (*sli == "-P" || *sli == "--print-config")
+		{
+			printConfig();
+		}
+		else if (*sli == "-v" || *sli == "--version")
+		{
+			printVersion();
+		}
 		else
-			std::cerr << *ai << ": unrecognized option" << std::endl;
+		{
+			std::cerr << *sli << ": unrecognized option" << std::endl;
+		}
 	}
 }
 
 /**
  * Print the program usage.
  */
-void UnrealBase::PrintUsage()
+void UnrealBase::printUsage()
 {
-	std::cout << "Usage: " << argv.at(0) << " [ -hv [ arguments ] ]"
-			  << std::endl << std::endl;
-	std::cout << "Available arguments:" << std::endl;
+	std::cout << "Usage: "
+			  << argv.at(0)
+			  << " [ -Cchv [ arguments ] ]"
+			  << std::endl
+			  << std::endl;
+	std::cout << "Available arguments:"
+			  << std::endl;
+	std::cout << "  -C, --check-config         Check your configuration file"
+			  << std::endl;
+	std::cout << "  -c, --config-file FILE     Specify an alternative config file"
+			  << std::endl
+			  << "                             Default: "
+			  << CONFIG_DEFAULT_FILE
+			  << std::endl;
 	std::cout << "  -h, --help                 Print this overview"
+			  << std::endl;
+	std::cout << "  -i, --interactive          Don't daemonize"
+			  << std::endl;
+	std::cout << "  -P, --print-config         Print config map contents"
 			  << std::endl;
 	std::cout << "  -v, --version              Print the program version"
 			  << std::endl;
+
+	exit();
 }
 
 /**
+ * Print the config map contents.
+ */
+void UnrealBase::printConfig()
+{
+	config.startRead();
+
+	Map<String, String> cmap = config.map();
+	Map<String, String>::Iterator ci = cmap.begin();
+
+	for (; ci != cmap.end(); ci++)
+	{
+		std::cout << ci->first << "\n  => \"" << ci->second << "\"\n";
+	}
+
+	exit();
+}
+/**
  * Print the program version.
  */
-void UnrealBase::PrintVersion()
+void UnrealBase::printVersion()
 {
 	std::cout << "UnrealIRCd 4.0.0-alpha" << std::endl;
 	std::cout << "Copyright (c) 2009 The UnrealIRCd Project" << std::endl;
@@ -95,12 +235,13 @@ void UnrealBase::PrintVersion()
 			  << "There is NO WARRANTY, to the extent permitted by law."
 			  << std::endl;
 
+	exit();
 }
 
 /**
  * Run the main loop.
  */
-void UnrealBase::Run()
+void UnrealBase::run()
 {
 	// TODO: enter the main loop here
 }

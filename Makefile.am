@@ -42,6 +42,7 @@ unrealircd_SOURCES = \
 	src/base.cpp \
 	src/config.cpp \
 	src/ioservicepool.cpp \
+	src/log.cpp \
 	src/module.cpp \
 	src/string.cpp \
 	src/stringlist.cpp \

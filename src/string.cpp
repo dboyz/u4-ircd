@@ -64,7 +64,7 @@ String::String(double n)
  *
  * @param n Number to insert
  */
-String::String(int8 n)
+String::String(int8_t n)
 {
 	std::stringstream ss;
 	ss << n;
@@ -112,7 +112,7 @@ String::String(int64_t n)
  *
  * @param n Number to insert
  */
-String::String(uint8 n)
+String::String(uint8_t n)
 {
 	std::stringstream ss;
 	ss << n;
@@ -316,9 +316,9 @@ int32_t String::toInt()
 /**
  * Convert string to 8bit integer.
  */
-int8 String::toInt8()
+int8_t String::toInt8()
 {
-	return toGenericType<int8>();
+	return toGenericType<int8_t>();
 }
 
 /**
@@ -372,9 +372,9 @@ uint32_t String::toUInt()
 /**
  * Convert string to 8bit unsigned integer.
  */
-uint8 String::toUInt8()
+uint8_t String::toUInt8()
 {
-	return toGenericType<uint8>();
+	return toGenericType<uint8_t>();
 }
 
 /**

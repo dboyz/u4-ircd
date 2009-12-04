@@ -42,7 +42,7 @@ public:
 	enum FState
 	{
 		Daemon,			//< server is to be forked
-		Daemon,			//< server is daemonized
+		Daemonized,		//< server is daemonized
 		Interactive		//< server should not be daemonized
 	};
 

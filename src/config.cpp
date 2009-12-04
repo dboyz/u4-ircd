@@ -253,8 +253,8 @@ bool UnrealConfig::read(const String& file)
 				continue;
 		}
 
-		// do actual file parsing
-		if ((pos = line.find(" {")) != String::npos)
+		/* Do actual file parsing */
+		while ((pos = line.find(" {")) != String::npos)
 		{
 			String tmp_cat = line.left(pos).trimmed();
 
@@ -278,8 +278,11 @@ bool UnrealConfig::read(const String& file)
 			{
 				category = line.mid(0, pos).trimmed();
 			}
+
+			line = line.mid(pos + 2).trimmed();
 		}
-		else if (line.contains("};")) //< end of block
+
+		while (line.left(2) == "};") //< end of block
 		{
 			/* on nested blocks, remove the last category item */
 			if (category.contains("/"))
@@ -290,8 +293,11 @@ bool UnrealConfig::read(const String& file)
 			}
 			else
 				category.clear();
+
+			line = line.mid(2);
 		}
-		else if (line.left(8) == "Include ") //< Include directive
+
+		if (line.left(8) == "Include ") //< Include directive
 		{
 			String r;
 			String s = line.mid(8);
@@ -365,18 +371,10 @@ bool UnrealConfig::read(const String& file)
 		}
 		else
 		{
-			if (category.empty())
-			{
-				std::cout << "Warning: " << file << ":" << lineno << " --"
-						  << " Assignment outside of a block: "
-						  << line.trimmed()
-						  << std::endl;
-				warnings_++;
-				continue;
-			}
-
 			while (line.contains(";"))
 			{
+				line = line.trimmed();
+
 				/* get end position of key */
 				size_t fi = line.find(' ');
 
@@ -425,24 +423,25 @@ bool UnrealConfig::read(const String& file)
 
 				entries_.add(key, val.trimmed());
 
+				/* skip now the assignment we had */
 				line = line.mid(sc + 1).trimmed();
+
+				while (line.left(2) == "};")
+				{
+					/* on nested blocks, remove the last category item */
+					if (category.contains("/"))
+					{
+						StringList sl = category.split("/");
+						sl.removeLast();
+						category = sl.join("/");
+					}
+					else
+						category.clear();
+
+					line = line.mid(2);
+				}
 			}
 		}
-		/*
-		else
-		{
-			std::cout << "Warning: "
-					  << file
-					  << ":"
-					  << lineno
-					  << " -- "
-					  << "Invalid directive: "
-					  << line.trimmed()
-					  << std::endl;
-
-			warnings_++;
-		}
-		*/
 	}
 
 	if (cpos != String::npos)

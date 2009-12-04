@@ -48,11 +48,11 @@ public:
 	String(const char* str);
 	String(const std::string& str);
 	String(double n);
-	String(int8 n);
+	String(int8_t n);
 	String(int16_t n);
 	String(int32_t n);
 	String(int64_t n);
-	String(uint8 n);
+	String(uint8_t n);
 	String(uint16_t n);
 	String(uint32_t n);
 	String(uint64_t n);
@@ -67,13 +67,13 @@ public:
 	bool toBool();
 	char toChar();
 	int32_t toInt();
-	int8 toInt8();
+	int8_t toInt8();
 	int16_t toInt16();
 	int32_t toInt32();
 	int64_t toInt64();
 	String toLower();
 	uint32_t toUInt();
-	uint8 toUInt8();
+	uint8_t toUInt8();
 	uint16_t toUInt16();
 	uint32_t toUInt32();
 	uint64_t toUInt64();
@@ -83,11 +83,11 @@ public:
 	String& operator<<(const String& str) { append(str); return *this; }
 	String& operator<<(const std::string& str) { append(str); return *this; }
 	String& operator<<(const char* str) { append(str); return *this; }
-	String& operator<<(int8 n) { String s(n); append(s); return *this; }
+	String& operator<<(int8_t n) { String s(n); append(s); return *this; }
 	String& operator<<(int16_t n) { String s(n); append(s); return *this; }
 	String& operator<<(int32_t n) { String s(n); append(s); return *this; }
 	String& operator<<(int64_t n) { String s(n); append(s); return *this; }
-	String& operator<<(uint8 n) { String s(n); append(s); return *this; }
+	String& operator<<(uint8_t n) { String s(n); append(s); return *this; }
 	String& operator<<(uint16_t n) { String s(n); append(s); return *this; }
 	String& operator<<(uint32_t n) { String s(n); append(s); return *this; }
 	String& operator<<(uint64_t n) { String s(n); append(s); return *this; }

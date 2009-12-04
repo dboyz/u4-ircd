@@ -423,7 +423,7 @@ void UnrealBase::setupListener()
 		lptr->setMaxConnections(max_conns);
 		lptr->setPingFrequency(ping_freq);
 		lptr->setType(ltype);
-		lptr->listen();
+		lptr->run();
 
 		/* debug message */
 		log.write(UnrealLog::Debug, "Adding listener \"%s:%s\"", addr.c_str(),

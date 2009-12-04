@@ -42,6 +42,10 @@ UnrealListener::UnrealListener(const String& address, const uint16_t& port)
  */
 UnrealListener::~UnrealListener()
 {
+	for (List<UnrealSocket*>::Iterator i = connections.begin();
+			i != connections.end(); i++)
+		delete *i;
+
 	connections.clear();
 	close();
 }
@@ -53,6 +57,7 @@ UnrealListener::~UnrealListener()
  */
 void UnrealListener::addConnection(UnrealSocket* sptr)
 {
+	std::cout<<"addConnection()\n";
 	if (connections.size() >= max_connections_)
 	{
 		/* all connection slots in use, drop the connection */
@@ -125,7 +130,7 @@ void UnrealListener::handleAccept(UnrealSocket* sptr, const ErrorCode& ec)
 		unreal->log.write(UnrealLog::Normal, "UnrealListener::handleAccept(): "
 				"Error encountered: %s", errmsg.c_str());
 
-		onError(*this, ec);
+		onError(this, ec);
 
 		/*
 		 * USUALLY, `sptr' should be free'd after leaving this method, as it's
@@ -135,7 +140,7 @@ void UnrealListener::handleAccept(UnrealSocket* sptr, const ErrorCode& ec)
 	else
 	{
 		addConnection(sptr);
-		onNewConnection(*this, sptr);
+		onNewConnection(this, sptr);
 
 		/* wait for the next connection */
 		waitForAccept();
@@ -148,7 +153,7 @@ void UnrealListener::handleAccept(UnrealSocket* sptr, const ErrorCode& ec)
  * @param sptr Shared UnrealSocket pointer
  * @param data Last line read from Socket
  */
-void UnrealListener::handleDataResponse(UnrealSocket& sref, const String& data)
+void UnrealListener::handleDataResponse(UnrealSocket* sptr, const String& data)
 {
 	static StringList tokens = splitLine(const_cast<String&>(data));
 	size_t shift = 0;
@@ -172,44 +177,9 @@ void UnrealListener::handleDataResponse(UnrealSocket& sref, const String& data)
  * @param sptr Shared UnrealSocket pointer
  * @param ec ErrorCode
  */
-void UnrealListener::handleError(UnrealSocket& sref, const ErrorCode& ec)
+void UnrealListener::handleError(UnrealSocket* sptr, const ErrorCode& ec)
 {
-	onError(*this, ec);
-}
-
-/**
- * Resolve the endpoint, bind to it and listen for incoming connections.
- */
-void UnrealListener::listen()
-{
-	ErrorCode ec;
-
-	tcp::resolver resolver(io_service());
-	tcp::resolver::query query(address_, String(port_));
-	tcp::endpoint endpoint = *resolver.resolve(query, ec);
-
-	if (ec)
-	{
-		unreal->log.write(UnrealLog::Normal, "UnrealListener::listen(): "
-				"Can't resolve endpoint for %s:%d", address_.c_str(), port_);
-
-		unreal->exit(1);
-	}
-
-	/* the endpoint should automatically obtain the inet address type */
-	open(endpoint.protocol());
-
-	/* reuse address if it's in use */
-	set_option(tcp::acceptor::reuse_address(true));
-
-	/* bind acceptor to specified endpoint */
-	bind(endpoint);
-
-	/* listen for connections */
-	listen();
-
-	/* wait for connections to be accepted */
-	waitForAccept();
+	onError(this, ec);
 }
 
 /**
@@ -237,10 +207,56 @@ uint32_t UnrealListener::pingFrequency()
  *
  * @param sptr Shared UnrealSocket pointer
  */
-void UnrealListener::removeConnection(UnrealSocket& sref)
+void UnrealListener::removeConnection(UnrealSocket* sptr)
 {
-	//UnrealSocket* sptr = &sref;
-	//connections.remove(sptr);
+	std::cout<<"removeConnection()\n";
+	connections.remove(sptr);
+}
+
+/**
+ * Resolve the endpoint, bind to it and listen for incoming connections.
+ */
+void UnrealListener::run()
+{
+	ErrorCode ec;
+
+	tcp::resolver resolver(io_service());
+	tcp::resolver::query query(address_, String(port_));
+	tcp::endpoint endpoint = *resolver.resolve(query, ec);
+
+	if (ec)
+	{
+		unreal->log.write(UnrealLog::Normal, "UnrealListener::listen(): "
+				"Can't resolve endpoint for %s:%d", address_.c_str(), port_);
+
+		unreal->exit(1);
+	}
+
+	try
+	{
+		/* the endpoint should automatically obtain the inet address type */
+		open(endpoint.protocol());
+
+		/* reuse address if it's in use */
+		set_option(tcp::acceptor::reuse_address(true), ec);
+
+		/* bind acceptor to specified endpoint */
+		bind(endpoint, ec);
+
+		/* listen for connections */
+		listen(socket_base::max_connections, ec);
+	}
+	catch (...)
+	{
+		String what = ec.message();
+
+		unreal->log.write(UnrealLog::Normal, "UnrealListener::listen(): "
+				"Caught exception: %s", what.c_str());
+
+		return;
+	}
+	/* wait for connections to be accepted */
+	waitForAccept();
 }
 
 /**

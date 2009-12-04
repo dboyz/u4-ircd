@@ -66,19 +66,19 @@ public:
 
 public:
 	/** emitted when a Socket starts connecting */
-	boost::signals2::signal<void(UnrealSocket&)> onConnecting;
+	boost::signals2::signal<void(UnrealSocket*)> onConnecting;
 
 	/** emitted when a Socket is connected to the Endpoint */
-	boost::signals2::signal<void(UnrealSocket&)> onConnected;
+	boost::signals2::signal<void(UnrealSocket*)> onConnected;
 
 	/** emitted when a Socket lost the connection */
-	boost::signals2::signal<void(UnrealSocket&)> onDisconnected;
+	boost::signals2::signal<void(UnrealSocket*)> onDisconnected;
 
 	/** emitted when an Error occured */
-	boost::signals2::signal<void(UnrealSocket&, const ErrorCode&)> onError;
+	boost::signals2::signal<void(UnrealSocket*, const ErrorCode&)> onError;
 
 	/** emitted when new data is available for reading */
-	boost::signals2::signal<void(UnrealSocket&, String&)> onRead;
+	boost::signals2::signal<void(UnrealSocket*, String&)> onRead;
 
 private:
 	void handleRead(const ErrorCode& ec, size_t bytes_read);

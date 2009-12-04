@@ -54,10 +54,10 @@ public:
 	void addConnection(UnrealSocket* sptr);
 	String bindAddress();
 	uint16_t bindPort();
-	void listen();
 	uint32_t maxConnections();
 	uint32_t pingFrequency();
-	void removeConnection(UnrealSocket& sref);
+	void removeConnection(UnrealSocket* sptr);
+	void run();
 	void setBindAddress(const String& address);
 	void setBindPort(const uint16_t& port);
 	void setMaxConnections(const uint32_t& max_conn);
@@ -73,16 +73,16 @@ public:
 
 public:
 	/** emitted when an error occured */
-	boost::signals2::signal<void(UnrealListener&, const ErrorCode&)> onError;
+	boost::signals2::signal<void(UnrealListener*, const ErrorCode&)> onError;
 
 	/** emitted when the listener got a new connection */
-	boost::signals2::signal<void(UnrealListener&, UnrealSocket*)>
+	boost::signals2::signal<void(UnrealListener*, UnrealSocket*)>
 		onNewConnection;
 
 private:
 	void handleAccept(UnrealSocket* sptr, const ErrorCode& ec);
-	void handleDataResponse(UnrealSocket& sref, const String& data);
-	void handleError(UnrealSocket& sref, const ErrorCode& ec);
+	void handleDataResponse(UnrealSocket* sptr, const String& data);
+	void handleError(UnrealSocket* sptr, const ErrorCode& ec);
 
 private:
 	/** listener type */

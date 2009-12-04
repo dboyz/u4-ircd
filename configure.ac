@@ -38,6 +38,12 @@ AC_CHECK_HEADER([ltdl.h],
   [LIBLTDL=])
 AC_SUBST([LTDL_LIBS], [${LIBLTDL}])
 
+# boost modules
+AX_BOOST_BASE([1.35])
+AX_BOOST_ASIO
+AX_BOOST_SYSTEM
+AX_BOOST_THREAD
+
 # Checks for header files.
 
 # Checks for typedefs, structures, and compiler characteristics.

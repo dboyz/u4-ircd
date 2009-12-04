@@ -616,7 +616,7 @@ void UnrealConfig::startRead()
  *
  * @return Number of warnings occurred
  */
-uint32 UnrealConfig::warnings()
+uint32_t UnrealConfig::warnings()
 {
 	return warnings_;
 }

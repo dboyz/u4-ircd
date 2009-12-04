@@ -53,7 +53,7 @@ public:
 	size_t sequenceCount(const String& blk);
 	void setFileName(const String& file);
 	void startRead();
-	uint32 warnings();
+	uint32_t warnings();
 
 private:
 	/** config table entries */
@@ -72,7 +72,7 @@ private:
 	String filename_;
 
 	/** number of warnings encountered on parsing */
-	uint32 warnings_;
+	uint32_t warnings_;
 };
 
 #endif /* _UNREALIRCD_CONFIG_HPP */

@@ -19,4 +19,4 @@ write doxygen-compatible comments in top over each function.
 
 Please *never* use the `long' data type, because it's 32bit wide on x86 and
 64bit wide on x64. That can result in undefined behaviour.
-Please use `int' or `int32' for 32bit integers and `int64' for 64bit integers.
+Please use `int' or `int32_t' for 32bit integers and `int64_t' for 64bit integers.

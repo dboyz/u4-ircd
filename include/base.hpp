@@ -28,6 +28,7 @@
 #include "config.hpp"
 #include "ioservicepool.hpp"
 #include "list.hpp"
+#include "listener.hpp"
 #include "log.hpp"
 #include "module.hpp"
 #include "string.hpp"
@@ -70,17 +71,20 @@ public:
 	/** IO service pool */
 	UnrealIOServicePool ios_pool;
 
+	/** list with listeners */
+	List<UnrealListener::ListenerPtr> listeners;
+
 private:
 	void checkConfig();
 	void checkPermissions();
 	void finish();
 	void initLog();
 	void initModules();
-
 	void parseArgv();
 	void printConfig();
 	void printUsage();
 	void printVersion();
+	void setupListener();
 
 private:
 	/** fork() state */

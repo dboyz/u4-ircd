@@ -76,7 +76,7 @@ String::String(int8 n)
  *
  * @param n Number to insert
  */
-String::String(int16 n)
+String::String(int16_t n)
 {
 	std::stringstream ss;
 	ss << n;
@@ -88,7 +88,7 @@ String::String(int16 n)
  *
  * @param n Number to insert
  */
-String::String(int32 n)
+String::String(int32_t n)
 {
 	std::stringstream ss;
 	ss << n;
@@ -100,7 +100,7 @@ String::String(int32 n)
  *
  * @param n Number to insert
  */
-String::String(int64 n)
+String::String(int64_t n)
 {
 	std::stringstream ss;
 	ss << n;
@@ -124,7 +124,7 @@ String::String(uint8 n)
  *
  * @param n Number to insert
  */
-String::String(uint16 n)
+String::String(uint16_t n)
 {
 	std::stringstream ss;
 	ss << n;
@@ -136,7 +136,7 @@ String::String(uint16 n)
  *
  * @param n Number to insert
  */
-String::String(uint32 n)
+String::String(uint32_t n)
 {
 	std::stringstream ss;
 	ss << n;
@@ -148,7 +148,7 @@ String::String(uint32 n)
  *
  * @param n Number to insert
  */
-String::String(uint64 n)
+String::String(uint64_t n)
 {
 	std::stringstream ss;
 	ss << n;
@@ -308,9 +308,9 @@ _Ty String::toGenericType()
 /**
  * Convert string to 32bit integer.
  */
-int32 String::toInt()
+int32_t String::toInt()
 {
-	return toGenericType<int32>();
+	return toGenericType<int32_t>();
 }
 
 /**
@@ -324,25 +324,25 @@ int8 String::toInt8()
 /**
  * Convert string to 16bit integer.
  */
-int16 String::toInt16()
+int16_t String::toInt16()
 {
-	return toGenericType<int16>();
+	return toGenericType<int16_t>();
 }
 
 /**
  * Convert string to 32bit integer.
  */
-int32 String::toInt32()
+int32_t String::toInt32()
 {
-	return toGenericType<int32>();
+	return toGenericType<int32_t>();
 }
 
 /**
  * Convert string to 64bit integer.
  */
-int64 String::toInt64()
+int64_t String::toInt64()
 {
-	return toGenericType<int64>();
+	return toGenericType<int64_t>();
 }
 
 /**
@@ -364,9 +364,9 @@ String String::toLower()
 /**
  * Convert string to 32bit unsigned integer.
  */
-uint32 String::toUInt()
+uint32_t String::toUInt()
 {
-	return toGenericType<uint32>();
+	return toGenericType<uint32_t>();
 }
 
 /**
@@ -380,25 +380,25 @@ uint8 String::toUInt8()
 /**
  * Convert string to 16bit unsigned integer.
  */
-uint16 String::toUInt16()
+uint16_t String::toUInt16()
 {
-	return toGenericType<uint16>();
+	return toGenericType<uint16_t>();
 }
 
 /**
  * Convert string to 32bit unsigned integer.
  */
-uint32 String::toUInt32()
+uint32_t String::toUInt32()
 {
-	return toGenericType<uint32>();
+	return toGenericType<uint32_t>();
 }
 
 /**
  * Convert string to 64bit unsigned integer.
  */
-uint64 String::toUInt64()
+uint64_t String::toUInt64()
 {
-	return toGenericType<uint64>();
+	return toGenericType<uint64_t>();
 }
 
 /**

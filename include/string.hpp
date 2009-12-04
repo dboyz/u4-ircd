@@ -49,13 +49,13 @@ public:
 	String(const std::string& str);
 	String(double n);
 	String(int8 n);
-	String(int16 n);
-	String(int32 n);
-	String(int64 n);
+	String(int16_t n);
+	String(int32_t n);
+	String(int64_t n);
 	String(uint8 n);
-	String(uint16 n);
-	String(uint32 n);
-	String(uint64 n);
+	String(uint16_t n);
+	String(uint32_t n);
+	String(uint64_t n);
 
 	bool contains(const String& str) const;
 	String left(size_t count);
@@ -66,17 +66,17 @@ public:
 	String& sprintf(const char* fmt, ...);
 	bool toBool();
 	char toChar();
-	int32 toInt();
+	int32_t toInt();
 	int8 toInt8();
-	int16 toInt16();
-	int32 toInt32();
-	int64 toInt64();
+	int16_t toInt16();
+	int32_t toInt32();
+	int64_t toInt64();
 	String toLower();
-	uint32 toUInt();
+	uint32_t toUInt();
 	uint8 toUInt8();
-	uint16 toUInt16();
-	uint32 toUInt32();
-	uint64 toUInt64();
+	uint16_t toUInt16();
+	uint32_t toUInt32();
+	uint64_t toUInt64();
 	String toUpper();
 	String trimmed();
 
@@ -84,13 +84,13 @@ public:
 	String& operator<<(const std::string& str) { append(str); return *this; }
 	String& operator<<(const char* str) { append(str); return *this; }
 	String& operator<<(int8 n) { String s(n); append(s); return *this; }
-	String& operator<<(int16 n) { String s(n); append(s); return *this; }
-	String& operator<<(int32 n) { String s(n); append(s); return *this; }
-	String& operator<<(int64 n) { String s(n); append(s); return *this; }
+	String& operator<<(int16_t n) { String s(n); append(s); return *this; }
+	String& operator<<(int32_t n) { String s(n); append(s); return *this; }
+	String& operator<<(int64_t n) { String s(n); append(s); return *this; }
 	String& operator<<(uint8 n) { String s(n); append(s); return *this; }
-	String& operator<<(uint16 n) { String s(n); append(s); return *this; }
-	String& operator<<(uint32 n) { String s(n); append(s); return *this; }
-	String& operator<<(uint64 n) { String s(n); append(s); return *this; }
+	String& operator<<(uint16_t n) { String s(n); append(s); return *this; }
+	String& operator<<(uint32_t n) { String s(n); append(s); return *this; }
+	String& operator<<(uint64_t n) { String s(n); append(s); return *this; }
 	String& operator>>(char& ch) { ch = toChar(); return *this; }
 
 private:

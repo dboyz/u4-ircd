@@ -1,0 +1,22 @@
+This document describes the code style reference for the UnrealIRCd Project.
+We encourage you to follow this recommandation. Writing code is like art,
+it's not just a pleasure to read clean code - it makes things easier.
+
+Before thinking of the first thing, make sure that your editor is writing unix-
+style newlines. The project is currently using unix-style newlines and mixing
+in <CR><LF>-type stuff is messy and will produce weird diffs/patches.
+
+First of all, make sure you've chosen an editor that supports UTF-8. Any code
+should be UTF-8 formatted, but make sure to disable BOM signatures for your
+files. Use real tabs for indentation. I prefer 4 characters per indentation.
+Any file has to end with an empty line.
+
+Class names begin with an uppercase letter, class members with an lowercase
+letter. Private class members should be suffixed with "_", instead of using
+the obsolete hungarian notation (m_*).
+Use comments heavily to describe what your code does. Additionally, please
+write doxygen-compatible comments in top over each function.
+
+Please *never* use the `long' data type, because it's 32bit wide on x86 and
+64bit wide on x64. That can result in undefined behaviour.
+Please use `int' or `int32_t' for 32bit integers and `int64_t' for 64bit integers.

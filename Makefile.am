@@ -1,0 +1,72 @@
+ #################################################################
+ # Unreal Internet Relay Chat Daemon, Version 4
+ # File         Makefile.am
+ # Description  Description of source files to build and install
+ #
+ # All parts of this program are Copyright(C) 2009 by their
+ # respective authors and the UnrealIRCd development team.
+ #
+ # This program is free software; you can redistribute it and/or
+ # modify it under the terms of the GNU General Public License as
+ # published by the Free Software Foundation; either version 3 of
+ # the License, or (at your option) any later version.
+ #
+ # You should have received a copy of the GNU General Public
+ # License along with this program; if not, write to the Free
+ # Software Foundation, Inc., 59 Temple Place - Suite 330,
+ # Boston, MA 02111-1307, USA.
+ #
+ # This program is distributed in the hope that it will be useful,
+ # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ # GNU General Public License for more details.
+ ##################################################################
+
+# The following is:
+# somewhat based off of unieject-6
+
+INCLUDES = -I$(top_srcdir)/include
+
+bin_PROGRAMS = unrealircd
+
+# this is pkginclude because these headers are needed
+# by modules that will be compiled against UnrealIRCd-CPP
+pkginclude_HEADERS = \
+	include/base.hpp \
+	include/config.hpp \
+	include/ioservicepool.hpp \
+	include/list.hpp \
+	include/log.hpp \
+	include/map.hpp \
+	include/module.hpp \
+	include/numerics.hpp \
+	include/platform.hpp \
+	include/string.hpp \
+	include/stringlist.hpp \
+	include/time.hpp
+
+unrealircd_SOURCES = \
+	src/base.cpp \
+	src/config.cpp \
+	src/ioservicepool.cpp \
+	src/log.cpp \
+	src/module.cpp \
+	src/string.cpp \
+	src/stringlist.cpp \
+	src/time.cpp \
+	src/unreal.cpp \
+	$(pkginclude_HEADERS)
+
+unrealircd_LDADD = @LTDL_LIBS@ @BOOST_LDFLAGS@ @BOOST_ASIO_LIB@ @BOOST_SYSTEM_LIB@ @BOOST_THREAD_LIB@ -ldl
+#unrealircd_CXXFLAGS = @BOOST_CPPFLAGS@ -std=c++0x -Wall
+unrealircd_CXXFLAGS = @BOOST_CPPFLAGS@ -Wall
+
+# http://www.flameeyes.eu/autotools-mythbuster/libtool/index.html#libtool.plugins.dlopen
+
+MODULEDIR=src/modules
+pkglib_LTLIBRARIES = \
+	m_null.la
+
+m_null_la_SOURCES = $(MODULEDIR)/m_null
+m_null_la_LIBADD = $(unrealircd_LDADD)
+m_null_la_LDFLAGS = -module -avoid-version -shared

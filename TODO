@@ -1,0 +1,55 @@
+UnrealIRCd C++ TODO:
+
+Legend:
+
+[X] Done
+[ ] No status
+[~] In progress
+[*] Seek the advice of other developers before attempting.
+
+===========================================================================
+
+[ ] Get a socket engine going (select() first?)
+[ ] Work on user management (use std::string for simple things (nicks, gecos's, etc))
+[ ] Create 3.2-style numeric sending (see src/s_err.c in 3.2)
+[ ] Main core (waiting for more developers to arrive)
+[ ] Configuration parser (3.2-style, core directives are in doc/configuration.txt)
+[ ] Commands needed in the core:
+    [ ] ADMIN
+    [ ] AWAY
+    [ ] CLOSE
+    [ ] GLINE
+    [ ] INVITE
+    [ ] ISON
+    [ ] JOIN   
+    [ ] KICK
+    [ ] KILL
+    [ ] KNOCK
+    [ ] LINKS
+    [ ] LIST
+    [ ] LUSERS
+    [ ] MAP
+    [ ] MODE
+    [ ] MODULES
+    [ ] MOTD
+    [ ] NAMES
+    [ ] NICK
+    [ ] NOTICE
+    [ ] OPER
+    [ ] PART
+    [ ] PASS
+    [ ] PING
+    [ ] PONG
+    [ ] PRIVMSG
+    [ ] QUIT
+    [ ] REHASH
+    [ ] SILENCE
+    [ ] TOPIC
+    [ ] USER
+    [ ] VERSION
+    [ ] WHO
+    [ ] WHOIS
+    [ ] WHOWAS
+    [ ] WATCH
+    [ ] ZLINE
+[ ] Make sure each function has a Pre-Event and regular event associated with it.

@@ -1,22 +1,29 @@
-/*  UnrealIRCd -- The Next Generation IRCd.
-*
-*   This program is free software; you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation; either version 1, or (at your option)
-*   any later version.
-*
-*   This program is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*   along with this program; if not, write to the Free Software
-*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-*/
+/*****************************************************************
+ * Unreal Internet Relay Chat Daemon, Version 4
+ * File         numerics,hpp
+ * Description  IRC Numerics; basic components of the IRC protocol
+ *
+ * All parts of this program are Copyright(C) 2009 by their
+ * respective authors and the UnrealIRCd development team.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the Free
+ * Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ ******************************************************************/
 
-#ifndef _UNREALIRCD_NUMERICS_H
-#define _UNREALIRCD_NUMERICS_H
+#ifndef _UNREALIRCD_NUMERICS_HPP
+#define _UNREALIRCD_NUMERICS_HPP
 
 /*
  * Numeric Constants

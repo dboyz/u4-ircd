@@ -2,6 +2,10 @@ This document describes the code style reference for the UnrealIRCd Project.
 We encourage you to follow this recommandation. Writing code is like art,
 it's not just a pleasure to read clean code - it makes things easier.
 
+Before thinking of the first thing, make sure that your editor is writing unix-
+style newlines. The project is currently using unix-style newlines and mixing
+in <CR><LF>-type stuff is messy and will produce weird diffs/patches.
+
 First of all, make sure you've chosen an editor that supports UTF-8. Any code
 should be UTF-8 formatted, but make sure to disable BOM signatures for your
 files. Use real tabs for indentation. I prefer 4 characters per indentation.

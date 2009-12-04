@@ -44,16 +44,16 @@ UnrealBase::UnrealBase(int cnt, char** vec)
 	for (int i = 0; i < cnt; i++)
 		argv << String(vec[i]);
 
-	// check the command line arguments
+	/* check the command line arguments */
 	parseArgv();
 
-	// start reading the initial config file
+	/* start reading the initial config file */
 	config.startRead();
 
-	// log file stuff
+	/* open log file */
 	initLog();
 
-	// load modules
+	/* load modules */
 	initModules();
 
 	/* setup IO service pool */
@@ -69,7 +69,8 @@ UnrealBase::UnrealBase(int cnt, char** vec)
 	else if (ios_pool.size() != io_pool_size)
 		ios_pool.resize(io_pool_size);
 
-	// TODO: setup listener (w/ threads ?!)
+	/* setup Listeners */
+	setupListener();
 
 	if (fork_state_ == Daemon)
 	{
@@ -363,4 +364,72 @@ void UnrealBase::printVersion()
 void UnrealBase::run()
 {
 	ios_pool.run();
+}
+
+/**
+ * Setup Listeners, that handle incoming connections.
+ */
+void UnrealBase::setupListener()
+{
+	for (size_t i = 1; i <= config.sequenceCount("Listener"); i++)
+	{
+		String addr = config.getSeqVal("Listener", i, "Address", "");
+
+		if (addr.empty())
+		{
+			log.write(UnrealLog::Normal, "Warning: Omitting Listener #%d: "
+					"No Address has been defined", i);
+
+			continue;
+		}
+
+		String port = config.getSeqVal("Listener", i, "Port", "");
+
+		if (port.empty())
+		{
+			log.write(UnrealLog::Normal, "Warning: Omitting Listener #%d: "
+					"No Port has been defined", i);
+
+			continue;
+		}
+
+		String type = config.getSeqVal("Listener", i, "Type", "");
+
+		if (type.empty())
+		{
+			log.write(UnrealLog::Normal, "Warning: Omitting Listener #%d: "
+					"No Type has been defined", i);
+
+			continue;
+		}
+
+		/* ping frequency */
+		uint32_t ping_freq = config.getSeqVal("Listener", i, "PingFreq",
+			config.get("Limits/PingFreq", "120")).toUInt();
+
+		/* max. connections allowed for this listener */
+		uint32_t max_conns = config.getSeqVal("Listener", i, "MaxConnections",
+			"1024").toUInt();
+
+		/* Setup the Listener */
+		UnrealListener::ListenerPtr lptr(new UnrealListener(addr, port.toUInt16()));
+		UnrealListener::ListenerType ltype;
+
+		if (type.toLower() == "server")
+			ltype = UnrealListener::LServer;
+		else
+			ltype = UnrealListener::LClient;
+
+		lptr->setMaxConnections(max_conns);
+		lptr->setPingFrequency(ping_freq);
+		lptr->setType(ltype);
+		lptr->listen();
+
+		/* debug message */
+		log.write(UnrealLog::Debug, "Adding listener \"%s:%s\"", addr.c_str(),
+				port.c_str());
+
+		/* append listener to list */
+		listeners << lptr;
+	}
 }

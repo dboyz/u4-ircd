@@ -36,11 +36,13 @@ pkginclude_HEADERS = \
 	include/config.hpp \
 	include/ioservicepool.hpp \
 	include/list.hpp \
+	include/listener.hpp \
 	include/log.hpp \
 	include/map.hpp \
 	include/module.hpp \
 	include/numerics.hpp \
 	include/platform.hpp \
+	include/socket.hpp \
 	include/string.hpp \
 	include/stringlist.hpp \
 	include/time.hpp
@@ -49,8 +51,10 @@ unrealircd_SOURCES = \
 	src/base.cpp \
 	src/config.cpp \
 	src/ioservicepool.cpp \
+	src/listener.cpp \
 	src/log.cpp \
 	src/module.cpp \
+	src/socket.cpp \
 	src/string.cpp \
 	src/stringlist.cpp \
 	src/time.cpp \

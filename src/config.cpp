@@ -279,7 +279,7 @@ bool UnrealConfig::read(const String& file)
 				category = line.mid(0, pos).trimmed();
 			}
 		}
-		else if (line.contains("};"))
+		else if (line.contains("};")) //< end of block
 		{
 			/* on nested blocks, remove the last category item */
 			if (category.contains("/"))
@@ -291,64 +291,7 @@ bool UnrealConfig::read(const String& file)
 			else
 				category.clear();
 		}
-		else if (line.contains("="))
-		{
-			if (category.empty())
-			{
-				std::cout << "Warning: " << file << ":" << lineno << " --"
-						  << " Assignment outside of a block: "
-						  << line.trimmed()
-						  << std::endl;
-				warnings_++;
-				continue;
-			}
-
-			// find first occurrence of "="
-			size_t fi = line.find('=');
-
-			// get the key
-			String val = line.left(fi).trimmed();
-			String key = category + "/" + val;
-
-			// content
-			String tmp = line.mid(fi + 1);
-
-			// lookup variables to be replaced
-			String ret;
-			if (!replaceVars(tmp, ret, category))
-			{
-				std::cout << "Warning: "
-						  << file
-						  << ":"
-						  << lineno
-						  << " -- Can't resolve content of variable \""
-						  << ret
-						  << "\" in category \""
-						  << category
-						  << "\"\n";
-				warnings_++;
-			}
-
-			// clear the value since we have to fill it up with proper content
-			val.clear();
-
-			if (!getQuotedContent(tmp, val))
-			{
-				std::cout << "Warning: "
-						  << file
-						  << ":"
-						  << lineno
-						  << " --"
-						  << " Value is missing closing quote"
-						  << std::endl;
-				warnings_++;
-
-				continue;
-			}
-
-			entries_.add(key, val.trimmed());
-		}
-		else if (line.left(8) == "Include ")
+		else if (line.left(8) == "Include ") //< Include directive
 		{
 			String r;
 			String s = line.mid(8);
@@ -372,7 +315,7 @@ bool UnrealConfig::read(const String& file)
 
 			files_ << r;
 		}
-		else if (line.left(11) == "LoadModule ")
+		else if (line.left(11) == "LoadModule ") //< LoadModule directive
 		{
 			String r;
 			String s = line.mid(11);
@@ -396,7 +339,7 @@ bool UnrealConfig::read(const String& file)
 
 			modules_ << r;
 		}
-		else if (line.left(9) == "Sequence ")
+		else if (line.left(9) == "Sequence ") //< Sequence directive
 		{
 			String r;
 			String s = line.mid(9);
@@ -422,6 +365,72 @@ bool UnrealConfig::read(const String& file)
 		}
 		else
 		{
+			if (category.empty())
+			{
+				std::cout << "Warning: " << file << ":" << lineno << " --"
+						  << " Assignment outside of a block: "
+						  << line.trimmed()
+						  << std::endl;
+				warnings_++;
+				continue;
+			}
+
+			while (line.contains(";"))
+			{
+				/* get end position of key */
+				size_t fi = line.find(' ');
+
+				/* get position of ';' */
+				size_t sc = line.find(';');
+
+				// get the key
+				String val = line.left(fi).trimmed();
+				String key = category + "/" + val;
+
+				// content
+				String tmp = line.mid(fi + 1, sc);
+
+				// lookup variables to be replaced
+				String ret;
+				if (!replaceVars(tmp, ret, category))
+				{
+					std::cout << "Warning: "
+							  << file
+							  << ":"
+							  << lineno
+							  << " -- Can't resolve content of variable \""
+							  << ret
+							  << "\" in block \""
+							  << category
+							  << "\"\n";
+					warnings_++;
+				}
+
+				// clear the value since we have to fill it up with proper content
+				val.clear();
+
+				if (!getQuotedContent(tmp, val))
+				{
+					std::cout << "Warning: "
+							  << file
+							  << ":"
+							  << lineno
+							  << " --"
+							  << " Value is missing closing quote"
+							  << std::endl;
+					warnings_++;
+
+					continue;
+				}
+
+				entries_.add(key, val.trimmed());
+
+				line = line.mid(sc + 1).trimmed();
+			}
+		}
+		/*
+		else
+		{
 			std::cout << "Warning: "
 					  << file
 					  << ":"
@@ -433,6 +442,7 @@ bool UnrealConfig::read(const String& file)
 
 			warnings_++;
 		}
+		*/
 	}
 
 	if (cpos != String::npos)
@@ -505,7 +515,13 @@ bool UnrealConfig::replaceVars(String& str, String& ret, const String& category)
 	{
 		char var_name[1024];
 
-		if (std::sscanf(str.c_str() + pos, "$(%[^)])", var_name) > 0)
+		/* ignore escaped vars */
+		if (pos > 0 && str[pos - 1] == '\\')
+		{
+			pos += 3;
+			continue;
+		}
+		else if (std::sscanf(str.c_str() + pos, "$(%[^)])", var_name) > 0)
 		{
 			String vr = var_name;
 			size_t vrlen = vr.length();

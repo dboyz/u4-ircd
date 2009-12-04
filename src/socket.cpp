@@ -51,10 +51,24 @@ void UnrealSocket::handleRead(const ErrorCode& ec, size_t bytes_read)
 		ErrorCode edupl = ec;
 		String errmsg = edupl.message();
 
-		unreal->log.write(UnrealLog::Normal, "Error handling async_write on "
-				"socket %d: %s", native(), errmsg.c_str());
+		unreal->log.write(UnrealLog::Normal, "Error handling async_read on "
+				"socket %d: %s (%d)", native(), errmsg.c_str(), edupl.value());
 
-		onError(*this, ec);
+		onError(this, ec);
+
+		/* notify on connection loss */
+		switch (edupl.value())
+		{
+			case boost::asio::error::eof:
+			case boost::asio::error::connection_reset:
+			case boost::asio::error::network_reset:
+			case boost::asio::error::network_unreachable:
+				onDisconnected(this);
+				break;
+
+			default:
+				break;
+		}
 	}
 	else
 	{
@@ -63,7 +77,7 @@ void UnrealSocket::handleRead(const ErrorCode& ec, size_t bytes_read)
 		std::getline(is, buffer);
 
 		if (buffer.length() > 0)
-			onRead(*this, buffer);
+			onRead(this, buffer);
 
 		/* wait for the next line */
 		waitForLine();
@@ -84,9 +98,23 @@ void UnrealSocket::handleWrite(const ErrorCode& ec, size_t bytes_written)
 		String errmsg = edupl.message();
 
 		unreal->log.write(UnrealLog::Normal, "Error handling async_write on "
-				"socket %d", native(), errmsg.c_str());
+				"socket %d: %s (%d)", native(), errmsg.c_str(), edupl.value());
 
-		onError(*this, ec);
+		onError(this, ec);
+
+		/* notify on connection loss */
+		switch (edupl.value())
+		{
+			case boost::asio::error::eof:
+			case boost::asio::error::connection_reset:
+			case boost::asio::error::network_reset:
+			case boost::asio::error::network_unreachable:
+				onDisconnected(this);
+				break;
+
+			default:
+				break;
+		}
 	}
 
 	/* add actual amount of data that has been written on the socket */

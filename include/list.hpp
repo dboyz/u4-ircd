@@ -92,7 +92,7 @@ public:
 	{
 		for (Iterator i = this->begin(); i != this->end(); i++)
 		{
-			if (i == el)
+			if (*i == el)
 			{
 				this->erase(i);
 				return;

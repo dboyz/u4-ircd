@@ -36,10 +36,10 @@
 #endif
 
 /** module initialization symbol name */
-#define MODULE_INIT_FN		"unrInit"
+#define MODULE_INIT_FN		"_init"
 
 /** module close symbol name */
-#define MODULE_CLOSE_FN		"unrClose"
+#define MODULE_CLOSE_FN		"_close"
 
 /**
  * This class holds informations that are updated by the modules itself
@@ -67,7 +67,7 @@ public:
 	enum ModuleState { SNone, SError, SLoaded };
 
 	/** enumerate module result */
-	enum ModuleResult { Success, Failed };
+	enum Result { Success, Failed };
 
 	/** alias the Inf class */
 	typedef UnrealModuleInf Info;
@@ -80,10 +80,10 @@ public:
 #endif
 
 	/** module initialization symbol type */
-	typedef ModuleResult (InitFunc)(UnrealModule&);
+	typedef Result (InitFunc)(UnrealModule&);
 
 	/** module close symbol type */
-	typedef ModuleResult (CloseFunc)(UnrealModule&);
+	typedef Result (CloseFunc)(UnrealModule&);
 
 public:
 	UnrealModule(const String& fname);

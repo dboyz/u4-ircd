@@ -167,6 +167,24 @@ bool String::contains(const String& str) const
 }
 
 /**
+ * Format string, static version.
+ *
+ * @param fmt printf-style string format
+ * @return Reference to actual string.
+ */
+String String::format(const char* fmt, ...)
+{
+	static char buffer[SPRINTF_BUFFER_SIZE];
+	va_list vl;
+
+	va_start(vl, fmt);
+	vsnprintf(buffer, SPRINTF_BUFFER_SIZE, fmt, vl);
+	va_end(vl);
+
+	return buffer;
+}
+
+/**
  * Returns `count' characters, start counting from the left side.
  *
  * @param count Number of characters to return

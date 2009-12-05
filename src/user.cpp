@@ -88,6 +88,32 @@ UnrealTime UnrealUser::connectionTime()
 }
 
 /**
+ * Lookup a user entry by socket.
+ *
+ * @param sptr UnrealSocket pointer
+ */
+UnrealUser* UnrealUser::find(UnrealSocket* sptr)
+{
+	if (unreal->users.contains(sptr))
+		return unreal->users[sptr];
+	else
+		return 0;
+}
+
+/**
+ * Lookup a user entry by nick.
+ *
+ * @param nickname Nick name
+ */
+UnrealUser* UnrealUser::find(const String& nickname)
+{
+	if (unreal->nicks.contains(nickname))
+		return unreal->nicks[nickname];
+	else
+		return 0;
+}
+
+/**
  * Callback for resolver response.
  *
  * @param ec boost error_code
@@ -221,6 +247,58 @@ void UnrealUser::send(const String& data)
 }
 
 /**
+ * Send a reply originating from the server using a numeric reply.
+ *
+ * @param numeric Numeric reply to send
+ * @param data Data block
+ */
+void UnrealUser::sendreply(IRCNumeric numeric, const String& data)
+{
+	int num = static_cast<int>(numeric);
+	String reply;
+
+	reply.sprintf(":%s %03d %s %s",
+			unreal->config.get("Me/ServerName", "not.configured").c_str(),
+			num,
+			nickname_.c_str(),
+			data.c_str());
+
+	send(reply);
+}
+
+/**
+ * Send a reply originating from the server using a command.
+ *
+ * @param cmd Command to send
+ * @param data Data block
+ */
+void UnrealUser::sendreply(const String& cmd, const String& data)
+{
+	String reply;
+
+	reply.sprintf(":%s %s %s %s",
+			unreal->config.get("Me/ServerName", "not.configured").c_str(),
+			cmd.c_str(),
+			nickname_.c_str(),
+			data.c_str());
+
+	send(reply);
+}
+
+/**
+ * Send a ping request.
+ */
+void UnrealUser::sendPing()
+{
+	String request_str;
+
+	request_str.sprintf("PING :%s",
+			unreal->config.get("Me/ServerName", "not.configured").c_str());
+
+	send(request_str);
+}
+
+/**
  * Update the visible hostname.
  *
  * @param newhost New hostname
@@ -280,6 +358,16 @@ void UnrealUser::setNick(const String& newnick)
 void UnrealUser::setRealHostname(const String& newhost)
 {
 	real_hostname_ = newhost;
+}
+
+/**
+ * Update the realname.
+ *
+ * @param rn Real name
+ */
+void UnrealUser::setRealname(const String& rn)
+{
+	realname_ = rn;
 }
 
 /**

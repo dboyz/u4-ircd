@@ -32,6 +32,7 @@
 #include "resolver.hpp"
 #include "string.hpp"
 #include "time.hpp"
+#include <boost/asio.hpp>
 
 /**
  * Representation of an user entry.
@@ -64,19 +65,25 @@ public:
 	void auth();
 	Bitmask<uint8_t>& authflags();
 	UnrealTime connectionTime();
+	void exitClient(const String& message);
 	static UnrealUser* find(UnrealSocket* sptr);
 	static UnrealUser* find(const String& nickname);
 	const String& hostname();
 	const String& ident();
+	UnrealTime lastPongTime();
 	UnrealListener* listener();
 	const String& nick();
 	const String& realHostname();
+	void registerUser();
 	void send(const String& data);
+	void sendISupport();
+	void sendlocalreply(const String& cmd, const String& data);
 	void sendreply(IRCNumeric numeric, const String& data);
 	void sendreply(const String& cmd, const String& data);
 	void sendPing();
 	void setHostname(const String& newhost);
 	void setIdent(const String& newident);
+	void setLastPongTime(const UnrealTime& ts);
 	void setListener(UnrealListener* lptr);
 	void setNick(const String& newnick);
 	void setRealHostname(const String& newhost);
@@ -84,10 +91,14 @@ public:
 	UnrealSocket* socket();
 
 private:
+	void checkAuthTimeout();
+	void checkPingTimeout();
 	void handleResolveResponse(const UnrealResolver::ErrorCode& ec,
 			UnrealResolver::Iterator response);
 	String lowerNick();
 	void resolveHostname();
+	void scheduleAuthTimeout();
+	void schedulePingTimeout();
 
 private:
 	/** authentication flags */
@@ -101,6 +112,9 @@ private:
 
 	/** connection timestamp */
 	UnrealTime connection_time_;
+
+	/** last pong timestamp */
+	UnrealTime last_pong_time_;
 
 	/** nick name */
 	String nickname_;
@@ -116,6 +130,9 @@ private:
 
 	/** real name */
 	String realname_;
+
+	/** timeout timer */
+	boost::asio::deadline_timer timer_;
 };
 
 #endif /* _UNREALIRCD_USER_HPP */

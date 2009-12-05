@@ -171,7 +171,7 @@ void UnrealListener::handleAccept(UnrealSocket* sptr, const ErrorCode& ec)
  */
 void UnrealListener::handleDataResponse(UnrealSocket* sptr, const String& data)
 {
-	static StringList tokens = splitLine(const_cast<String&>(data));
+	StringList tokens = splitLine(const_cast<String&>(data));
 	size_t shift = 0;
 
 	std::cout << "handleDataResponse[" << data << "]" << std::endl;

@@ -22,6 +22,7 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
+#include "base.hpp"
 #include "module.hpp"
 
 /**
@@ -65,6 +66,24 @@ const String& UnrealModule::fileName()
 }
 
 /**
+ * Lookup a Module by filename.
+ *
+ * @param fname Filename of module to lookup
+ * @return Pointer to UnrealModule, or 0 when not found
+ */
+UnrealModule* UnrealModule::find(const String& fname)
+{
+	for (List<UnrealModule*>::Iterator i = unreal->modules.begin();
+			i != unreal->modules.end(); i++)
+	{
+		if ((*i)->fileName() == fname)
+			return *i;
+	}
+
+	return 0;
+}
+
+/**
  * Returns the library handle.
  */
 void* UnrealModule::handle()
@@ -97,37 +116,40 @@ bool UnrealModule::load()
 {
 	if (filename_.empty())
 		state_ = SNone;
-#ifdef WIN32
-	else if (!(handle_ = LoadLibrary(filename_.c_str())))
+	else if (UnrealModule::find(filename_))
 	{
-		DWORD lastErr = GetLastError();
-
-		/* TODO: someone has to convert lastErr to a readable string using
-		 * FormatString(). I'm not familiar with MSVC stuff --commx
-		 */
-		error_str_ = "Unknown error";
+		error_str_ = "Module already loaded";
 		state_ = SError;
 	}
-#else
 	else if (!(handle_ = dlopen(filename_.c_str(), RTLD_NOW | RTLD_GLOBAL)))
 	{
 		error_str_ = dlerror();
 		state_ = SError;
 	}
-#endif
 	else
 	{
-		InitFunc* init = reinterpret_cast<InitFunc*>(resolve(MODULE_INIT_FN));
+		state_ = SLoaded;
 
-		if (!init)
+		InitFunc* initfn = (InitFunc*)resolve(MODULE_INIT_FN);
+
+		if (!initfn)
 		{
 			error_str_.sprintf("Entry symbol \"%s\" not found", MODULE_INIT_FN);
 			state_ = SError;
+
+			dlclose(handle_);
+			handle_ = 0;
 		}
 		else
 		{
-			init(*this);
-			state_ = SLoaded;
+			if (initfn(*this) != Success)
+			{
+				error_str_.sprintf("Init function did not succeed");
+				state_ = SError;
+
+				dlclose(handle_);
+				handle_ = 0;
+			}
 		}
 	}
 
@@ -147,22 +169,10 @@ void* UnrealModule::resolve(const String& name)
 		return 0;
 	else
 	{
-#ifdef WIN32
-		void* sym = reinterpret_cast<void*>(GetProcAddress(handle_, name.c_str()));
-
-		if (!sym)
-		{
-			DWORD lastErr = GetLastError();
-
-			/* TODO: as written above, someone has to do this. */
-			error_str_ = "Unknown error";
-		}
-#else
 		void* sym = dlsym(handle_, name.c_str());
 
 		if (!sym)
 			error_str_ = dlerror();
-#endif
 
 		return sym;
 	}
@@ -202,7 +212,14 @@ void UnrealModule::unload()
 		CloseFunc* clfn = reinterpret_cast<CloseFunc*>(resolve(MODULE_CLOSE_FN));
 
 		if (clfn)
-			clfn(*this);
+		{
+			if (clfn(*this) != Success)
+			{
+				unreal->log.write(UnrealLog::Normal,
+						"UnrealModule::unload(): "
+						"Close function didn't return Success");
+			}
+		}
 
 		dlclose(handle_);
 		handle_ = 0;

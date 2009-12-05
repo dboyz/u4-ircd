@@ -41,6 +41,8 @@ UnrealBase::UnrealBase(int cnt, char** vec)
 	/* make this UnrealBase globally available */
 	unreal = this;
 
+	starttime = UnrealTime::now();
+
 	for (int i = 0; i < cnt; i++)
 		argv << String(vec[i]);
 
@@ -71,6 +73,9 @@ UnrealBase::UnrealBase(int cnt, char** vec)
 
 	/* setup Listeners */
 	setupListener();
+
+	/* build ISupport map */
+	setupISupport();
 
 	if (fork_state_ == Daemon)
 	{
@@ -213,12 +218,11 @@ void UnrealBase::initModules()
 	{
 		UnrealModule* mptr = new UnrealModule(*miter);
 
-		if (!mptr->load())
+		if (!mptr->isLoaded())
 		{
 			String errStr = mptr->errorString();
 
-			log.write(UnrealLog::Normal, "Warning: Loading module \"%s\" failed: %s",
-					(*miter).c_str(),
+			log.write(UnrealLog::Normal, "Warning: Loading module failed: %s",
 					errStr.c_str());
 
 			delete mptr;
@@ -364,6 +368,31 @@ void UnrealBase::printVersion()
 void UnrealBase::run()
 {
 	ios_pool.run();
+}
+
+/**
+ * Setup basic iSupport items.
+ */
+void UnrealBase::setupISupport()
+{
+	if (isupport.size() > 0)
+		isupport.clear();
+
+	isupport.add("SILENCE", "0");
+	isupport.add("MODES", "6");
+	isupport.add("MAXCHANNELS", config.get("Limits/MaxChannels", "20"));
+	isupport.add("MAXBANS", config.get("Limits/MaxBans", "30"));
+	isupport.add("NICKLEN", config.get("Limits/Nicklen", "18"));
+	isupport.add("TOPICLEN", config.get("Limits/Topiclen", "250"));
+	isupport.add("AWAYLEN", config.get("Limits/Awaylen", "250"));
+	isupport.add("KICKLEN", config.get("Limits/Kicklen", "250"));
+	isupport.add("CHANNELLEN", config.get("Limits/Channellen", "200"));
+	isupport.add("CHANTYPES", "#");
+	isupport.add("PREFIX", "(hov)%@+"); //TODO: make halfop disableable w/ cfg
+	isupport.add("STATUSMSG", "%@+");
+	isupport.add("CHANMODES", "b,k,l,imnsp"); // TODO: dynamic generation
+	isupport.add("CASEMAPPING", "rfc1459");
+	isupport.add("NETWORK", config.get("Me/Network", "ExampleNet"));
 }
 
 /**

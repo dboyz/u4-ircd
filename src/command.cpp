@@ -35,7 +35,7 @@
  */
 UnrealUserCommand::UnrealUserCommand(const String& name, Function cfn,
 		bool oper_only)
-	: name_(name), fn_(cfn), oper_only_(oper_only)
+	: name_(name), fn_(cfn), oper_only_(oper_only), active_(true)
 {
 	unreal->user_commands.add(name, this);
 }

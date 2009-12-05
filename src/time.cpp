@@ -35,6 +35,18 @@ UnrealTime::UnrealTime(const std::time_t& ts)
 { }
 
 /**
+ * Add seconds to the actual timestamp data.
+ *
+ * @param sec Seconds to add
+ * @return Reference to the UnrealTime object
+ */
+UnrealTime& UnrealTime::addSeconds(const std::time_t& sec)
+{
+	timestamp_ += sec;
+	return *this;
+}
+
+/**
  * Return a UnrealTime object with the current time.
  *
  * @return Time object

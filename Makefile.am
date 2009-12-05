@@ -38,6 +38,7 @@ pkginclude_HEADERS = \
 	include/command.hpp \
 	include/config.hpp \
 	include/ioservicepool.hpp \
+	include/isupport.hpp \
 	include/list.hpp \
 	include/listener.hpp \
 	include/log.hpp \
@@ -72,6 +73,7 @@ unrealircd_SOURCES = \
 unrealircd_LDADD = @LTDL_LIBS@ @BOOST_LDFLAGS@ @BOOST_ASIO_LIB@ @BOOST_SYSTEM_LIB@ @BOOST_THREAD_LIB@ -ldl
 #unrealircd_CXXFLAGS = @BOOST_CPPFLAGS@ -std=c++0x -Wall
 unrealircd_CXXFLAGS = @BOOST_CPPFLAGS@ -Wall
+unrealircd_LDFLAGS = -Wl,--export-dynamic
 
 # http://www.flameeyes.eu/autotools-mythbuster/libtool/index.html#libtool.plugins.dlopen
 

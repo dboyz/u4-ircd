@@ -1,7 +1,7 @@
 /*****************************************************************
  * Unreal Internet Relay Chat Daemon, Version 4
- * File         user.cpp
- * Description  USER command handler
+ * File         pong.cpp
+ * Description  PONG command handler
  *
  * All parts of this program are Copyright(C) 2009 by their
  * respective authors and the UnrealIRCd development team.
@@ -32,7 +32,7 @@
 UnrealModule::Info modinf =
 {
 	/** Module name */
-	"USER command handler",
+	"PONG command handler",
 
 	/** Module version */
 	"1.0",
@@ -45,45 +45,29 @@ UnrealModule::Info modinf =
 UnrealUserCommand* uc = 0;
 
 /**
- * USER command handler for User connections.
+ * PONG command handler for User connections.
  *
  * Message example:
- * USER commx "commx" "commx.ws" :da real world
+ * PONG :server.name
  *
  * @param uptr Originating user
  * @param argv Argument list
  */
-void uc_user(UnrealUser* uptr, StringList* argv)
+void uc_pong(UnrealUser* uptr, StringList* argv)
 {
-	if (argv->size() < 5)
+	if (argv->size() < 2)
 	{
 		uptr->sendreply(ERR_NEEDMOREPARAMS,
 				String::format(MSG_NEEDMOREPARAMS,
-						CMD_USER));
+						CMD_PONG));
 	}
-	else if (uptr->authflags().isset(UnrealUser::AFUser))
+	else if (argv->at(1) == unreal->config.get("Me/ServerName",
+			"not.configured"))
 	{
-		if (uptr->ident().empty())
-		{
-			/* hyperion-style ident prefix */
-			String ident = "u=" + argv->at(1);
-			uptr->setIdent(ident);
-		}
+		if (uptr->lastPongTime().toTS() == 0)
+			uptr->registerUser();
 
-		size_t userlen = unreal->config.get("Limits/Userlen", "10").toUInt();
-
-		/* trim the ident if it's too long */
-		if (uptr->ident().length() > userlen)
-		{
-			String tmp = uptr->ident();
-			uptr->setIdent(tmp.left(userlen));
-		}
-
-		uptr->setRealname(argv->at(argv->size() - 1));
-		uptr->authflags().revoke(UnrealUser::AFUser);
-
-		if (uptr->authflags().value() == 0)
-			uptr->sendPing();
+		uptr->setLastPongTime(UnrealTime::now());
 	}
 }
 
@@ -93,13 +77,13 @@ void uc_user(UnrealUser* uptr, StringList* argv)
  *
  * @param module Reference to Module
  */
-UNREAL_DLL UnrealModule::Result _init(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
 {
 	/* update module info */
 	module.info = modinf;
 
 	/* register command */
-	uc = new UnrealUserCommand(CMD_USER, &uc_user);
+	uc = new UnrealUserCommand(CMD_PONG, &uc_pong);
 
 	return UnrealModule::Success;
 }
@@ -108,8 +92,9 @@ UNREAL_DLL UnrealModule::Result _init(UnrealModule& module)
  * Module close function.
  * It's called before the Module is unloaded.
  */
-UNREAL_DLL UnrealModule::Result _close(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrClose(UnrealModule& module)
 {
 	delete uc;
+
 	return UnrealModule::Success;
 }

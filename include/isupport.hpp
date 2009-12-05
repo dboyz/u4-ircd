@@ -1,7 +1,7 @@
 /*****************************************************************
  * Unreal Internet Relay Chat Daemon, Version 4
- * File         time.hpp
- * Description  Object for time storage and math
+ * File         isupport.hpp
+ * Description  Manageable iSupport features
  *
  * All parts of this program are Copyright(C) 2009 by their
  * respective authors and the UnrealIRCd development team.
@@ -22,37 +22,12 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#ifndef _UNREALIRCD_TIME_HPP
-#define _UNREALIRCD_TIME_HPP
+#ifndef _UNREALIRCD_ISUPPORT_HPP
+#define _UNREALIRCD_ISUPPORT_HPP
 
-#include "string.hpp"
-#include <ctime>
-
-/**
- * UnrealTime class.
- */
-class UnrealTime
+class UnrealISupport
+	: public Map<String, String>
 {
-public:
-	UnrealTime(const std::time_t& ts = 0);
-
-	UnrealTime& addSeconds(const std::time_t& sec);
-	static UnrealTime now();
-	void setTS(const std::time_t& ts);
-	std::time_t toTS();
-	String toString(const String& fmt);
-
-	inline bool operator<(UnrealTime& other)
-	{ return timestamp_ < other.toTS(); }
-
-	inline bool operator>(UnrealTime& other)
-	{ return timestamp_ > other.toTS(); }
-
-	inline bool operator==(UnrealTime& other)
-	{ return timestamp_ == other.toTS(); }
-
-private:
-	std::time_t timestamp_;
 };
 
-#endif /* _UNREALIRCD_TIME_HPP */
+#endif /* _UNREALIRCD_ISUPPORT_HPP */

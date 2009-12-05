@@ -1,7 +1,7 @@
 /*****************************************************************
  * Unreal Internet Relay Chat Daemon, Version 4
- * File         time.hpp
- * Description  Object for time storage and math
+ * File         resolver.hpp
+ * Description  Asyncronous DNS resolver
  *
  * All parts of this program are Copyright(C) 2009 by their
  * respective authors and the UnrealIRCd development team.
@@ -22,27 +22,39 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#ifndef _UNREALIRCD_TIME_HPP
-#define _UNREALIRCD_TIME_HPP
+#ifndef _UNREALIRCD_RESOLVER_HPP
+#define _UNREALIRCD_RESOLVER_HPP
 
 #include "string.hpp"
-#include <ctime>
+#include <boost/asio.hpp>
+#include <boost/signals2.hpp>
 
-/**
- * UnrealTime class.
- */
-class UnrealTime
+using namespace boost::asio::ip;
+
+class UnrealResolver
+	: public tcp::resolver
 {
 public:
-	UnrealTime(const std::time_t& ts = 0);
+	/** alias errorcode class */
+	typedef boost::system::error_code ErrorCode;
 
-	static UnrealTime now();
-	void setTS(const std::time_t& ts);
-	std::time_t toTS();
-	String toString(const String& fmt);
+	/** alias the resolver iterator */
+	typedef tcp::resolver::iterator Iterator;
+
+	/** alias the query type */
+	typedef tcp::resolver::query Query;
+
+public:
+	UnrealResolver();
+	void query(tcp::endpoint& endpoint);
+	void query(const String& hostname, const uint16_t port);
+
+public:
+	/** emitted when we got an result, or an error occured */
+	boost::signals2::signal<void(const ErrorCode&, Iterator)> onResolve;
 
 private:
-	std::time_t timestamp_;
+	void handleResult(const ErrorCode& ec, Iterator ep_iter);
 };
 
-#endif /* _UNREALIRCD_TIME_HPP */
+#endif /* _UNREALIRCD_RESOLVER_HPP */

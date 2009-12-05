@@ -27,6 +27,7 @@
 
 #include "list.hpp"
 #include "socket.hpp"
+#include "string.hpp"
 #include "stringlist.hpp"
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>

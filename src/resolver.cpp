@@ -1,7 +1,7 @@
 /*****************************************************************
  * Unreal Internet Relay Chat Daemon, Version 4
- * File         time.hpp
- * Description  Object for time storage and math
+ * File         resolver.cpp
+ * Description  Asyncronous DNS resolver
  *
  * All parts of this program are Copyright(C) 2009 by their
  * respective authors and the UnrealIRCd development team.
@@ -22,27 +22,46 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#ifndef _UNREALIRCD_TIME_HPP
-#define _UNREALIRCD_TIME_HPP
+#include "base.hpp"
+#include "resolver.hpp"
 
-#include "string.hpp"
-#include <ctime>
+UnrealResolver::UnrealResolver()
+	: tcp::resolver(unreal->ios_pool.getIOService())
+{ }
 
 /**
- * UnrealTime class.
+ * Callback for asyncronous resolver query.
+ *
+ * @param err boost error_code
+ * @param ep Resolver query iterator
  */
-class UnrealTime
+void UnrealResolver::handleResult(const ErrorCode& ec, Iterator ep_iter)
 {
-public:
-	UnrealTime(const std::time_t& ts = 0);
+	onResolve(ec, ep_iter);
+}
 
-	static UnrealTime now();
-	void setTS(const std::time_t& ts);
-	std::time_t toTS();
-	String toString(const String& fmt);
+/**
+ * Initiate an DNS query using an endpoint specification
+ */
+void UnrealResolver::query(tcp::endpoint& endpoint)
+{
+	async_resolve(endpoint,
+		boost::bind(&UnrealResolver::handleResult,
+			this,
+			boost::asio::placeholders::error,
+			boost::asio::placeholders::iterator));
+}
 
-private:
-	std::time_t timestamp_;
-};
+/**
+ * Initiate an DNS query w/ host/port.
+ */
+void UnrealResolver::query(const String& hostname, const uint16_t port)
+{
+	Query query(hostname, String(port));
 
-#endif /* _UNREALIRCD_TIME_HPP */
+	async_resolve(query,
+		boost::bind(&UnrealResolver::handleResult,
+			this,
+			boost::asio::placeholders::error,
+			boost::asio::placeholders::iterator));
+}

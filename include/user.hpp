@@ -27,6 +27,7 @@
 
 #include "bitmask.hpp"
 #include "listener.hpp"
+#include "numeric.hpp"
 #include "platform.hpp"
 #include "resolver.hpp"
 #include "string.hpp"
@@ -63,17 +64,23 @@ public:
 	void auth();
 	Bitmask<uint8_t>& authflags();
 	UnrealTime connectionTime();
+	static UnrealUser* find(UnrealSocket* sptr);
+	static UnrealUser* find(const String& nickname);
 	const String& hostname();
 	const String& ident();
 	UnrealListener* listener();
 	const String& nick();
 	const String& realHostname();
 	void send(const String& data);
+	void sendreply(IRCNumeric numeric, const String& data);
+	void sendreply(const String& cmd, const String& data);
+	void sendPing();
 	void setHostname(const String& newhost);
 	void setIdent(const String& newident);
 	void setListener(UnrealListener* lptr);
 	void setNick(const String& newnick);
 	void setRealHostname(const String& newhost);
+	void setRealname(const String& rn);
 	UnrealSocket* socket();
 
 private:
@@ -106,6 +113,9 @@ private:
 
 	/** real host name */
 	String real_hostname_;
+
+	/** real name */
+	String realname_;
 };
 
 #endif /* _UNREALIRCD_USER_HPP */

@@ -25,6 +25,7 @@
 #ifndef _UNREALIRCD_BASE_H
 #define _UNREALIRCD_BASE_H
 
+#include "command.hpp"
 #include "config.hpp"
 #include "ioservicepool.hpp"
 #include "list.hpp"
@@ -81,6 +82,9 @@ public:
 
 	/** nick mapping */
 	Map<String, UnrealUser*> nicks;
+
+	/** user command mapping */
+	Map<String, UnrealUserCommand*> user_commands;
 
 private:
 	void checkConfig();

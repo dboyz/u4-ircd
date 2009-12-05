@@ -58,6 +58,7 @@ public:
 	String(uint64_t n);
 
 	bool contains(const String& str) const;
+	static String format(const char* fmt, ...);
 	String left(size_t count);
 	String mid(size_t start, size_t count = npos);
 	static String repeat(char ch, size_t count);

@@ -23,7 +23,10 @@
  ******************************************************************/
 
 #include "base.hpp"
+#include "cmdmap.hpp"
+#include "command.hpp"
 #include "listener.hpp"
+#include "numeric.hpp"
 #include "user.hpp"
 #include <iostream>
 
@@ -180,7 +183,42 @@ void UnrealListener::handleDataResponse(UnrealSocket* sptr, const String& data)
 
 	if (type_ == LClient)
 	{
-		//..
+		UnrealUser* uptr = UnrealUser::find(sptr);
+
+		if (!uptr)
+		{
+			unreal->log.write(UnrealLog::Normal,
+					"UnrealListener::handleDataResponse(): "
+					"Error: Socket %d not assigned with User?",
+					sptr->native());
+		}
+		else
+		{
+			UnrealUserCommand* ucptr = UnrealUserCommand::find(cmd);
+
+			if (ucptr)
+			{
+				/* look if the command is suspended */
+				if (!ucptr->isActive())
+					uptr->sendreply(CMD_NOTICE,
+							String::format(MSG_CMDNOTAVAILABLE,
+									cmd.c_str()));
+				/* ... or oper-only */
+				else if (ucptr->isOperOnly())
+					uptr->sendreply(ERR_NOPRIVILEGES, MSG_NOPRIVILEGES);
+				else
+				{
+					UnrealUserCommand::Function fn = ucptr->fn();
+
+					/* call the command function */
+					fn(uptr, &tokens);
+				}
+			}
+			else
+				uptr->sendreply(ERR_UNKNOWNCOMMAND,
+						String::format(MSG_UNKNOWNCOMMAND,
+								cmd.c_str()));
+		}
 	}
 }
 

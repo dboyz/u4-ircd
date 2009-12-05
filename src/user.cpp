@@ -23,7 +23,9 @@
  ******************************************************************/
 
 #include "base.hpp"
+#include "cmdmap.hpp"
 #include "user.hpp"
+#include <iostream>
 
 /** active resolver queries map */
 Map<UnrealSocket*, UnrealResolver*> resolver_queries;
@@ -34,7 +36,8 @@ Map<UnrealSocket*, UnrealResolver*> resolver_queries;
  * @param sptr Socket pointer if attached to the server directly.
  */
 UnrealUser::UnrealUser(UnrealSocket* sptr)
-	: socket_(sptr), connection_time_(UnrealTime::now())
+	: socket_(sptr), connection_time_(UnrealTime::now()),
+	  timer_(unreal->ios_pool.getIOService())
 { }
 
 /**
@@ -44,12 +47,7 @@ UnrealUser::~UnrealUser()
 {
 	/* remove nick from nicklist */
 	if (!nickname_.empty())
-	{
-		String lower_nick = lowerNick();
-
-		if (unreal->nicks.contains(lower_nick))
-			unreal->nicks.remove(lower_nick);
-	}
+		unreal->nicks.remove(lowerNick());
 }
 
 /**
@@ -78,6 +76,43 @@ Bitmask<uint8_t>& UnrealUser::authflags()
 }
 
 /**
+ * Checks for authorization timeout.
+ */
+void UnrealUser::checkAuthTimeout()
+{
+	if (auth_flags_.isset(AFNick) || auth_flags_.isset(AFUser))
+	{
+		/* haven't received USER and NICK within auth timeout */
+		exitClient("Authorization timeout");
+	}
+	else if (!auth_flags_.isset(AFNick) && !auth_flags_.isset(AFUser)
+		&& last_pong_time_.toTS() == 0)
+	{
+		/* got NICK and USER, but no valid PONG reply */
+		exitClient("Ping timeout");
+	}
+}
+
+/**
+ * Checks for ping timeout.
+ */
+void UnrealUser::checkPingTimeout()
+{
+	UnrealTime now = UnrealTime::now();
+
+	if (last_pong_time_ < now.addSeconds(-120))
+	{
+		/* no PONG reply within two minutes */
+		exitClient("Ping timeout");
+	}
+	else
+	{
+		sendPing();
+		schedulePingTimeout();
+	}
+}
+
+/**
  * Returns the connection time for this user.
  *
  * @return UnrealTime
@@ -85,6 +120,27 @@ Bitmask<uint8_t>& UnrealUser::authflags()
 UnrealTime UnrealUser::connectionTime()
 {
 	return connection_time_;
+}
+
+/**
+ * Exit client with specified message and close the socket.
+ *
+ * @param message Message to send for closing link
+ */
+void UnrealUser::exitClient(const String& message)
+{
+	String reply;
+
+	reply.sprintf("ERROR :Closing link: %s by %s (%s)",
+		nickname_.empty() ? "*" : nickname_.c_str(),
+		unreal->config.get("Me/ServerName", "not.configured").c_str(),
+		message.c_str());
+
+	send(reply);
+
+	/* close socket */
+	if (socket_->is_open())
+		socket_->close();
 }
 
 /**
@@ -107,10 +163,18 @@ UnrealUser* UnrealUser::find(UnrealSocket* sptr)
  */
 UnrealUser* UnrealUser::find(const String& nickname)
 {
-	if (unreal->nicks.contains(nickname))
-		return unreal->nicks[nickname];
+	String lower = const_cast<String&>(nickname).toLower();
+std::cout<<"UnrealUser::find("<<nickname<<")\n";
+	if (unreal->nicks.contains(lower))
+	{
+		std::cout<<"yes, contained by nicks, size="<<unreal->nicks.size()<<"\n";
+		return unreal->nicks[lower];
+	}
 	else
+	{
+		std::cout<<"no, not found, size="<<unreal->nicks.size()<<"\n";
 		return 0;
+	}
 }
 
 /**
@@ -178,6 +242,16 @@ const String& UnrealUser::ident()
 }
 
 /**
+ * Returns the last pong timestamp.
+ *
+ * @return UnrealTime
+ */
+UnrealTime UnrealUser::lastPongTime()
+{
+	return last_pong_time_;
+}
+
+/**
  * Returns the listener, where this user is attached to (if any).
  *
  * @return UnrealListener pointer
@@ -218,6 +292,63 @@ const String& UnrealUser::realHostname()
 }
 
 /**
+ * Once any necessary informations like NICK, USER and an valid PONG reply have
+ * been received, we can fully register the user.
+ */
+void UnrealUser::registerUser()
+{
+	UnrealConfig& cfg = unreal->config;
+	static String version = "unrealircd-4.0.0hgal";
+
+	sendreply(RPL_WELCOME,
+		String::format(MSG_WELCOME,
+			cfg.get("Me/Network", "ExampleNet").c_str(),
+			nickname_.c_str()));
+	sendreply(RPL_YOURHOST,
+		String::format(MSG_YOURHOST,
+			cfg.get("Me/ServerName", "not.configured").c_str(),
+			version.c_str()));
+	sendreply(RPL_CREATED,
+		String::format(MSG_CREATED,
+			unreal->starttime.toString("%Y-%M-%dT%H:%M:%S/%Z").c_str()));
+	sendreply(RPL_MYINFO,
+		String::format(MSG_MYINFO,
+			cfg.get("Me/ServerName", "not.configured").c_str(),
+			version.c_str(),
+			"diow", /* to be changed .. */
+			"biklmnps",
+			"blkov"));
+
+	/* send server features */
+	sendISupport();
+
+	/* lusers */
+	UnrealUserCommand* ucptr = UnrealUserCommand::find(CMD_LUSERS);
+
+	if (ucptr)
+	{
+		UnrealUserCommand::Function fn = ucptr->fn();
+		fn(this, 0);
+	}
+
+	// no motd yet
+	sendreply(ERR_NOMOTD, MSG_NOMOTD);
+
+	/*
+	 * RPL_WELCOME
+	 * RPL_YOURHOST
+	 * RPL_CREATED
+	 * RPL_MYINFO
+	 * send_supported()
+	 * Lusers()
+	 * motds..
+	 *
+	 * propagate this message to other servers
+	 */
+	schedulePingTimeout();
+}
+
+/**
  * Initialize asyncronous hostname resolving.
  */
 void UnrealUser::resolveHostname()
@@ -237,6 +368,29 @@ void UnrealUser::resolveHostname()
 }
 
 /**
+ * Schedule the auth timeout check.
+ */
+void UnrealUser::scheduleAuthTimeout()
+{
+	int authTimeout = unreal->config.get("Limits/AuthTimeout", "12").toInt();
+	timer_.expires_from_now(boost::posix_time::seconds(authTimeout));
+	timer_.async_wait(boost::bind(&UnrealUser::checkAuthTimeout, this));
+}
+
+/**
+ * Schedule the ping timeout check.
+ */
+void UnrealUser::schedulePingTimeout()
+{
+	if (socket_->is_open())
+	{
+		int ping_freq = static_cast<int>(listener_->pingFrequency());
+		timer_.expires_from_now(boost::posix_time::seconds(ping_freq));
+		timer_.async_wait(boost::bind(&UnrealUser::checkPingTimeout, this));
+	}
+}
+
+/**
  * Send data to the client.
  *
  * @param data Data to send
@@ -244,6 +398,46 @@ void UnrealUser::resolveHostname()
 void UnrealUser::send(const String& data)
 {
 	socket_->write(data);
+}
+
+/**
+ * Tell the client the features we support.
+ */
+void UnrealUser::sendISupport()
+{
+	String buf;
+
+	for (UnrealISupport::Iterator i = unreal->isupport.begin();
+			i != unreal->isupport.end(); i++)
+	{
+		buf += i->first + "=" + i->second + " ";
+
+		if (buf.length() > 400)
+			sendreply(RPL_ISUPPORT, buf);
+	}
+
+	if (!buf.empty())
+		sendreply(RPL_ISUPPORT, buf);
+}
+
+/**
+ * Send a reply originating from the client itself using a command.
+ *
+ * @param cmd Command to send
+ * @param data Data block
+ */
+void UnrealUser::sendlocalreply(const String& cmd, const String& data)
+{
+	String reply;
+
+	reply.sprintf(":%s!%s@%s %s %s",
+			nickname_.c_str(),
+			ident_.c_str(),
+			hostname_.c_str(),
+			cmd.c_str(),
+			data.c_str());
+
+	send(reply);
 }
 
 /**
@@ -260,7 +454,7 @@ void UnrealUser::sendreply(IRCNumeric numeric, const String& data)
 	reply.sprintf(":%s %03d %s %s",
 			unreal->config.get("Me/ServerName", "not.configured").c_str(),
 			num,
-			nickname_.c_str(),
+			nickname_.empty() ? "*" : nickname_.c_str(),
 			data.c_str());
 
 	send(reply);
@@ -279,7 +473,7 @@ void UnrealUser::sendreply(const String& cmd, const String& data)
 	reply.sprintf(":%s %s %s %s",
 			unreal->config.get("Me/ServerName", "not.configured").c_str(),
 			cmd.c_str(),
-			nickname_.c_str(),
+			nickname_.empty() ? "*" : nickname_.c_str(),
 			data.c_str());
 
 	send(reply);
@@ -319,6 +513,16 @@ void UnrealUser::setIdent(const String& newident)
 }
 
 /**
+ * Set the last pong timestamp.
+ *
+ * @param ts Timestamp
+ */
+void UnrealUser::setLastPongTime(const UnrealTime& ts)
+{
+	last_pong_time_ = ts;
+}
+
+/**
  * Set the listener.
  *
  * @param lptr Listener pointer
@@ -335,6 +539,7 @@ void UnrealUser::setListener(UnrealListener* lptr)
  */
 void UnrealUser::setNick(const String& newnick)
 {
+	std::cout << "UnrealUser::setNick() to <"<<newnick<<">\n";
 	/* if there is already a nickname set, remove it from the nicklist */
 	if (!nickname_.empty())
 	{

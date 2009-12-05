@@ -28,6 +28,7 @@
 #include "command.hpp"
 #include "config.hpp"
 #include "ioservicepool.hpp"
+#include "isupport.hpp"
 #include "list.hpp"
 #include "listener.hpp"
 #include "log.hpp"
@@ -35,6 +36,7 @@
 #include "module.hpp"
 #include "string.hpp"
 #include "stringlist.hpp"
+#include "time.hpp"
 #include "user.hpp"
 
 /**
@@ -86,6 +88,12 @@ public:
 	/** user command mapping */
 	Map<String, UnrealUserCommand*> user_commands;
 
+	/** server start timestamp */
+	UnrealTime starttime;
+
+	/** iSupport features */
+	UnrealISupport isupport;
+
 private:
 	void checkConfig();
 	void checkPermissions();
@@ -96,6 +104,7 @@ private:
 	void printConfig();
 	void printUsage();
 	void printVersion();
+	void setupISupport();
 	void setupListener();
 
 private:

@@ -27,19 +27,15 @@
 
 #include "platform.hpp"
 #include "string.hpp"
+#include <dlfcn.h>
 
-#ifdef COMPILER_MSVC
-#	define UNREAL_DLL extern "C" __declspec(dllexport)
-#else
-#	include <dlfcn.h>
-#	define UNREAL_DLL extern "C"
-#endif
+#define UNREAL_DLL extern "C"
 
 /** module initialization symbol name */
-#define MODULE_INIT_FN		"_init"
+#define MODULE_INIT_FN		"unrInit"
 
 /** module close symbol name */
-#define MODULE_CLOSE_FN		"_close"
+#define MODULE_CLOSE_FN		"unrClose"
 
 /**
  * This class holds informations that are updated by the modules itself
@@ -91,6 +87,7 @@ public:
 
 	const String& errorString();
 	const String& fileName();
+	static UnrealModule* find(const String& fname);
 	Handle* handle();
 	bool isError();
 	bool isLoaded();

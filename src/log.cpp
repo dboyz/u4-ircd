@@ -109,7 +109,7 @@ void UnrealLog::write(LogLevel level, const char* fmt, ...)
 	va_end(vl);
 
 	// time string
-	Time now = Time::now();
+	UnrealTime now = UnrealTime::now();
 	String timeFmt = now.toString("%Y-%m-%dT%H:%M:%S %Z");
 
 	/* print to file if opened */

@@ -66,6 +66,9 @@ public:
 	/** enumerate module state */
 	enum ModuleState { SNone, SError, SLoaded };
 
+	/** enumerate module result */
+	enum ModuleResult { Success, Failed };
+
 	/** alias the Inf class */
 	typedef UnrealModuleInf Info;
 
@@ -77,10 +80,10 @@ public:
 #endif
 
 	/** module initialization symbol type */
-	typedef void (InitFunc)(UnrealModule&);
+	typedef ModuleResult (InitFunc)(UnrealModule&);
 
 	/** module close symbol type */
-	typedef void (CloseFunc)(UnrealModule&);
+	typedef ModuleResult (CloseFunc)(UnrealModule&);
 
 public:
 	UnrealModule(const String& fname);

@@ -26,6 +26,7 @@
 #define _UNREALIRCD_SOCKET_HPP
 
 #include "platform.hpp"
+#include "string.hpp"
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/signals2.hpp>

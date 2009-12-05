@@ -33,6 +33,7 @@ bin_PROGRAMS = unrealircd
 # by modules that will be compiled against UnrealIRCd-CPP
 pkginclude_HEADERS = \
 	include/base.hpp \
+	include/bitmask.hpp \
 	include/config.hpp \
 	include/ioservicepool.hpp \
 	include/list.hpp \
@@ -42,10 +43,12 @@ pkginclude_HEADERS = \
 	include/module.hpp \
 	include/numerics.hpp \
 	include/platform.hpp \
+	include/resolver.hpp \
 	include/socket.hpp \
 	include/string.hpp \
 	include/stringlist.hpp \
-	include/time.hpp
+	include/time.hpp \
+	include/user.hpp
 
 unrealircd_SOURCES = \
 	src/base.cpp \
@@ -54,11 +57,13 @@ unrealircd_SOURCES = \
 	src/listener.cpp \
 	src/log.cpp \
 	src/module.cpp \
+	src/resolver.cpp \
 	src/socket.cpp \
 	src/string.cpp \
 	src/stringlist.cpp \
 	src/time.cpp \
 	src/unreal.cpp \
+	src/user.cpp \
 	$(pkginclude_HEADERS)
 
 unrealircd_LDADD = @LTDL_LIBS@ @BOOST_LDFLAGS@ @BOOST_ASIO_LIB@ @BOOST_SYSTEM_LIB@ @BOOST_THREAD_LIB@ -ldl

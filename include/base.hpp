@@ -30,9 +30,11 @@
 #include "list.hpp"
 #include "listener.hpp"
 #include "log.hpp"
+#include "map.hpp"
 #include "module.hpp"
 #include "string.hpp"
 #include "stringlist.hpp"
+#include "user.hpp"
 
 /**
  * UnrealBase acts as the global ircd instance.
@@ -73,6 +75,12 @@ public:
 
 	/** list with listeners */
 	List<UnrealListener::ListenerPtr> listeners;
+
+	/** user mapping */
+	Map<UnrealSocket*, UnrealUser*> users;
+
+	/** nick mapping */
+	Map<String, UnrealUser*> nicks;
 
 private:
 	void checkConfig();

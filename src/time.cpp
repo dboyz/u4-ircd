@@ -25,25 +25,25 @@
 #include "time.hpp"
 
 /**
- * Time constructor.
+ * UnrealTime constructor.
  *
  * @param ts If set, the timestamp is assigned to the internal timestamp.
  * If ts is not specified, the internal timestamp is set to zero.
  */
-Time::Time(const std::time_t& ts)
+UnrealTime::UnrealTime(const std::time_t& ts)
 	: timestamp_(ts)
 { }
 
 /**
- * Return a Time object with the current time.
+ * Return a UnrealTime object with the current time.
  *
  * @return Time object
  */
-Time Time::now()
+UnrealTime UnrealTime::now()
 {
-	Time t;
-	t.setTS(std::time(0));
-	return t;
+	UnrealTime ut;
+	ut.setTS(std::time(0));
+	return ut;
 }
 
 /**
@@ -51,7 +51,7 @@ Time Time::now()
  *
  * @param ts New timestamp
  */
-void Time::setTS(const std::time_t& ts)
+void UnrealTime::setTS(const std::time_t& ts)
 {
 	timestamp_ = ts;
 }
@@ -63,7 +63,7 @@ void Time::setTS(const std::time_t& ts)
  * @param fmt Format according to strftime()
  * @return Formatted string
  */
-String Time::toString(const String& fmt)
+String UnrealTime::toString(const String& fmt)
 {
 	static char buf[1024];
 	struct tm* tmx = localtime(&timestamp_);
@@ -79,7 +79,7 @@ String Time::toString(const String& fmt)
  *
  * @return Timestamp time_t
  */
-std::time_t Time::toTS()
+std::time_t UnrealTime::toTS()
 {
 	return timestamp_;
 }

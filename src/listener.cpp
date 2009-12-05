@@ -24,6 +24,7 @@
 
 #include "base.hpp"
 #include "listener.hpp"
+#include "user.hpp"
 #include <iostream>
 
 /**
@@ -79,12 +80,24 @@ void UnrealListener::addConnection(UnrealSocket* sptr)
 	switch (type_)
 	{
 		case LClient:
-			// create Client instance here
+		{
+			UnrealUser* uptr = new UnrealUser(sptr);
+			uptr->setListener(this);
+
+			/* add it into the userlist */
+			unreal->users.add(sptr, uptr);
+
+			/* initialize authentication process */
+			uptr->auth();
+
 			break;
+		}
 
 		case LServer:
+		{
 			// create Server instance here
 			break;
+		}
 
 		default:
 			break;
@@ -209,8 +222,14 @@ uint32_t UnrealListener::pingFrequency()
  */
 void UnrealListener::removeConnection(UnrealSocket* sptr)
 {
-	std::cout<<"removeConnection()\n";
+	/* if an user, remove it from the userlist */
+	if (unreal->users.contains(sptr))
+		unreal->users.remove(sptr);
+
 	connections.remove(sptr);
+
+	/* free some memory */
+	delete sptr;
 }
 
 /**

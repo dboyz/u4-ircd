@@ -79,8 +79,23 @@ unrealircd_LDFLAGS = -Wl,--export-dynamic
 
 MODULEDIR=src/modules
 pkglib_LTLIBRARIES = \
-	m_null.la
+	m_nick.la \
+	m_pong.la \
+	m_user.la
 
-m_null_la_SOURCES = $(MODULEDIR)/m_null
-m_null_la_LIBADD = $(unrealircd_LDADD)
-m_null_la_LDFLAGS = -module -avoid-version -shared
+#m_null_la_SOURCES = $(MODULEDIR)/m_null.cpp
+#m_null_la_LIBADD = $(unrealircd_LDADD)
+#m_null_la_LDFLAGS = -module -avoid-version -shared
+
+m_nick_la_SOURCES = src/cmd/nick.cpp
+m_nick_la_LIBADD = $(unrealircd_LDADD)
+m_nick_la_LDFLAGS = -module -avoid-version -shared
+
+m_pong_la_SOURCES = src/cmd/pong.cpp
+m_pong_la_LIBADD = $(unrealircd_LDADD)
+m_pong_la_LDFLAGS = -module -avoid-version -shared
+
+m_user_la_SOURCES = src/cmd/user.cpp
+m_user_la_LIBADD = $(unrealircd_LDADD)
+m_user_la_LDFLAGS = -module -avoid-version -shared
+

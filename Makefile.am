@@ -43,6 +43,7 @@ pkginclude_HEADERS = \
 	include/listener.hpp \
 	include/log.hpp \
 	include/map.hpp \
+	include/mode.hpp \
 	include/module.hpp \
 	include/numeric.hpp \
 	include/platform.hpp \

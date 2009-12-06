@@ -30,6 +30,25 @@
 /** active resolver queries map */
 Map<UnrealSocket*, UnrealResolver*> resolver_queries;
 
+/** user mode definitions */
+namespace UnrealUserProperties
+{
+	/** user will not receive channel messages */
+	UnrealUserMode Deaf('d');
+
+	/** user is marked as being invisible */
+	UnrealUserMode Invisible('i');
+
+	/** user is marked as being IRC operator */
+	UnrealUserMode Operator('o');
+
+	/** user is receiving wallop messages */
+	UnrealUserMode Wallops('w');
+
+	/** user mode table */
+	UnrealUserModeTable ModeTable;
+}
+
 /**
  * UnrealUser constructor.
  *
@@ -317,6 +336,40 @@ UnrealListener* UnrealUser::listener()
 String UnrealUser::lowerNick()
 {
 	return nickname_.toLower();
+}
+
+/**
+ * Returns the user modes bitmask.
+ *
+ * @return Bitmask
+ */
+Bitmask<uint16_t>& UnrealUser::modes()
+{
+	return modes_;
+}
+
+/**
+ * Returns a readable version of the user modes.
+ *
+ * @return User mode string w/ params
+ */
+String UnrealUser::modestr()
+{
+	UnrealUserModeTable::Iterator umi;
+	String result;
+
+	/* using the usermode namespace */
+	using namespace UnrealUserProperties;
+
+	for (umi = ModeTable.begin(); umi != ModeTable.end(); umi++)
+	{
+		UnrealUserMode mo = umi->first;
+
+		if (modes_.isset(umi->second))
+			result += mo.mode_char;
+	}
+
+	return result;
 }
 
 /**

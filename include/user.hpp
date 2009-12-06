@@ -27,6 +27,7 @@
 
 #include "bitmask.hpp"
 #include "listener.hpp"
+#include "mode.hpp"
 #include "numeric.hpp"
 #include "platform.hpp"
 #include "resolver.hpp"
@@ -59,6 +60,24 @@ public:
 		AFIdent = 0x08
 	};
 
+	/**
+	 * Enumeration of user mode flags.
+	 */
+	enum ModeFlagType
+	{
+		/** user will not receive channel messages */
+		mode_deaf 		= 0x0001,
+
+		/** user is marked as being invisible */
+		mode_invisible 	= 0x0002,
+
+		/** user is marked as being an IRC operator */
+		mode_operator 	= 0x0004,
+
+		/** user receives wallop messages */
+		mode_wallops 	= 0x0008
+	};
+
 public:
 	UnrealUser(UnrealSocket* sptr = 0);
 	~UnrealUser();
@@ -77,6 +96,8 @@ public:
 	UnrealTime lastPongTime();
 	UnrealListener* listener();
 	String lowerNick();
+	Bitmask<uint16_t>& modes();
+	String modestr();
 	const String& nick();
 	const String& realHostname();
 	const String& realname();
@@ -112,6 +133,9 @@ private:
 private:
 	/** authentication flags */
 	Bitmask<uint8_t> auth_flags_;
+
+	/** user mode flags */
+	Bitmask<uint16_t> modes_;
 
 	/** socket of this user; this is set to zero if it's not a real user */
 	UnrealSocket* socket_;
@@ -149,5 +173,14 @@ private:
 	/** timeout timer */
 	boost::asio::deadline_timer timer_;
 };
+
+namespace UnrealUserProperties
+{
+	extern UnrealUserMode Deaf;
+	extern UnrealUserMode Invisible;
+	extern UnrealUserMode Operator;
+	extern UnrealUserMode Wallops;
+	extern UnrealUserModeTable ModeTable;
+}
 
 #endif /* _UNREALIRCD_USER_HPP */

@@ -58,6 +58,9 @@ UnrealBase::UnrealBase(int cnt, char** vec)
 	/* load modules */
 	initModules();
 
+	/* initialize mode tables */
+	initModes();
+
 	/* setup IO service pool */
 	size_t io_pool_size = static_cast<size_t>(
 			config.get("Me/IOPoolSize", "1").toUInt());
@@ -204,6 +207,26 @@ void UnrealBase::initLog()
 					  << "\" failed."
 					  << std::endl;
 		}
+	}
+}
+
+/**
+ * Load initial modes into the mode tables.
+ */
+void UnrealBase::initModes()
+{
+	/* user modes */
+	if (true)
+	{
+		using namespace UnrealUserProperties;
+
+		/* register standard modes into the mode table */
+		/*ModeTable.registerMode(Deaf);
+		ModeTable.registerMode(Invisible);
+		ModeTable.registerMode(Operator);
+		ModeTable.registerMode(Wallops);
+		*/
+		ModeTable.add(Deaf, 1);
 	}
 }
 

@@ -103,6 +103,7 @@ private:
 	void checkPermissions();
 	void finish();
 	void initLog();
+	void initModes();
 	void initModules();
 	void parseArgv();
 	void printConfig();

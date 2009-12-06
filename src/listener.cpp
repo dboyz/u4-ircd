@@ -80,6 +80,11 @@ void UnrealListener::addConnection(UnrealSocket* sptr)
 	/* add to the connection list */
 	connections << sptr;
 
+	/* modify stats; every new connection is marked to be "unknown" */
+	unreal->stats.connections_unk++;
+	unreal->stats.connections_cur++;
+	unreal->stats.connections_total++;
+
 	switch (type_)
 	{
 		case LClient:
@@ -105,6 +110,9 @@ void UnrealListener::addConnection(UnrealSocket* sptr)
 		default:
 			break;
 	}
+
+	if (unreal->stats.connections_cur > unreal->stats.connections_max)
+		unreal->stats.connections_max = unreal->stats.connections_cur;
 
 	/* wait for lines to be read from the socket */
 	sptr->waitForLine();
@@ -262,7 +270,23 @@ void UnrealListener::removeConnection(UnrealSocket* sptr)
 {
 	/* if an user, remove it from the userlist */
 	if (unreal->users.contains(sptr))
+	{
+		UnrealUser* uptr = unreal->users[sptr];
+
+		/* if in nicklist, swipe it out there */
+		String lower = uptr->lowerNick();
+
+		if (unreal->nicks.contains(lower))
+			unreal->nicks.remove(lower);
+
 		unreal->users.remove(sptr);
+
+		delete uptr;
+	}
+	else
+		unreal->stats.connections_unk--;
+
+	unreal->stats.connections_cur--;
 
 	connections.remove(sptr);
 

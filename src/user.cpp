@@ -45,9 +45,29 @@ UnrealUser::UnrealUser(UnrealSocket* sptr)
  */
 UnrealUser::~UnrealUser()
 {
-	/* remove nick from nicklist */
-	if (!nickname_.empty())
-		unreal->nicks.remove(lowerNick());
+	std::cout<<"~UnrealUser()\n";
+	if (resolver_queries.contains(socket_))
+	{
+		UnrealResolver* rq = resolver_queries[socket_];
+
+		resolver_queries.remove(socket_);
+
+		delete rq;
+	}
+
+	unreal->stats.users_local_cur--;
+	//TODO decrease stats, according to if the user is visible or not
+
+	UnrealSocket::ErrorCode ec;
+	timer_.cancel(ec);
+
+	if (ec)
+	{
+		unreal->log.write(UnrealLog::Normal,
+				"~UnrealUser(): "
+				"Timer cancellation failed: %s",
+				ec.message().c_str());
+	}
 }
 
 /**
@@ -78,37 +98,43 @@ Bitmask<uint8_t>& UnrealUser::authflags()
 /**
  * Checks for authorization timeout.
  */
-void UnrealUser::checkAuthTimeout()
+void UnrealUser::checkAuthTimeout(const UnrealSocket::ErrorCode& ec)
 {
-	if (auth_flags_.isset(AFNick) || auth_flags_.isset(AFUser))
+	if (!ec)
 	{
-		/* haven't received USER and NICK within auth timeout */
-		exitClient("Authorization timeout");
-	}
-	else if (!auth_flags_.isset(AFNick) && !auth_flags_.isset(AFUser)
-		&& last_pong_time_.toTS() == 0)
-	{
-		/* got NICK and USER, but no valid PONG reply */
-		exitClient("Ping timeout");
+		if (auth_flags_.isset(AFNick) || auth_flags_.isset(AFUser))
+		{
+			/* haven't received USER and NICK within auth timeout */
+			exitClient("Authorization timeout");
+		}
+		else if (!auth_flags_.isset(AFNick) && !auth_flags_.isset(AFUser)
+				&& last_pong_time_.toTS() == 0)
+		{
+			/* got NICK and USER, but no valid PONG reply */
+			exitClient("Ping timeout");
+		}
 	}
 }
 
 /**
  * Checks for ping timeout.
  */
-void UnrealUser::checkPingTimeout()
+void UnrealUser::checkPingTimeout(const UnrealSocket::ErrorCode& ec)
 {
-	UnrealTime now = UnrealTime::now();
+	if (!ec)
+	{
+		UnrealTime now = UnrealTime::now();
 
-	if (last_pong_time_ < now.addSeconds(-120))
-	{
-		/* no PONG reply within two minutes */
-		exitClient("Ping timeout");
-	}
-	else
-	{
-		sendPing();
-		schedulePingTimeout();
+		if (last_pong_time_ < now.addSeconds(-120))
+		{
+			/* no PONG reply within two minutes */
+			exitClient("Ping timeout");
+		}
+		else
+		{
+			sendPing();
+			schedulePingTimeout();
+		}
 	}
 }
 
@@ -322,6 +348,15 @@ void UnrealUser::registerUser()
 	/* send server features */
 	sendISupport();
 
+	/* modify stats */
+	unreal->stats.connections_unk--;
+	unreal->stats.users_local_cur++;
+
+	if (unreal->users.size() > unreal->stats.users_max)
+		unreal->stats.users_max = unreal->users.size();
+	if (unreal->stats.users_local_cur > unreal->stats.users_local_max)
+		unreal->stats.users_local_max = unreal->stats.users_local_cur;
+
 	/* lusers */
 	UnrealUserCommand* ucptr = UnrealUserCommand::find(CMD_LUSERS);
 
@@ -372,9 +407,11 @@ void UnrealUser::resolveHostname()
  */
 void UnrealUser::scheduleAuthTimeout()
 {
+	std::cout<<"scheduleAuthTimeout()\n";
 	int authTimeout = unreal->config.get("Limits/AuthTimeout", "12").toInt();
 	timer_.expires_from_now(boost::posix_time::seconds(authTimeout));
-	timer_.async_wait(boost::bind(&UnrealUser::checkAuthTimeout, this));
+	timer_.async_wait(boost::bind(&UnrealUser::checkAuthTimeout, this,
+			boost::asio::placeholders::error));
 }
 
 /**
@@ -382,12 +419,11 @@ void UnrealUser::scheduleAuthTimeout()
  */
 void UnrealUser::schedulePingTimeout()
 {
-	if (socket_->is_open())
-	{
-		int ping_freq = static_cast<int>(listener_->pingFrequency());
-		timer_.expires_from_now(boost::posix_time::seconds(ping_freq));
-		timer_.async_wait(boost::bind(&UnrealUser::checkPingTimeout, this));
-	}
+	std::cout<<"schedulePingTimeout()\n";
+	int ping_freq = static_cast<int>(listener_->pingFrequency());
+	timer_.expires_from_now(boost::posix_time::seconds(ping_freq));
+	timer_.async_wait(boost::bind(&UnrealUser::checkPingTimeout, this,
+			boost::asio::placeholders::error));
 }
 
 /**

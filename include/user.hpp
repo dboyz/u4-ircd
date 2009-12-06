@@ -72,6 +72,7 @@ public:
 	const String& ident();
 	UnrealTime lastPongTime();
 	UnrealListener* listener();
+	String lowerNick();
 	const String& nick();
 	const String& realHostname();
 	void registerUser();
@@ -91,11 +92,10 @@ public:
 	UnrealSocket* socket();
 
 private:
-	void checkAuthTimeout();
-	void checkPingTimeout();
+	void checkAuthTimeout(const UnrealSocket::ErrorCode& ec);
+	void checkPingTimeout(const UnrealSocket::ErrorCode& ec);
 	void handleResolveResponse(const UnrealResolver::ErrorCode& ec,
 			UnrealResolver::Iterator response);
-	String lowerNick();
 	void resolveHostname();
 	void scheduleAuthTimeout();
 	void schedulePingTimeout();

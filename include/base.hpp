@@ -34,6 +34,7 @@
 #include "log.hpp"
 #include "map.hpp"
 #include "module.hpp"
+#include "stats.hpp"
 #include "string.hpp"
 #include "stringlist.hpp"
 #include "time.hpp"
@@ -93,6 +94,9 @@ public:
 
 	/** iSupport features */
 	UnrealISupport isupport;
+
+	/** server statistics */
+	UnrealLocalStat stats;
 
 private:
 	void checkConfig();

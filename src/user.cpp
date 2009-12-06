@@ -358,15 +358,15 @@ String UnrealUser::modestr()
 	UnrealUserModeTable::Iterator umi;
 	String result;
 
-	/* using the usermode namespace */
-	using namespace UnrealUserProperties;
+	/* user mode table */
+	UnrealUserModeTable& modetab = UnrealUserProperties::ModeTable;
 
-	for (umi = ModeTable.begin(); umi != ModeTable.end(); umi++)
+	for (umi = modetab.begin(); umi != modetab.end(); umi++)
 	{
 		UnrealUserMode mo = umi->first;
 
 		if (modes_.isset(umi->second))
-			result += mo.mode_char;
+			result.append(1, mo.mode_char);
 	}
 
 	return result;
@@ -380,6 +380,114 @@ String UnrealUser::modestr()
 const String& UnrealUser::nick()
 {
 	return nickname_;
+}
+
+/**
+ * Parse user mode changes.
+ *
+ * @param args Arguments
+ */
+void UnrealUser::parseModeChange(StringList* argv)
+{
+	ModeBuf::StateType state = ModeBuf::Add, last_state = ModeBuf::None;
+	String flagset = argv->at(0);
+	String changeset;
+
+	/* mode table */
+	UnrealUserModeTable& modetab = UnrealUserProperties::ModeTable;
+
+	std::cout << "-- parseModeChange()\n";
+	std::cout << "   print modetab:\n";
+
+	for (UnrealUserModeTable::Iterator i = modetab.begin(); i != modetab.end(); i++)
+	{
+		std::cout << "      iter ch=" << (i->first).mode_char
+				<< " fl=" << i->second << "\n";
+	}
+
+	std::cout << "   print current modes <" << modes_.value() << ">\n";
+
+	for (UnrealUserModeTable::Iterator i = modetab.begin(); i != modetab.end(); i++)
+	{
+		if (modes_.isset(i->second))
+			std::cout << "      has set ch=" << (i->first).mode_char
+				<< " fl=" << i->second << "\n";
+	}
+
+	for (String::Iterator ch = flagset.begin(); ch != flagset.end(); ch++)
+	{
+		if (*ch == '+' || *ch == '-')
+			state = (*ch == '+') ? ModeBuf::Add : ModeBuf::Remove;
+		else
+		{
+			if (!modetab.hasFlag(*ch))
+			{
+				sendreply(ERR_UMODEUNKNOWNFLAG,
+					String::format(MSG_UMODEUNKNOWNFLAG,
+						*ch));
+
+				continue;
+			}
+
+			UnrealUserMode umo = modetab.lookup(*ch);
+			uint16_t fl = modetab.value(umo);
+
+			std::cout<<"parseModeChange() ch="<<umo.mode_char
+					<< " fl=" << fl << "\n";
+
+			if (last_state != state)
+			{
+				last_state = state;
+
+				String change_str;
+
+				switch (state)
+				{
+					case ModeBuf::Add:
+						change_str = "+";
+						break;
+					default:
+						change_str = "-";
+						break;
+				}
+
+				changeset << change_str;
+			}
+
+			if (state == ModeBuf::Add)
+			{
+				/* apply mode flag */
+				if (!modes_.isset(fl) && umo != UnrealUserProperties::Operator)
+				{
+					modes_ << fl;
+					changeset.append(1, *ch);
+
+					if (umo == UnrealUserProperties::Invisible)
+					{
+						unreal->stats.users_inv++;
+					}
+				}
+			}
+			else if (state == ModeBuf::Remove)
+			{
+				/* apply mode flag */
+				if (modes_.isset(fl))
+				{
+					modes_.revoke(fl);
+					changeset.append(1, *ch);
+
+					if (umo == UnrealUserProperties::Invisible)
+					{
+						unreal->stats.users_inv--;
+					}
+				}
+			}
+		}
+	}
+
+	/* send mode changes */
+	if (changeset.length() > 0)
+		sendreply(CMD_MODE, changeset);
 }
 
 /**

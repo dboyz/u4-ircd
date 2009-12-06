@@ -221,12 +221,10 @@ void UnrealBase::initModes()
 		using namespace UnrealUserProperties;
 
 		/* register standard modes into the mode table */
-		/*ModeTable.registerMode(Deaf);
+		ModeTable.registerMode(Deaf);
 		ModeTable.registerMode(Invisible);
 		ModeTable.registerMode(Operator);
 		ModeTable.registerMode(Wallops);
-		*/
-		ModeTable.add(Deaf, 1);
 	}
 }
 

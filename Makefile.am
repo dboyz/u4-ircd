@@ -44,6 +44,7 @@ pkginclude_HEADERS = \
 	include/log.hpp \
 	include/map.hpp \
 	include/mode.hpp \
+	include/modebuf.hpp \
 	include/module.hpp \
 	include/numeric.hpp \
 	include/platform.hpp \
@@ -84,6 +85,7 @@ pkglib_LTLIBRARIES = \
 	m_admin.la \
 	m_away.la \
 	m_lusers.la \
+	m_mode.la \
 	m_nick.la \
 	m_notice.la \
 	m_pong.la \
@@ -108,6 +110,10 @@ m_away_la_LDFLAGS = -module -avoid-version -shared
 m_lusers_la_SOURCES = src/cmd/lusers.cpp
 m_lusers_la_LIBADD = $(unrealircd_LDADD)
 m_lusers_la_LDFLAGS = -module -avoid-version -shared
+
+m_mode_la_SOURCES = src/cmd/mode.cpp
+m_mode_la_LIBADD = $(unrealircd_LDADD)
+m_mode_la_LDFLAGS = -module -avoid-version -shared
 
 m_nick_la_SOURCES = src/cmd/nick.cpp
 m_nick_la_LIBADD = $(unrealircd_LDADD)

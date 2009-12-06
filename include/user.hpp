@@ -28,10 +28,12 @@
 #include "bitmask.hpp"
 #include "listener.hpp"
 #include "mode.hpp"
+#include "modebuf.hpp"
 #include "numeric.hpp"
 #include "platform.hpp"
 #include "resolver.hpp"
 #include "string.hpp"
+#include "stringlist.hpp"
 #include "time.hpp"
 #include <boost/asio.hpp>
 
@@ -60,23 +62,8 @@ public:
 		AFIdent = 0x08
 	};
 
-	/**
-	 * Enumeration of user mode flags.
-	 */
-	enum ModeFlagType
-	{
-		/** user will not receive channel messages */
-		mode_deaf 		= 0x0001,
-
-		/** user is marked as being invisible */
-		mode_invisible 	= 0x0002,
-
-		/** user is marked as being an IRC operator */
-		mode_operator 	= 0x0004,
-
-		/** user receives wallop messages */
-		mode_wallops 	= 0x0008
-	};
+	/** alias the mode buffer type for user modes */
+	typedef UnrealModeBufferType<UnrealUserMode> ModeBuf;
 
 public:
 	UnrealUser(UnrealSocket* sptr = 0);
@@ -99,6 +86,7 @@ public:
 	Bitmask<uint16_t>& modes();
 	String modestr();
 	const String& nick();
+	void parseModeChange(StringList* argv);
 	const String& realHostname();
 	const String& realname();
 	void registerUser();

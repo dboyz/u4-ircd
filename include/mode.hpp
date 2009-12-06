@@ -55,6 +55,16 @@ public:
 		: mode_char(ch), param_count(params), hook(hookfn)
 	{ }
 
+	inline bool operator==(const UnrealMode& other)
+	{
+		return mode_char == other.mode_char;
+	}
+
+	inline bool operator!=(const UnrealMode& other)
+	{
+		return mode_char != other.mode_char;
+	}
+
 	/** mode character */
 	char mode_char;
 
@@ -116,7 +126,7 @@ public:
 
 		if (!si)
 			return Failed; /* all slots in use */
-		else if (hasFlag(mo.mode_char))
+		else if (/*hasFlag(mo.mode_char)*/0)
 			return Failed; /* we've already such a flag registered */
 		else
 		{
@@ -138,7 +148,7 @@ public:
 	{
 		_StorageSizeType max = std::numeric_limits<_StorageSizeType>::max();
 
-		for (_StorageSizeType i = 1; i <= max; i *= 2)
+		for (_StorageSizeType i = 1; i <= max && i > 0; i *= 2)
 		{
 			if (!containsElement(i)) /* search by element */
 			{
@@ -156,7 +166,7 @@ public:
 	 * @param ch Mode character to search
 	 * @return true when found, otherwise false
 	 */
-	bool hasFlag(char ch) const
+	bool hasFlag(char ch)
 	{
 		for (Iterator i = this->begin(); i != this->end(); i++)
 		{

@@ -48,6 +48,7 @@ pkginclude_HEADERS = \
 	include/platform.hpp \
 	include/resolver.hpp \
 	include/socket.hpp \
+	include/stats.hpp \
 	include/string.hpp \
 	include/stringlist.hpp \
 	include/time.hpp \
@@ -79,6 +80,7 @@ unrealircd_LDFLAGS = -Wl,--export-dynamic
 
 MODULEDIR=src/modules
 pkglib_LTLIBRARIES = \
+	m_lusers.la \
 	m_nick.la \
 	m_pong.la \
 	m_user.la
@@ -86,6 +88,10 @@ pkglib_LTLIBRARIES = \
 #m_null_la_SOURCES = $(MODULEDIR)/m_null.cpp
 #m_null_la_LIBADD = $(unrealircd_LDADD)
 #m_null_la_LDFLAGS = -module -avoid-version -shared
+
+m_lusers_la_SOURCES = src/cmd/lusers.cpp
+m_lusers_la_LIBADD = $(unrealircd_LDADD)
+m_lusers_la_LDFLAGS = -module -avoid-version -shared
 
 m_nick_la_SOURCES = src/cmd/nick.cpp
 m_nick_la_LIBADD = $(unrealircd_LDADD)

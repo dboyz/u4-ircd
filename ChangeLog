@@ -2,6 +2,11 @@
   UnrealIRCd 4 ChangeLog
 -------------------------------------------------------------------------------
 
+  2009-12-06 11:07 +0100  Christian Jurk <commx@commx.ws>
+    >> src/cmd/admin.cpp: Added ADMIN command
+    >> src/cmd/away.cpp: Added AWAY command
+    >> include/numeric.hpp: Added a numeric reply for AWAY
+
   2009-12-06 09:35 CET+1  Christian Jurk <commx@commx.ws>
     >> src/cmd/notice.cpp: Added NOTICE command
     >> src/cmd/privmsg.cpp: Added PRIVMSG command

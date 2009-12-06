@@ -76,6 +76,7 @@ enum IRCNumeric
 	ERR_NOTEXTTOSEND			= 412,
 	ERR_UNKNOWNCOMMAND			= 421,
 	ERR_NOMOTD					= 422,
+	ERR_NOADMININFO				= 423,
 	ERR_INVALIDNICK				= 432,
 	ERR_NICKNAMEINUSE			= 433,
 	ERR_USERNOTINCHANNEL		= 441,
@@ -142,6 +143,7 @@ enum IRCNumeric
 #define MSG_NOTEXTTOSEND		":No text to send"
 #define MSG_UNKNOWNCOMMAND		"%s :Unknown command"
 #define MSG_NOMOTD				":No MOTD"
+#define MSG_NOADMININFO			"%s :No administrative info available"
 #define MSG_INVALIDNICK			"%s :Invalid nickname"
 #define MSG_NICKNAMEINUSE		"%s :Nickname is already in use"
 #define MSG_USERNOTINCHANNEL	"%s :They aren't on that channel"

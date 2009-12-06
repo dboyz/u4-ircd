@@ -2,6 +2,12 @@
   UnrealIRCd 4 ChangeLog
 -------------------------------------------------------------------------------
 
+  2009-12-07 00:50 +0100  Christian Jurk <commx@commx.ws>
+    >> src/user.cpp, include/user.hpp: Added mode change handler
+    >> include/mode.hpp: Fixed iterator issue when using registerMode()
+    >> include/modebuf.hpp: Added mode buffer class
+    >> src/cmd/mode.cpp: Added MODE command
+
   2009-12-06 23:30 +0100  Christian Jurk <commx@commx.ws>
     >> src/user.cpp, include/user.hpp: Added basic user modes
     >> src/base.cpp: Added mode initialization function

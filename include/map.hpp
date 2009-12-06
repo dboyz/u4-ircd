@@ -74,7 +74,7 @@ public:
 	 * @param el Element to find
 	 * @return true when found, otherwise false
 	 */
-	bool containsElement(const _ElementType& el) const
+	bool containsElement(const _ElementType& el)
 	{
 		for (Iterator i = this->begin(); i != this->end(); i++)
 		{

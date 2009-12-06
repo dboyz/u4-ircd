@@ -64,17 +64,22 @@ public:
 	~UnrealUser();
 	void auth();
 	Bitmask<uint8_t>& authflags();
+	const String& awayMessage();
 	UnrealTime connectionTime();
 	void exitClient(const String& message);
 	static UnrealUser* find(UnrealSocket* sptr);
 	static UnrealUser* find(const String& nickname);
 	const String& hostname();
 	const String& ident();
+	bool isAway();
+	bool isOper();
+	UnrealTime lastActionTime();
 	UnrealTime lastPongTime();
 	UnrealListener* listener();
 	String lowerNick();
 	const String& nick();
 	const String& realHostname();
+	const String& realname();
 	void registerUser();
 	void send(const String& data);
 	void sendISupport();
@@ -82,8 +87,10 @@ public:
 	void sendreply(IRCNumeric numeric, const String& data);
 	void sendreply(const String& cmd, const String& data);
 	void sendPing();
+	void setAwayMessage(const String& msg);
 	void setHostname(const String& newhost);
 	void setIdent(const String& newident);
+	void setLastActionTime(const UnrealTime& ts);
 	void setLastPongTime(const UnrealTime& ts);
 	void setListener(UnrealListener* lptr);
 	void setNick(const String& newnick);
@@ -116,6 +123,9 @@ private:
 	/** last pong timestamp */
 	UnrealTime last_pong_time_;
 
+	/** last action time */
+	UnrealTime last_action_time_;
+
 	/** nick name */
 	String nickname_;
 
@@ -130,6 +140,9 @@ private:
 
 	/** real name */
 	String realname_;
+
+	/** away message */
+	String away_message_;
 
 	/** timeout timer */
 	boost::asio::deadline_timer timer_;

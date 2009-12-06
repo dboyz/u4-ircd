@@ -177,12 +177,15 @@ void UnrealListener::handleAccept(UnrealSocket* sptr, const ErrorCode& ec)
  * @param sptr Shared UnrealSocket pointer
  * @param data Last line read from Socket
  */
-void UnrealListener::handleDataResponse(UnrealSocket* sptr, const String& data)
+void UnrealListener::handleDataResponse(UnrealSocket* sptr, String& data)
 {
-	StringList tokens = splitLine(const_cast<String&>(data));
+	StringList tokens = splitLine(data);
 	size_t shift = 0;
 
-	std::cout << "handleDataResponse[" << data << "]" << std::endl;
+	/* data has to be trimmed, in case to remove whitespaces;
+	 * mIRC seem to send lines with LF only
+	 */
+	unreal->log.write(UnrealLog::Debug, ">> %s", data.c_str());
 
 	if (tokens.size() < (shift + 1))
 		return; // invalid command
@@ -226,6 +229,9 @@ void UnrealListener::handleDataResponse(UnrealSocket* sptr, const String& data)
 				uptr->sendreply(ERR_UNKNOWNCOMMAND,
 						String::format(MSG_UNKNOWNCOMMAND,
 								cmd.c_str()));
+
+			/* update last action timestamp */
+			uptr->setLastActionTime(UnrealTime::now());
 		}
 	}
 }

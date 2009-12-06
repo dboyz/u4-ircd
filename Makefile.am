@@ -80,6 +80,8 @@ unrealircd_LDFLAGS = -Wl,--export-dynamic
 
 MODULEDIR=src/modules
 pkglib_LTLIBRARIES = \
+	m_admin.la \
+	m_away.la \
 	m_lusers.la \
 	m_nick.la \
 	m_notice.la \
@@ -93,6 +95,14 @@ pkglib_LTLIBRARIES = \
 #m_null_la_SOURCES = $(MODULEDIR)/m_null.cpp
 #m_null_la_LIBADD = $(unrealircd_LDADD)
 #m_null_la_LDFLAGS = -module -avoid-version -shared
+
+m_admin_la_SOURCES = src/cmd/admin.cpp
+m_admin_la_LIBADD = $(unrealircd_LDADD)
+m_admin_la_LDFLAGS = -module -avoid-version -shared
+
+m_away_la_SOURCES = src/cmd/away.cpp
+m_away_la_LIBADD = $(unrealircd_LDADD)
+m_away_la_LDFLAGS = -module -avoid-version -shared
 
 m_lusers_la_SOURCES = src/cmd/lusers.cpp
 m_lusers_la_LIBADD = $(unrealircd_LDADD)

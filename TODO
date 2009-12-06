@@ -9,14 +9,14 @@ Legend:
 
 ===========================================================================
 
-[ ] Get a socket engine going (select() first?)
-[ ] Work on user management (use std::string for simple things (nicks, gecos's, etc))
-[ ] Create 3.2-style numeric sending (see src/s_err.c in 3.2)
-[ ] Main core (waiting for more developers to arrive)
-[ ] Configuration parser (3.2-style, core directives are in doc/configuration.txt)
+[X] Get a socket engine going
+[ ] Work on user management
+[ ] Create 3.2-style numeric sending
+[~] Main core
+[X] Configuration parser (3.2-style, core directives are in doc/configuration.txt)
 [ ] Commands needed in the core:
-    [ ] ADMIN
-    [ ] AWAY
+    [X] ADMIN
+    [X] AWAY
     [ ] CLOSE
     [ ] GLINE
     [ ] INVITE
@@ -27,28 +27,29 @@ Legend:
     [ ] KNOCK
     [ ] LINKS
     [ ] LIST
-    [ ] LUSERS
+    [X] LUSERS
     [ ] MAP
     [ ] MODE
     [ ] MODULES
     [ ] MOTD
     [ ] NAMES
     [ ] NICK
-    [ ] NOTICE
+    [X] NOTICE
     [ ] OPER
     [ ] PART
     [ ] PASS
     [ ] PING
-    [ ] PONG
-    [ ] PRIVMSG
+    [X] PONG
+    [X] PRIVMSG
     [ ] QUIT
     [ ] REHASH
     [ ] SILENCE
     [ ] TOPIC
-    [ ] USER
+    [X] USER
+    [X] USERHOST
     [ ] VERSION
     [ ] WHO
-    [ ] WHOIS
+    [X] WHOIS
     [ ] WHOWAS
     [ ] WATCH
     [ ] ZLINE

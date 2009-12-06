@@ -548,6 +548,30 @@ void UnrealUser::sendreply(const String& cmd, const String& data)
 }
 
 /**
+ * Send a reply to another User, originating from the client itself using
+ * a command.
+ *
+ * @param uptr User entry to relay message to
+ * @param cmd Command to send
+ * @param data Data block
+ */
+void UnrealUser::sendreply(UnrealUser* uptr, const String& cmd,
+		const String& data)
+{
+	String reply;
+
+	reply.sprintf(":%s!%s@%s %s %s %s",
+		nickname_.c_str(),
+		ident_.c_str(),
+		hostname_.c_str(),
+		cmd.c_str(),
+		uptr->nick().c_str(),
+		data.c_str());
+
+	uptr->send(reply);
+}
+
+/**
  * Send a ping request.
  */
 void UnrealUser::sendPing()

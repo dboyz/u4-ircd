@@ -82,7 +82,9 @@ MODULEDIR=src/modules
 pkglib_LTLIBRARIES = \
 	m_lusers.la \
 	m_nick.la \
+	m_notice.la \
 	m_pong.la \
+	m_privmsg.la \
 	m_quit.la \
 	m_user.la \
 	m_userhost.la \
@@ -100,13 +102,21 @@ m_nick_la_SOURCES = src/cmd/nick.cpp
 m_nick_la_LIBADD = $(unrealircd_LDADD)
 m_nick_la_LDFLAGS = -module -avoid-version -shared
 
+m_notice_la_SOURCES = src/cmd/notice.cpp
+m_notice_la_LIBADD = $(unrealircd_LDADD)
+m_notice_la_LDFLAGS = -module -avoid-version -shared
+
 m_pong_la_SOURCES = src/cmd/pong.cpp
 m_pong_la_LIBADD = $(unrealircd_LDADD)
 m_pong_la_LDFLAGS = -module -avoid-version -shared
 
+m_privmsg_la_SOURCES = src/cmd/privmsg.cpp
+m_privmsg_la_LIBADD = $(unrealircd_LDADD)
+m_privmsg_la_LDFLAGS = -module -avoid-version -shared
+
 m_quit_la_SOURCES = src/cmd/quit.cpp
 m_quit_la_LIBADD = $(unrealircd_LDADD)
-m_quit_la_LDFLAGS = -modules -avoid-version -shared
+m_quit_la_LDFLAGS = -module -avoid-version -shared
 
 m_user_la_SOURCES = src/cmd/user.cpp
 m_user_la_LIBADD = $(unrealircd_LDADD)

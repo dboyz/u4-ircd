@@ -1,0 +1,12 @@
+-------------------------------------------------------------------------------
+  UnrealIRCd 4 ChangeLog
+-------------------------------------------------------------------------------
+
+  2009-12-06 09:35 CET+1  Christian Jurk <commx@commx.ws>
+    >> src/cmd/notice.cpp: Added NOTICE command
+    >> src/cmd/privmsg.cpp: Added PRIVMSG command
+    >> src/user.cpp, include/user.hpp: Added sendreply() class method for
+       relay replies to a different user entry
+    >> docs/CODINGSTYLE: Renamed to docs/codingstyle.txt
+    >> AUTHORS: Converted to UNIX LE
+    >> Makefile.am: Fixed issue at m_quit.la

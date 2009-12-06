@@ -86,6 +86,8 @@ public:
 	void sendlocalreply(const String& cmd, const String& data);
 	void sendreply(IRCNumeric numeric, const String& data);
 	void sendreply(const String& cmd, const String& data);
+	void sendreply(UnrealUser* uptr, const String& cmd,
+			const String& data);
 	void sendPing();
 	void setAwayMessage(const String& msg);
 	void setHostname(const String& newhost);

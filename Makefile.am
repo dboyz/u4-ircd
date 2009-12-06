@@ -83,7 +83,10 @@ pkglib_LTLIBRARIES = \
 	m_lusers.la \
 	m_nick.la \
 	m_pong.la \
-	m_user.la
+	m_quit.la \
+	m_user.la \
+	m_userhost.la \
+	m_whois.la
 
 #m_null_la_SOURCES = $(MODULEDIR)/m_null.cpp
 #m_null_la_LIBADD = $(unrealircd_LDADD)
@@ -101,7 +104,18 @@ m_pong_la_SOURCES = src/cmd/pong.cpp
 m_pong_la_LIBADD = $(unrealircd_LDADD)
 m_pong_la_LDFLAGS = -module -avoid-version -shared
 
+m_quit_la_SOURCES = src/cmd/quit.cpp
+m_quit_la_LIBADD = $(unrealircd_LDADD)
+m_quit_la_LDFLAGS = -modules -avoid-version -shared
+
 m_user_la_SOURCES = src/cmd/user.cpp
 m_user_la_LIBADD = $(unrealircd_LDADD)
 m_user_la_LDFLAGS = -module -avoid-version -shared
 
+m_userhost_la_SOURCES = src/cmd/userhost.cpp
+m_userhost_la_LIBADD = $(unrealircd_LDADD)
+m_userhost_la_LDFLAGS = -module -avoid-version -shared
+
+m_whois_la_SOURCES = src/cmd/whois.cpp
+m_whois_la_LIBADD = $(unrealircd_LDADD)
+m_whois_la_LDFLAGS = -module -avoid-version -shared

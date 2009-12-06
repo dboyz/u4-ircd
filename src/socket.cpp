@@ -63,6 +63,7 @@ void UnrealSocket::handleRead(const ErrorCode& ec, size_t bytes_read)
 			case boost::asio::error::connection_reset:
 			case boost::asio::error::network_reset:
 			case boost::asio::error::network_unreachable:
+			case boost::asio::error::bad_descriptor:
 				onDisconnected(this);
 				break;
 
@@ -75,6 +76,9 @@ void UnrealSocket::handleRead(const ErrorCode& ec, size_t bytes_read)
 		static String buffer;
 		std::istream is(&streambuf_);
 		std::getline(is, buffer);
+
+		/* clean whitespace */
+		buffer = buffer.trimmed();
 
 		if (buffer.length() > 0)
 			onRead(this, buffer);
@@ -162,7 +166,5 @@ void UnrealSocket::write(const String& data)
 				boost::asio::placeholders::bytes_transferred));
 
 	/* debug message */
-	unreal->log << UnrealLog::Debug
-				<< "UnrealSocket::write: "
-				<< buffer;
+	unreal->log.write(UnrealLog::Debug, "<< %s", data.c_str());
 }

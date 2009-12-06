@@ -45,7 +45,6 @@ UnrealUser::UnrealUser(UnrealSocket* sptr)
  */
 UnrealUser::~UnrealUser()
 {
-	std::cout<<"~UnrealUser()\n";
 	if (resolver_queries.contains(socket_))
 	{
 		UnrealResolver* rq = resolver_queries[socket_];
@@ -57,17 +56,6 @@ UnrealUser::~UnrealUser()
 
 	unreal->stats.users_local_cur--;
 	//TODO decrease stats, according to if the user is visible or not
-
-	UnrealSocket::ErrorCode ec;
-	timer_.cancel(ec);
-
-	if (ec)
-	{
-		unreal->log.write(UnrealLog::Normal,
-				"~UnrealUser(): "
-				"Timer cancellation failed: %s",
-				ec.message().c_str());
-	}
 }
 
 /**
@@ -93,6 +81,14 @@ void UnrealUser::auth()
 Bitmask<uint8_t>& UnrealUser::authflags()
 {
 	return auth_flags_;
+}
+
+/**
+ * Returns the away message.
+ */
+const String& UnrealUser::awayMessage()
+{
+	return away_message_;
 }
 
 /**
@@ -268,6 +264,32 @@ const String& UnrealUser::ident()
 }
 
 /**
+ * Returns whether the user is marked as away.
+ */
+bool UnrealUser::isAway()
+{
+	return !away_message_.empty();
+}
+
+/**
+ * Returns whether the user has IRC operator status.
+ */
+bool UnrealUser::isOper()
+{
+	return false;
+}
+
+/**
+ * Returns the last action timestamp.
+ *
+ * @return UnrealTime
+ */
+UnrealTime UnrealUser::lastActionTime()
+{
+	return last_action_time_;
+}
+
+/**
  * Returns the last pong timestamp.
  *
  * @return UnrealTime
@@ -315,6 +337,16 @@ const String& UnrealUser::nick()
 const String& UnrealUser::realHostname()
 {
 	return real_hostname_;
+}
+
+/**
+ * Returns the realname for this user.
+ *
+ * @return Realname
+ */
+const String& UnrealUser::realname()
+{
+	return realname_;
 }
 
 /**
@@ -529,6 +561,16 @@ void UnrealUser::sendPing()
 }
 
 /**
+ * Update the away message.
+ *
+ * @param msg New message
+ */
+void UnrealUser::setAwayMessage(const String& msg)
+{
+	away_message_ = msg;
+}
+
+/**
  * Update the visible hostname.
  *
  * @param newhost New hostname
@@ -546,6 +588,16 @@ void UnrealUser::setHostname(const String& newhost)
 void UnrealUser::setIdent(const String& newident)
 {
 	ident_ = newident;
+}
+
+/**
+ * Set the last action timestamp.
+ *
+ * @param ts Timestamp
+ */
+void UnrealUser::setLastActionTime(const UnrealTime& ts)
+{
+	last_action_time_ = ts;
 }
 
 /**

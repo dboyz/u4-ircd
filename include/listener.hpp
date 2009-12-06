@@ -82,7 +82,7 @@ public:
 
 private:
 	void handleAccept(UnrealSocket* sptr, const ErrorCode& ec);
-	void handleDataResponse(UnrealSocket* sptr, const String& data);
+	void handleDataResponse(UnrealSocket* sptr, String& data);
 	void handleError(UnrealSocket* sptr, const ErrorCode& ec);
 
 private:

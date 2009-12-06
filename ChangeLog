@@ -2,12 +2,17 @@
   UnrealIRCd 4 ChangeLog
 -------------------------------------------------------------------------------
 
+  2009-12-06 23:30 +0100  Christian Jurk <commx@commx.ws>
+    >> src/user.cpp, include/user.hpp: Added basic user modes
+    >> src/base.cpp: Added mode initialization function
+    >> include/mode.hpp: Template-based dynamic mode system
+
   2009-12-06 11:07 +0100  Christian Jurk <commx@commx.ws>
     >> src/cmd/admin.cpp: Added ADMIN command
     >> src/cmd/away.cpp: Added AWAY command
     >> include/numeric.hpp: Added a numeric reply for AWAY
 
-  2009-12-06 09:35 CET+1  Christian Jurk <commx@commx.ws>
+  2009-12-06 09:35 +0100  Christian Jurk <commx@commx.ws>
     >> src/cmd/notice.cpp: Added NOTICE command
     >> src/cmd/privmsg.cpp: Added PRIVMSG command
     >> src/user.cpp, include/user.hpp: Added sendreply() class method for

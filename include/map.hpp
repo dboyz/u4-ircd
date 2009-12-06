@@ -38,13 +38,15 @@
  *
  * This class is header-only.
  */
-template<typename _KeyType, typename _ElementType>
+template<typename _KeyType, typename _ElementType,
+	class _Cmp = std::less<_KeyType> >
 class Map
-	: public __CONTAINER<_KeyType, _ElementType>
+	: public __CONTAINER<_KeyType, _ElementType, _Cmp>
 {
 public:
 	/** Alias the original iterator */
-	typedef typename __CONTAINER<_KeyType, _ElementType>::iterator Iterator;
+	typedef typename __CONTAINER<_KeyType, _ElementType, _Cmp>::iterator
+		Iterator;
 
 public:
 	/**
@@ -64,6 +66,25 @@ public:
 	bool contains(const _KeyType& key) const
 	{
 		return this->find(key) != this->end();
+	}
+
+	/**
+	 * Returns whether the map contains the specified Element.
+	 *
+	 * @param el Element to find
+	 * @return true when found, otherwise false
+	 */
+	bool containsElement(const _ElementType& el) const
+	{
+		for (Iterator i = this->begin(); i != this->end(); i++)
+		{
+			if (i->second == el)
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

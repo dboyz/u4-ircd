@@ -2,6 +2,13 @@
   UnrealIRCd 4 ChangeLog
 -------------------------------------------------------------------------------
 
+  2009-12-07 08:15 +0100  Christian Jurk <commx@commx.ws>
+    >> src/channel.cpp, include/channel.hpp: Added channel system
+    >> include/user.hpp: Added channel list for each user to locate
+       channels faster
+    >> src/base.cpp: Added registration of basic channel modes
+    >> TODO: Updates
+
   2009-12-07 00:50 +0100  Christian Jurk <commx@commx.ws>
     >> src/user.cpp, include/user.hpp: Added mode change handler
     >> include/mode.hpp: Fixed iterator issue when using registerMode()

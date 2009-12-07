@@ -26,6 +26,8 @@
 #define _UNREALIRCD_USER_HPP
 
 #include "bitmask.hpp"
+#include "channel.hpp"
+#include "list.hpp"
 #include "listener.hpp"
 #include "mode.hpp"
 #include "modebuf.hpp"
@@ -78,6 +80,7 @@ public:
 	const String& hostname();
 	const String& ident();
 	bool isAway();
+	bool isInvisible();
 	bool isOper();
 	UnrealTime lastActionTime();
 	UnrealTime lastPongTime();
@@ -108,6 +111,9 @@ public:
 	void setRealHostname(const String& newhost);
 	void setRealname(const String& rn);
 	UnrealSocket* socket();
+
+public:
+	List<UnrealChannel*> channels;
 
 private:
 	void checkAuthTimeout(const UnrealSocket::ErrorCode& ec);

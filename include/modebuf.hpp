@@ -25,6 +25,10 @@
 #ifndef _UNREALIRCD_MODEBUF_HPP
 #define _UNREALIRCD_MODEBUF_HPP
 
+#include "string.hpp"
+
+class UnrealUser;
+
 /**
  * Mode buffer type. Used to build MODE lines easily.
  */

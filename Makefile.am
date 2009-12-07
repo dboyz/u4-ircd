@@ -34,6 +34,7 @@ bin_PROGRAMS = unrealircd
 pkginclude_HEADERS = \
 	include/base.hpp \
 	include/bitmask.hpp \
+	include/channel.hpp \
 	include/cmdmap.hpp \
 	include/command.hpp \
 	include/config.hpp \
@@ -58,6 +59,7 @@ pkginclude_HEADERS = \
 
 unrealircd_SOURCES = \
 	src/base.cpp \
+	src/channel.cpp \
 	src/command.cpp \
 	src/config.cpp \
 	src/ioservicepool.cpp \

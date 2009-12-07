@@ -226,6 +226,25 @@ void UnrealBase::initModes()
 		ModeTable.registerMode(Operator);
 		ModeTable.registerMode(Wallops);
 	}
+
+	/* channel modes */
+	if (true)
+	{
+		using namespace UnrealChannelProperties;
+
+		/* register standard modes into the mode table */
+		ModeTable.registerMode(Ban);
+		ModeTable.registerMode(InviteOnly);
+		ModeTable.registerMode(Key);
+		ModeTable.registerMode(Limit);
+		ModeTable.registerMode(Moderated);
+		ModeTable.registerMode(NoExternalMsg);
+		ModeTable.registerMode(ChanOp);
+		ModeTable.registerMode(Private);
+		ModeTable.registerMode(Secret);
+		ModeTable.registerMode(TopicOpsOnly);
+		ModeTable.registerMode(Voice);
+	}
 }
 
 /**

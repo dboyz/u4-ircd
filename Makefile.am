@@ -77,7 +77,7 @@ unrealircd_CPPFLAGS = @BOOST_CPPFLAGS@
 unrealircd_CXXFLAGS = -Wall
 
 unrealircd_LDFLAGS = @BOOST_LDFLAGS@ -Wl,--export-dynamic
-unrealircd_LDADD = @LTDL_LIBS@ @BOOST_ASIO_LIB@ @BOOST_SIGNALS_LIB@ @BOOST_SYSTEM_LIB@ @BOOST_THREAD_LIB@ -ldl
+unrealircd_LDADD = @LTDL_LIBS@ @BOOST_ASIO_LIB@ @BOOST_SYSTEM_LIB@ @BOOST_THREAD_LIB@ -ldl
 #unrealircd_CXXFLAGS = @BOOST_CPPFLAGS@ -std=c++0x -Wall
 
 # http://www.flameeyes.eu/autotools-mythbuster/libtool/index.html#libtool.plugins.dlopen
@@ -102,49 +102,61 @@ pkglib_LTLIBRARIES = \
 #m_null_la_LDFLAGS = -module -avoid-version -shared
 
 m_admin_la_SOURCES = src/cmd/admin.cpp
+m_admin_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_admin_la_LIBADD = $(unrealircd_LDADD)
 m_admin_la_LDFLAGS = -module -avoid-version -shared
 
 m_away_la_SOURCES = src/cmd/away.cpp
+m_away_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_away_la_LIBADD = $(unrealircd_LDADD)
 m_away_la_LDFLAGS = -module -avoid-version -shared
 
 m_lusers_la_SOURCES = src/cmd/lusers.cpp
+m_lusers_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_lusers_la_LIBADD = $(unrealircd_LDADD)
 m_lusers_la_LDFLAGS = -module -avoid-version -shared
 
 m_mode_la_SOURCES = src/cmd/mode.cpp
+m_mode_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_mode_la_LIBADD = $(unrealircd_LDADD)
 m_mode_la_LDFLAGS = -module -avoid-version -shared
 
 m_nick_la_SOURCES = src/cmd/nick.cpp
+m_nick_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_nick_la_LIBADD = $(unrealircd_LDADD)
 m_nick_la_LDFLAGS = -module -avoid-version -shared
 
 m_notice_la_SOURCES = src/cmd/notice.cpp
+m_notice_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_notice_la_LIBADD = $(unrealircd_LDADD)
 m_notice_la_LDFLAGS = -module -avoid-version -shared
 
 m_pong_la_SOURCES = src/cmd/pong.cpp
+m_pong_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_pong_la_LIBADD = $(unrealircd_LDADD)
 m_pong_la_LDFLAGS = -module -avoid-version -shared
 
 m_privmsg_la_SOURCES = src/cmd/privmsg.cpp
+m_privmsg_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_privmsg_la_LIBADD = $(unrealircd_LDADD)
 m_privmsg_la_LDFLAGS = -module -avoid-version -shared
 
 m_quit_la_SOURCES = src/cmd/quit.cpp
+m_quit_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_quit_la_LIBADD = $(unrealircd_LDADD)
 m_quit_la_LDFLAGS = -module -avoid-version -shared
 
 m_user_la_SOURCES = src/cmd/user.cpp
+m_user_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_user_la_LIBADD = $(unrealircd_LDADD)
 m_user_la_LDFLAGS = -module -avoid-version -shared
 
 m_userhost_la_SOURCES = src/cmd/userhost.cpp
+m_userhost_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_userhost_la_LIBADD = $(unrealircd_LDADD)
 m_userhost_la_LDFLAGS = -module -avoid-version -shared
 
 m_whois_la_SOURCES = src/cmd/whois.cpp
+m_whois_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_whois_la_LIBADD = $(unrealircd_LDADD)
 m_whois_la_LDFLAGS = -module -avoid-version -shared

@@ -2,6 +2,13 @@
   UnrealIRCd 4 ChangeLog
 -------------------------------------------------------------------------------
 
+  2009-12-07 11:04 +0100  Christian Jurk <commx@commx.ws>
+    >> src/user.cpp: Fixed output for QUIT message on channels;
+       Removed a few debug messages;
+       Added auth timeout check for clients (was missing)
+    >> src/cmd/lusers.cpp: Print channel count
+    >> src/cmd/topic.cpp: Added TOPIC command handler
+
   2009-12-07 09:42 +0100  Christian Jurk <commx@commx.ws>
     >> src/user.cpp, include/user.hpp: Added joinChannel() and
        leaveChannel() functions

@@ -94,6 +94,9 @@ void UnrealUser::auth()
 
 	/* resolve remote host */
 	resolveHostname();
+
+	/* give the user some time to register */
+	scheduleAuthTimeout();
 }
 
 /**
@@ -209,17 +212,11 @@ UnrealUser* UnrealUser::find(UnrealSocket* sptr)
 UnrealUser* UnrealUser::find(const String& nickname)
 {
 	String lower = const_cast<String&>(nickname).toLower();
-std::cout<<"UnrealUser::find("<<nickname<<")\n";
+
 	if (unreal->nicks.contains(lower))
-	{
-		std::cout<<"yes, contained by nicks, size="<<unreal->nicks.size()<<"\n";
 		return unreal->nicks[lower];
-	}
 	else
-	{
-		std::cout<<"no, not found, size="<<unreal->nicks.size()<<"\n";
 		return 0;
-	}
 }
 
 /**
@@ -430,10 +427,29 @@ void UnrealUser::leaveChannel(const String& chname, const String& message,
 			String msg;
 
 			if (!message.empty())
-				msg = ":" + message;
+				msg = " :" + message;
 
-			if (type == CMD_PART || type == CMD_QUIT)
+			if (type == CMD_PART)
 				chptr->sendlocalreply(this, type, msg);
+			else if (type == CMD_QUIT)
+			{
+				String reply;
+
+				/* build custom message for QUIT */
+				reply.sprintf(":%s!%s@%s %s%s",
+					nickname_.c_str(),
+					ident_.c_str(),
+					hostname_.c_str(),
+					type.c_str(),
+					msg.c_str());
+
+				for (UnrealChannel::MemberIterator cm = chptr->members.begin();
+						cm != chptr->members.end(); cm++)
+				{
+					UnrealUser* uptr = cm->first;
+					uptr->send(reply);
+				}
+			}
 
 			chptr->removeMember(this);
 
@@ -705,7 +721,6 @@ void UnrealUser::resolveHostname()
  */
 void UnrealUser::scheduleAuthTimeout()
 {
-	std::cout<<"scheduleAuthTimeout()\n";
 	int authTimeout = unreal->config.get("Limits/AuthTimeout", "12").toInt();
 	timer_.expires_from_now(boost::posix_time::seconds(authTimeout));
 	timer_.async_wait(boost::bind(&UnrealUser::checkAuthTimeout, this,
@@ -717,7 +732,6 @@ void UnrealUser::scheduleAuthTimeout()
  */
 void UnrealUser::schedulePingTimeout()
 {
-	std::cout<<"schedulePingTimeout()\n";
 	int ping_freq = static_cast<int>(listener_->pingFrequency());
 	timer_.expires_from_now(boost::posix_time::seconds(ping_freq));
 	timer_.async_wait(boost::bind(&UnrealUser::checkPingTimeout, this,

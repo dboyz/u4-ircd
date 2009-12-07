@@ -931,6 +931,21 @@ void UnrealChannel::setLimit(const uint32_t& lim)
  */
 void UnrealChannel::setName(const String& chname)
 {
+	/* remove old name from channel list*/
+	if (!name_.empty())
+	{
+		String cur_lower = lowerName();
+
+		if (unreal->channels.contains(cur_lower))
+			unreal->channels.remove(cur_lower);
+	}
+
+	String lower_cn = chname;
+	lower_cn = lower_cn.toLower();
+
+	/* add channel to channel list */
+	unreal->channels.add(lower_cn, this);
+
 	name_ = chname;
 }
 

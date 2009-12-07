@@ -60,7 +60,14 @@ void uc_quit(UnrealUser* uptr, StringList* argv)
 	if (argv->size() > 1)
 		quitMessage = argv->at(1);
 
-	// TODO: send QUIT message to all channels the user is on
+	/* send quit message to all channels the user is on */
+	while (uptr->channels.size() > 0)
+	{
+		UnrealChannel* chptr = uptr->channels.takeFirst();
+
+		/* remove from channel */
+		uptr->leaveChannel(chptr->name(), quitMessage, CMD_QUIT);
+	}
 
 	uptr->socket()->close();
 }

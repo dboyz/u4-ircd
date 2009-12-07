@@ -73,19 +73,26 @@ void uc_notice(UnrealUser* uptr, StringList* argv)
 
 		if (target.at(0) == '#')
 		{
-			// TODO: channel notice handling
+			UnrealChannel* chptr = UnrealChannel::find(target);
+
+			if (!chptr)
+				return; /* ignore the message */
+			else
+			{
+				if (!chptr->canSend(uptr, argv->at(2)))
+					return; /* can't send, so ignore it */
+				else
+					chptr->sendlocalreply(uptr, CMD_NOTICE,
+						String::format(":%s",
+							argv->at(2).c_str()),
+						true);
+			}
 		}
 		else
 		{
 			UnrealUser* tuptr = UnrealUser::find(target);
 
-			if (!tuptr)
-			{
-				uptr->sendreply(ERR_NOSUCHNICK,
-					String::format(MSG_NOSUCHNICK,
-						target.c_str()));
-			}
-			else
+			if (tuptr)
 			{
 				uptr->sendreply(tuptr, CMD_NOTICE,
 					String::format(":%s",

@@ -2,6 +2,14 @@
   UnrealIRCd 4 ChangeLog
 -------------------------------------------------------------------------------
 
+  2009-12-07 09:42 +0100  Christian Jurk <commx@commx.ws>
+    >> src/user.cpp, include/user.hpp: Added joinChannel() and
+       leaveChannel() functions
+    >> src/cmd/join.cpp: Added JOIN command handler
+    >> src/cmd/part.cpp: Added PART command handler
+    >> src/cmd/names.cpp: Added NAMES command handler
+    >> etc/unreal.conf: Removed
+
   2009-12-07 08:15 +0100  Christian Jurk <commx@commx.ws>
     >> src/channel.cpp, include/channel.hpp: Added channel system
     >> include/user.hpp: Added channel list for each user to locate

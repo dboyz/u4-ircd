@@ -61,6 +61,8 @@ public:
 	static String format(const char* fmt, ...);
 	String left(size_t count);
 	String mid(size_t start, size_t count = npos);
+	inline String& prepend(const char* str) { this->insert(0, str); return *this; }
+	inline String& prepend(const String& str) { this->insert(0, str); return *this; }
 	static String repeat(char ch, size_t count);
 	String right(size_t count);
 	StringList split(const String& separator);

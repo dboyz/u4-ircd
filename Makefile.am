@@ -73,10 +73,12 @@ unrealircd_SOURCES = \
 	src/user.cpp \
 	$(pkginclude_HEADERS)
 
-unrealircd_LDADD = @LTDL_LIBS@ @BOOST_LDFLAGS@ @BOOST_ASIO_LIB@ @BOOST_SYSTEM_LIB@ @BOOST_THREAD_LIB@ -ldl
+unrealircd_CPPFLAGS = @BOOST_CPPFLAGS@
+unrealircd_CXXFLAGS = -Wall
+
+unrealircd_LDFLAGS = @BOOST_LDFLAGS@ -Wl,--export-dynamic
+unrealircd_LDADD = @LTDL_LIBS@ @BOOST_ASIO_LIB@ @BOOST_SIGNALS_LIB@ @BOOST_SYSTEM_LIB@ @BOOST_THREAD_LIB@ -ldl
 #unrealircd_CXXFLAGS = @BOOST_CPPFLAGS@ -std=c++0x -Wall
-unrealircd_CXXFLAGS = @BOOST_CPPFLAGS@ -Wall
-unrealircd_LDFLAGS = -Wl,--export-dynamic
 
 # http://www.flameeyes.eu/autotools-mythbuster/libtool/index.html#libtool.plugins.dlopen
 

@@ -88,16 +88,22 @@ MODULEDIR=src/modules
 pkglib_LTLIBRARIES = \
 	m_admin.la \
 	m_away.la \
+	m_insmod.la \
 	m_join.la \
+	m_kick.la \
+	m_list.la \
+	m_lsmod.la \
 	m_lusers.la \
 	m_mode.la \
 	m_names.la \
 	m_nick.la \
 	m_notice.la \
 	m_part.la \
+	m_ping.la \
 	m_pong.la \
 	m_privmsg.la \
 	m_quit.la \
+	m_rmmod.la \
 	m_topic.la \
 	m_user.la \
 	m_userhost.la \
@@ -117,10 +123,30 @@ m_away_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_away_la_LIBADD = $(unrealircd_LDADD)
 m_away_la_LDFLAGS = -module -avoid-version -shared
 
+m_insmod_la_SOURCES = src/cmd/insmod.cpp
+m_insmod_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
+m_insmod_la_LIBADD = $(unrealircd_LDADD)
+m_insmod_la_LDFLAGS = -module -avoid-version -shared
+
 m_join_la_SOURCES = src/cmd/join.cpp
 m_join_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_join_la_LIBADD = $(unrealircd_LDADD)
 m_join_la_LDFLAGS = -module -avoid-version -shared
+
+m_kick_la_SOURCES = src/cmd/kick.cpp
+m_kick_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
+m_kick_la_LIBADD = $(unrealircd_LDADD)
+m_kick_la_LDFLAGS = -module -avoid-version -shared
+
+m_list_la_SOURCES = src/cmd/list.cpp
+m_list_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
+m_list_la_LIBADD = $(unrealircd_LDADD)
+m_list_la_LDFLAGS = -module -avoid-version -shared
+
+m_lsmod_la_SOURCES = src/cmd/lsmod.cpp
+m_lsmod_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
+m_lsmod_la_LIBADD = $(unrealircd_LDADD)
+m_lsmod_la_LDFLAGS = -module -avoid-version -shared
 
 m_lusers_la_SOURCES = src/cmd/lusers.cpp
 m_lusers_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
@@ -152,6 +178,11 @@ m_part_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_part_la_LIBADD = $(unrealircd_LDADD)
 m_part_la_LDFLAGS = -module -avoid-version -shared
 
+m_ping_la_SOURCES = src/cmd/ping.cpp
+m_ping_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
+m_ping_la_LIBADD = $(unrealircd_LDADD)
+m_ping_la_LDFLAGS = -module -avoid-version -shared
+
 m_pong_la_SOURCES = src/cmd/pong.cpp
 m_pong_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_pong_la_LIBADD = $(unrealircd_LDADD)
@@ -166,6 +197,11 @@ m_quit_la_SOURCES = src/cmd/quit.cpp
 m_quit_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_quit_la_LIBADD = $(unrealircd_LDADD)
 m_quit_la_LDFLAGS = -module -avoid-version -shared
+
+m_rmmod_la_SOURCES = src/cmd/rmmod.cpp
+m_rmmod_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
+m_rmmod_la_LIBADD = $(unrealircd_LDADD)
+m_rmmod_la_LDFLAGS = -module -avoid-version -shared
 
 m_topic_la_SOURCES = src/cmd/topic.cpp
 m_topic_la_CPPFLAGS = $(unrealircd_CPPFLAGS)

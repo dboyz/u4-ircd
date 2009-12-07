@@ -79,6 +79,8 @@ UnrealUser::~UnrealUser()
 		unreal->stats.users_inv--;
 	if (auth_flags_.value() != 0)
 		unreal->stats.connections_unk--;
+	if (isOper())
+		unreal->stats.operators--;
 }
 
 /**
@@ -525,6 +527,28 @@ const String& UnrealUser::nick()
 }
 
 /**
+ * Sends a notice to all IRC operators.
+ *
+ * @param msg Message to send
+ */
+void UnrealUser::notifyOpers(const String& msg)
+{
+	Map<UnrealSocket*, UnrealUser*>::Iterator ui;
+	UnrealUser* uptr;
+	String preparedMsg = ":*** Notice -- " + msg;
+
+	for (ui = unreal->users.begin(); ui != unreal->users.end(); ui++)
+	{
+		uptr = ui->second;
+
+		if (!uptr->isOper())
+			continue;
+		else
+			uptr->sendreply(CMD_NOTICE, preparedMsg);
+	}
+}
+
+/**
  * Parse user mode changes.
  *
  * @param args Arguments
@@ -601,13 +625,17 @@ void UnrealUser::parseModeChange(StringList* argv)
 					{
 						unreal->stats.users_inv--;
 					}
+					else if (umo == UnrealUserProperties::Operator)
+					{
+						unreal->stats.operators--;
+					}
 				}
 			}
 		}
 	}
 
 	/* send mode changes */
-	if (changeset.length() > 0)
+	if (changeset.length() > 1)
 		sendreply(CMD_MODE, changeset);
 }
 

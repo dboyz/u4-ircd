@@ -92,6 +92,7 @@ public:
 	Bitmask<uint16_t>& modes();
 	String modestr();
 	const String& nick();
+	void notifyOpers(const String& msg);
 	void parseModeChange(StringList* argv);
 	const String& realHostname();
 	const String& realname();

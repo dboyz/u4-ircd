@@ -181,6 +181,8 @@ bool UnrealChannel::canSend(UnrealUser* uptr, String& text)
 		if (cmptr && (!cmptr->isChanOp() && !cmptr->isHalfOp() && !cmptr->isVoiced()))
 			return false;
 	}
+	else if (isNoExternalMsg() && !findMember(uptr))
+		return false; /* no external messages */
 
 	// TODO: check for ban. Banned users can not talk to channels.
 

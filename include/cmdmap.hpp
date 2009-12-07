@@ -34,11 +34,20 @@
 #define CMD_HELP		"HELP"
 #define TOK_HELP		"HLP"
 
+#define CMD_INSMOD		"INSMOD"
+#define TOK_INSMOD		"IMO"
+
 #define CMD_JOIN		"JOIN"
 #define TOK_JOIN		"J"
 
 #define CMD_KICK		"KICK"
 #define TOK_KICK		"K"
+
+#define CMD_LIST		"LIST"
+#define TOK_LIST		"LI"
+
+#define CMD_LSMOD		"LSMOD"
+#define TOK_LSMOD		"LMO"
 
 #define CMD_LUSERS		"LUSERS"
 #define TOK_LUSERS		"LU"
@@ -75,6 +84,9 @@
 
 #define CMD_QUIT		"QUIT"
 #define TOK_QUIT		"Q"
+
+#define CMD_RMMOD		"RMMOD"
+#define TOK_RMMOD		"RMO"
 
 #define CMD_TOPIC		"TOPIC"
 #define TOK_TOPIC		"T"

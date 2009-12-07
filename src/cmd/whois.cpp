@@ -99,7 +99,6 @@ void uc_whois(UnrealUser* uptr, StringList* argv)
 						tuptr->hostname().c_str(),
 						tuptr->realname().c_str()));
 
-				std::cout << "whois channels.size()="<<tuptr->channels.size()<<"\n";
 				/* collect channel list */
 				if (tuptr->channels.size() > 0)
 				{
@@ -112,7 +111,6 @@ void uc_whois(UnrealUser* uptr, StringList* argv)
 						UnrealChannel* chptr = *chan;
 						UnrealChannel::Member* cmptr=chptr->findMember(tuptr);
 
-						std::cout << "whois channel <" << chptr->name() << ">\n";
 						if (chptr->isSecret() && !uptr->isOper())
 							continue; // don't show channels with secret flag
 
@@ -128,7 +126,6 @@ void uc_whois(UnrealUser* uptr, StringList* argv)
 								result.append(1, '+');
 
 							result << chptr->name();
-							std::cout << "whois channel cmptr is valid <" << chptr->name() << ">\n";
 						}
 
 						if (result.length() >= 420)

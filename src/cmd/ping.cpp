@@ -1,7 +1,7 @@
 /*****************************************************************
  * Unreal Internet Relay Chat Daemon, Version 4
- * File         nick.cpp
- * Description  NICK command handler
+ * File         ping.cpp
+ * Description  PING command handler
  *
  * All parts of this program are Copyright(C) 2009 by their
  * respective authors and the UnrealIRCd development team.
@@ -32,7 +32,7 @@
 UnrealModule::Info modinf =
 {
 	/** Module name */
-	"NICK command handler",
+	"PING command handler",
 
 	/** Module version */
 	"1.0",
@@ -45,93 +45,31 @@ UnrealModule::Info modinf =
 UnrealUserCommand* uc = 0;
 
 /**
- * Checks whether the specified string represents a valid nick name.
+ * PING command handler for User connections.
  *
- * @return true when valid, otherwise false
- */
-bool is_valid_nick(const String& str)
-{
-	String allowed = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234"
-					 "56789-_|^()[]{}\\`´'";
-	size_t nicklen = static_cast<size_t>(unreal->config.get("Limits/Nicklen",
-			"18").toUInt());
-
-	String trstr = str;
-	trstr = trstr.trimmed();
-
-	if (trstr.length() > nicklen)
-		return false;
-
-	for (size_t i = 0; i < trstr.length(); i++)
-		if (allowed.find(trstr[i]) == String::npos)
-			return false;
-
-	return true;
-}
-
-/**
- * NICK command handler for User connections.
+ * Usage:
+ * PING <server1> [<server2>]
  *
  * Message example:
- * NICK newnick
+ * PING server.name
  *
  * @param uptr Originating user
  * @param argv Argument list
  */
-void uc_nick(UnrealUser* uptr, StringList* argv)
+void uc_ping(UnrealUser* uptr, StringList* argv)
 {
 	if (argv->size() < 2)
 	{
 		uptr->sendreply(ERR_NEEDMOREPARAMS,
 				String::format(MSG_NEEDMOREPARAMS,
-						CMD_NICK));
+						CMD_PING));
 	}
-	else if (UnrealUser::find(argv->at(1)) != 0)
-	{
-		uptr->sendreply(ERR_NICKNAMEINUSE,
-				String::format(MSG_NICKNAMEINUSE,
-						argv->at(1).c_str()));
-	}
-	else if (!is_valid_nick(argv->at(1)))
-	{
-		uptr->sendreply(ERR_INVALIDNICK,
-				String::format(MSG_INVALIDNICK,
-						argv->at(1).c_str()));
-	}
-	/* handle this when not fully registered yet */
-	else if (uptr->authflags().isset(UnrealUser::AFNick))
-	{
-		if (uptr->nick().empty())
-			uptr->setNick(argv->at(1));
 
-		uptr->authflags().revoke(UnrealUser::AFNick);
+	// TODO: if <server2> is set, send that PING request to that server
+	String origin = argv->at(1);
 
-		if (uptr->authflags().value() == 0)
-			uptr->sendPing();
-	}
-	else
-	{
-		uptr->sendlocalreply(CMD_NICK,
-				String::format(":%s",
-						argv->at(1).c_str()));
-
-		uptr->setNick(argv->at(1));
-
-		/* send this nick change to all users on common channels */
-		if (uptr->channels.size() > 0)
-		{
-			for (List<UnrealChannel*>::Iterator uci = uptr->channels.begin();
-					uci != uptr->channels.end(); uci++)
-			{
-				UnrealChannel* chptr = *uci;
-
-				chptr->sendlocalreply(uptr, CMD_NICK,
-						String::format(":%s",
-							argv->at(1).c_str()),
-						true);
-			}
-		}
-	}
+	uptr->sendreply(CMD_PONG,
+		String::format(":%s", origin.c_str()));
 }
 
 /**
@@ -146,7 +84,7 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
 	module.info = modinf;
 
 	/* register command */
-	uc = new UnrealUserCommand(CMD_NICK, &uc_nick);
+	uc = new UnrealUserCommand(CMD_PING, &uc_ping);
 
 	return UnrealModule::Success;
 }

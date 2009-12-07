@@ -61,9 +61,13 @@ void UnrealSocket::handleRead(const ErrorCode& ec, size_t bytes_read)
 		{
 			case boost::asio::error::eof:
 			case boost::asio::error::connection_reset:
+			case boost::asio::error::connection_aborted:
 			case boost::asio::error::network_reset:
 			case boost::asio::error::network_unreachable:
 			case boost::asio::error::bad_descriptor:
+			case boost::asio::error::broken_pipe:
+			case boost::asio::error::host_unreachable:
+			case boost::asio::error::timed_out:
 				onDisconnected(this);
 				break;
 
@@ -111,8 +115,13 @@ void UnrealSocket::handleWrite(const ErrorCode& ec, size_t bytes_written)
 		{
 			case boost::asio::error::eof:
 			case boost::asio::error::connection_reset:
+			case boost::asio::error::connection_aborted:
 			case boost::asio::error::network_reset:
 			case boost::asio::error::network_unreachable:
+			case boost::asio::error::bad_descriptor:
+			case boost::asio::error::broken_pipe:
+			case boost::asio::error::host_unreachable:
+			case boost::asio::error::timed_out:
 				onDisconnected(this);
 				break;
 

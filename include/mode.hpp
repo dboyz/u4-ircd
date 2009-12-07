@@ -26,11 +26,15 @@
 #define _UNREALIRCD_MODE_HPP
 
 #include "map.hpp"
-#include "user.hpp"
+#include "platform.hpp"
 #include <limits>
 
+class UnrealChannel;
 class UnrealUser;
 
+/**
+ * Defines a type to be used for comparing mode entries.
+ */
 struct UnrealModeCompareIterator
 {
 	template<typename _IterA, typename _IterB>
@@ -40,6 +44,9 @@ struct UnrealModeCompareIterator
 	}
 };
 
+/**
+ * UnrealMode defines an actual mode entry.
+ */
 template<typename TargetType>
 class UnrealMode
 {
@@ -51,7 +58,7 @@ public:
 	typedef Result (*HookFunc)(UnrealUser*, TargetType*);
 
 	/** mode constructor */
-	UnrealMode(char ch, size_t params = 0, HookFunc hookfn = 0)
+	UnrealMode(char ch = 0, size_t params = 0, HookFunc hookfn = 0)
 		: mode_char(ch), param_count(params), hook(hookfn)
 	{ }
 
@@ -76,6 +83,7 @@ public:
 };
 
 /** global mode type declarations */
+typedef UnrealMode<UnrealChannel> UnrealChannelMode;
 typedef UnrealMode<UnrealUser> UnrealUserMode;
 
 /**
@@ -126,7 +134,7 @@ public:
 
 		if (!si)
 			return Failed; /* all slots in use */
-		else if (/*hasFlag(mo.mode_char)*/0)
+		else if (hasFlag(mo.mode_char))
 			return Failed; /* we've already such a flag registered */
 		else
 		{
@@ -196,6 +204,7 @@ public:
 };
 
 /** global mode table declarations */
+typedef UnrealModeTable<uint32_t, UnrealChannelMode> UnrealChannelModeTable;
 typedef UnrealModeTable<uint16_t, UnrealUserMode> UnrealUserModeTable;
 
 #endif /* _UNREALIRCD_MODE_HPP */

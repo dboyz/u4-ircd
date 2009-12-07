@@ -95,9 +95,8 @@ void uc_nick(UnrealUser* uptr, StringList* argv)
 				String::format(MSG_INVALIDNICK,
 						argv->at(1).c_str()));
 	}
-
 	/* handle this when not fully registered yet */
-	if (uptr->authflags().isset(UnrealUser::AFNick))
+	else if (uptr->authflags().isset(UnrealUser::AFNick))
 	{
 		if (uptr->nick().empty())
 			uptr->setNick(argv->at(1));

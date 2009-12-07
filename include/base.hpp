@@ -25,6 +25,7 @@
 #ifndef _UNREALIRCD_BASE_H
 #define _UNREALIRCD_BASE_H
 
+#include "channel.hpp"
 #include "command.hpp"
 #include "config.hpp"
 #include "ioservicepool.hpp"
@@ -85,6 +86,9 @@ public:
 
 	/** nick mapping */
 	Map<String, UnrealUser*> nicks;
+
+	/** channel mapping */
+	Map<String, UnrealChannel*> channels;
 
 	/** user command mapping */
 	Map<String, UnrealUserCommand*> user_commands;

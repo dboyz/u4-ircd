@@ -74,7 +74,11 @@ UnrealUser::~UnrealUser()
 	}
 
 	unreal->stats.users_local_cur--;
-	//TODO decrease stats, according to if the user is visible or not
+
+	if (isInvisible())
+		unreal->stats.users_inv--;
+	if (auth_flags_.value() != 0)
+		unreal->stats.connections_unk--;
 }
 
 /**
@@ -291,11 +295,31 @@ bool UnrealUser::isAway()
 }
 
 /**
+ * Returns whether the user has the invisible mode flag set.
+ */
+bool UnrealUser::isInvisible()
+{
+	using namespace UnrealUserProperties;
+
+	if (ModeTable.contains(Invisible)
+			&& modes_.isset(ModeTable.value(Invisible)))
+		return true;
+	else
+		return false;
+}
+
+/**
  * Returns whether the user has IRC operator status.
  */
 bool UnrealUser::isOper()
 {
-	return false;
+	using namespace UnrealUserProperties;
+
+	if (ModeTable.contains(Operator)
+			&& modes_.isset(ModeTable.value(Operator)))
+		return true;
+	else
+		return false;
 }
 
 /**

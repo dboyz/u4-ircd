@@ -33,7 +33,7 @@ Legend:
     [ ] MODULES
     [ ] MOTD
     [ ] NAMES
-    [ ] NICK
+    [X] NICK
     [X] NOTICE
     [ ] OPER
     [ ] PART

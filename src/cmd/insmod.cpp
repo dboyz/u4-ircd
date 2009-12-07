@@ -1,7 +1,7 @@
 /*****************************************************************
  * Unreal Internet Relay Chat Daemon, Version 4
- * File         nick.cpp
- * Description  NICK command handler
+ * File         insmod.cpp
+ * Description  INSMOD command handler
  *
  * All parts of this program are Copyright(C) 2009 by their
  * respective authors and the UnrealIRCd development team.
@@ -32,7 +32,7 @@
 UnrealModule::Info modinf =
 {
 	/** Module name */
-	"NICK command handler",
+	"INSMOD command handler",
 
 	/** Module version */
 	"1.0",
@@ -45,91 +45,61 @@ UnrealModule::Info modinf =
 UnrealUserCommand* uc = 0;
 
 /**
- * Checks whether the specified string represents a valid nick name.
+ * INSMOD command handler for User connections.
  *
- * @return true when valid, otherwise false
- */
-bool is_valid_nick(const String& str)
-{
-	String allowed = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234"
-					 "56789-_|^()[]{}\\`´'";
-	size_t nicklen = static_cast<size_t>(unreal->config.get("Limits/Nicklen",
-			"18").toUInt());
-
-	String trstr = str;
-	trstr = trstr.trimmed();
-
-	if (trstr.length() > nicklen)
-		return false;
-
-	for (size_t i = 0; i < trstr.length(); i++)
-		if (allowed.find(trstr[i]) == String::npos)
-			return false;
-
-	return true;
-}
-
-/**
- * NICK command handler for User connections.
+ * INSMOD allows IRC operators to load modules dynamically while
+ * the server is running.
+ *
+ * Usage:
+ * INSMOD <filename>
  *
  * Message example:
- * NICK newnick
+ * INSMOD /home/chris/lib/cmd/help.so
  *
  * @param uptr Originating user
  * @param argv Argument list
  */
-void uc_nick(UnrealUser* uptr, StringList* argv)
+void uc_insmod(UnrealUser* uptr, StringList* argv)
 {
 	if (argv->size() < 2)
 	{
 		uptr->sendreply(ERR_NEEDMOREPARAMS,
-				String::format(MSG_NEEDMOREPARAMS,
-						CMD_NICK));
-	}
-	else if (UnrealUser::find(argv->at(1)) != 0)
-	{
-		uptr->sendreply(ERR_NICKNAMEINUSE,
-				String::format(MSG_NICKNAMEINUSE,
-						argv->at(1).c_str()));
-	}
-	else if (!is_valid_nick(argv->at(1)))
-	{
-		uptr->sendreply(ERR_INVALIDNICK,
-				String::format(MSG_INVALIDNICK,
-						argv->at(1).c_str()));
-	}
-	/* handle this when not fully registered yet */
-	else if (uptr->authflags().isset(UnrealUser::AFNick))
-	{
-		if (uptr->nick().empty())
-			uptr->setNick(argv->at(1));
-
-		uptr->authflags().revoke(UnrealUser::AFNick);
-
-		if (uptr->authflags().value() == 0)
-			uptr->sendPing();
+			String::format(MSG_NEEDMOREPARAMS,
+				CMD_INSMOD));
 	}
 	else
 	{
-		uptr->sendlocalreply(CMD_NICK,
-				String::format(":%s",
-						argv->at(1).c_str()));
+		UnrealModule* mptr = new UnrealModule(argv->at(1));
 
-		uptr->setNick(argv->at(1));
-
-		/* send this nick change to all users on common channels */
-		if (uptr->channels.size() > 0)
+		if (!mptr->isLoaded())
 		{
-			for (List<UnrealChannel*>::Iterator uci = uptr->channels.begin();
-					uci != uptr->channels.end(); uci++)
-			{
-				UnrealChannel* chptr = *uci;
+			String errStr = mptr->errorString();
 
-				chptr->sendlocalreply(uptr, CMD_NICK,
-						String::format(":%s",
-							argv->at(1).c_str()),
-						true);
-			}
+			uptr->sendreply(CMD_NOTICE,
+				String::format(MSG_INSMODFAILED,
+					errStr.c_str()));
+
+			unreal->log.write(UnrealLog::Normal, "Warning: Loading module "
+					"failed: %s (INSMOD from %s)",
+					errStr.c_str(),
+					uptr->nick().c_str());
+
+			delete mptr;
+		}
+		else
+		{
+			uptr->sendreply(CMD_NOTICE,
+				String::format(MSG_INSMODOK,
+					mptr->info.name.c_str(),
+					mptr->info.version.c_str()));
+
+			unreal->log.write(UnrealLog::Debug, "Loading Module \"%s\" "
+				"(INSMOD from %s)",
+				mptr->fileName().c_str(),
+				uptr->nick().c_str());
+
+			/* add to module list */
+			unreal->modules << mptr;
 		}
 	}
 }
@@ -146,7 +116,7 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
 	module.info = modinf;
 
 	/* register command */
-	uc = new UnrealUserCommand(CMD_NICK, &uc_nick);
+	uc = new UnrealUserCommand(CMD_INSMOD, &uc_insmod, true);
 
 	return UnrealModule::Success;
 }

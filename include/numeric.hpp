@@ -57,6 +57,9 @@ enum IRCNumeric
 	RPL_WHOIS_IDLE				= 317,
 	RPL_ENDOFWHOIS				= 318,
 	RPL_WHOISCHANNELS			= 319,
+	RPL_LISTSTART				= 321,
+	RPL_LIST					= 322,
+	RPL_LISTEND					= 323,
 	RPL_CHANNELMODEIS			= 324,
 	RPL_CHANNELCREATED			= 329,
 	RPL_NOTOPIC					= 331,
@@ -124,6 +127,9 @@ enum IRCNumeric
 #define MSG_WHOIS_IDLE			"%s %d %d :seconds idle, signon time"
 #define MSG_ENDOFWHOIS			"%s :End of /WHOIS list."
 #define MSG_WHOISCHANNELS		"%s :%s"
+#define MSG_LISTSTART			"Channel :Users  Name"
+#define MSG_LIST				"%s %d :%s"
+#define MSG_LISTEND				":End of /LIST"
 #define MSG_CHANNELMODEIS		"+%s"
 #define MSG_CHANNELCREATED		"%d"
 #define MSG_NOTOPIC				":No topic is set."
@@ -164,5 +170,13 @@ enum IRCNumeric
 
 #define MSG_UMODEUNKNOWNFLAG	"%c :Unknown user mode flag"
 #define MSG_USERSDONTMATCH		":Can't change MODE for other users"
+
+#define MSG_INSMODFAILED		":Loading module failed: %s"
+#define MSG_INSMODOK			":Module \"%s\", Version \"%s\" loaded"
+#define MSG_RMMODNOTFOUND		":Unable to locate module: %s"
+#define MSG_RMMODOK				":Unloading module \"%s\""
+#define MSG_LSMODSTART			":---- Active server modules (%d)"
+#define MSG_LSMOD				":%s Version %s Author %s File %s"
+#define MSG_LSMODEND			":End of /LSMOD."
 
 #endif /* _UNREALIRCD_NUMERIC_HPP */

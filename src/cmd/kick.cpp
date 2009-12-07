@@ -1,7 +1,7 @@
 /*****************************************************************
  * Unreal Internet Relay Chat Daemon, Version 4
- * File         nick.cpp
- * Description  NICK command handler
+ * File         kick.cpp
+ * Description  KICK command handler
  *
  * All parts of this program are Copyright(C) 2009 by their
  * respective authors and the UnrealIRCd development team.
@@ -32,7 +32,7 @@
 UnrealModule::Info modinf =
 {
 	/** Module name */
-	"NICK command handler",
+	"KICK command handler",
 
 	/** Module version */
 	"1.0",
@@ -45,91 +45,70 @@ UnrealModule::Info modinf =
 UnrealUserCommand* uc = 0;
 
 /**
- * Checks whether the specified string represents a valid nick name.
+ * KICK command handler for User connections.
  *
- * @return true when valid, otherwise false
- */
-bool is_valid_nick(const String& str)
-{
-	String allowed = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234"
-					 "56789-_|^()[]{}\\`´'";
-	size_t nicklen = static_cast<size_t>(unreal->config.get("Limits/Nicklen",
-			"18").toUInt());
-
-	String trstr = str;
-	trstr = trstr.trimmed();
-
-	if (trstr.length() > nicklen)
-		return false;
-
-	for (size_t i = 0; i < trstr.length(); i++)
-		if (allowed.find(trstr[i]) == String::npos)
-			return false;
-
-	return true;
-}
-
-/**
- * NICK command handler for User connections.
+ * Usage:
+ * KICK <channel> <nick> [:<comment>]
  *
  * Message example:
- * NICK newnick
+ * KICK #test WiZ :get out of here
  *
  * @param uptr Originating user
  * @param argv Argument list
  */
-void uc_nick(UnrealUser* uptr, StringList* argv)
+void uc_kick(UnrealUser* uptr, StringList* argv)
 {
-	if (argv->size() < 2)
+	if (argv->size() < 3)
 	{
 		uptr->sendreply(ERR_NEEDMOREPARAMS,
-				String::format(MSG_NEEDMOREPARAMS,
-						CMD_NICK));
-	}
-	else if (UnrealUser::find(argv->at(1)) != 0)
-	{
-		uptr->sendreply(ERR_NICKNAMEINUSE,
-				String::format(MSG_NICKNAMEINUSE,
-						argv->at(1).c_str()));
-	}
-	else if (!is_valid_nick(argv->at(1)))
-	{
-		uptr->sendreply(ERR_INVALIDNICK,
-				String::format(MSG_INVALIDNICK,
-						argv->at(1).c_str()));
-	}
-	/* handle this when not fully registered yet */
-	else if (uptr->authflags().isset(UnrealUser::AFNick))
-	{
-		if (uptr->nick().empty())
-			uptr->setNick(argv->at(1));
-
-		uptr->authflags().revoke(UnrealUser::AFNick);
-
-		if (uptr->authflags().value() == 0)
-			uptr->sendPing();
+			String::format(MSG_NEEDMOREPARAMS,
+				CMD_KICK));
 	}
 	else
 	{
-		uptr->sendlocalreply(CMD_NICK,
-				String::format(":%s",
-						argv->at(1).c_str()));
+		UnrealChannel* chptr = UnrealChannel::find(argv->at(1));
+		UnrealChannel::Member* cmptr = 0;
+		UnrealUser* tuptr = UnrealUser::find(argv->at(2));
 
-		uptr->setNick(argv->at(1));
-
-		/* send this nick change to all users on common channels */
-		if (uptr->channels.size() > 0)
+		if (!chptr)
 		{
-			for (List<UnrealChannel*>::Iterator uci = uptr->channels.begin();
-					uci != uptr->channels.end(); uci++)
-			{
-				UnrealChannel* chptr = *uci;
+			uptr->sendreply(ERR_NOSUCHCHANNEL,
+				String::format(MSG_NOSUCHCHANNEL,
+					argv->at(1).c_str()));
+		}
+		else if (!tuptr)
+		{
+			uptr->sendreply(ERR_NOSUCHNICK,
+				String::format(MSG_NOSUCHNICK,
+					argv->at(2).c_str()));
+		}
+		else if (!(cmptr = chptr->findMember(uptr)))
+		{
+			chptr->sendreply(uptr, ERR_NOTONCHANNEL, MSG_NOTONCHANNEL);
+		}
+		else if (!cmptr->isChanOp() && !uptr->isOper())
+		{
+			chptr->sendreply(uptr, ERR_CHANOPRIVSNEEDED, MSG_CHANOPRIVSNEEDED);
+		}
+		else if (!(cmptr = chptr->findMember(tuptr)))
+		{
+			chptr->sendreply(uptr, ERR_USERNOTINCHANNEL,
+				String::format(MSG_USERNOTINCHANNEL,
+					tuptr->nick().c_str()));
+		}
+		else
+		{
+			String message;
 
-				chptr->sendlocalreply(uptr, CMD_NICK,
-						String::format(":%s",
-							argv->at(1).c_str()),
-						true);
-			}
+			if (argv->size() > 3)
+				message = argv->at(3);
+
+			chptr->sendlocalreply(uptr, CMD_KICK,
+				String::format("%s :%s",
+					tuptr->nick().c_str(),
+					message.c_str()));
+
+			tuptr->leaveChannel(chptr->name(), message, CMD_KICK);
 		}
 	}
 }
@@ -146,7 +125,7 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
 	module.info = modinf;
 
 	/* register command */
-	uc = new UnrealUserCommand(CMD_NICK, &uc_nick);
+	uc = new UnrealUserCommand(CMD_KICK, &uc_kick);
 
 	return UnrealModule::Success;
 }

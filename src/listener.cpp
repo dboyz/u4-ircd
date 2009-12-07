@@ -215,7 +215,7 @@ void UnrealListener::handleDataResponse(UnrealSocket* sptr, String& data)
 							String::format(MSG_CMDNOTAVAILABLE,
 									cmd.c_str()));
 				/* ... or oper-only */
-				else if (ucptr->isOperOnly())
+				else if (ucptr->isOperOnly() && !uptr->isOper())
 					uptr->sendreply(ERR_NOPRIVILEGES, MSG_NOPRIVILEGES);
 				else
 				{

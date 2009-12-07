@@ -98,6 +98,7 @@ pkglib_LTLIBRARIES = \
 	m_pong.la \
 	m_privmsg.la \
 	m_quit.la \
+	m_topic.la \
 	m_user.la \
 	m_userhost.la \
 	m_whois.la
@@ -149,7 +150,7 @@ m_notice_la_LDFLAGS = -module -avoid-version -shared
 m_part_la_SOURCES = src/cmd/part.cpp
 m_part_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_part_la_LIBADD = $(unrealircd_LDADD)
-m_part_la_LDFLAGS = -modules -avoid-version -shared
+m_part_la_LDFLAGS = -module -avoid-version -shared
 
 m_pong_la_SOURCES = src/cmd/pong.cpp
 m_pong_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
@@ -165,6 +166,11 @@ m_quit_la_SOURCES = src/cmd/quit.cpp
 m_quit_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_quit_la_LIBADD = $(unrealircd_LDADD)
 m_quit_la_LDFLAGS = -module -avoid-version -shared
+
+m_topic_la_SOURCES = src/cmd/topic.cpp
+m_topic_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
+m_topic_la_LIBADD = $(unrealircd_LDADD)
+m_topic_la_LDFLAGS = -module -avoid-version -shared
 
 m_user_la_SOURCES = src/cmd/user.cpp
 m_user_la_CPPFLAGS = $(unrealircd_CPPFLAGS)

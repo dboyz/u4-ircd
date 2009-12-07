@@ -167,6 +167,9 @@ public:
 	void setLastJoinTime(const UnrealTime& ts);
 	void setLimit(const uint32_t& lim);
 	void setName(const String& chname);
+	void setTopic(const String& msg);
+	void setTopicMask(const String& mask);
+	void setTopicTime(const UnrealTime& ts);
 	const String& topic();
 	const String& topicMask();
 	UnrealTime topicTime();

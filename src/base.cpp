@@ -234,6 +234,11 @@ void UnrealBase::initModes()
 
 		/* register standard modes into the mode table */
 		ModeTable.registerMode(Ban);
+
+		/* half op can be disabled */
+		if (config.get("Features/EnableHalfOp", "false").toBool())
+			ModeTable.registerMode(HalfOp);
+
 		ModeTable.registerMode(InviteOnly);
 		ModeTable.registerMode(Key);
 		ModeTable.registerMode(Limit);
@@ -428,11 +433,18 @@ void UnrealBase::setupISupport()
 	isupport.add("KICKLEN", config.get("Limits/Kicklen", "250"));
 	isupport.add("CHANNELLEN", config.get("Limits/Channellen", "200"));
 	isupport.add("CHANTYPES", "#");
-	isupport.add("PREFIX", "(hov)%@+"); //TODO: make halfop disableable w/ cfg
 	isupport.add("STATUSMSG", "%@+");
 	isupport.add("CHANMODES", "b,k,l,imnsp"); // TODO: dynamic generation
 	isupport.add("CASEMAPPING", "rfc1459");
 	isupport.add("NETWORK", config.get("Me/Network", "ExampleNet"));
+
+	/* build PREFIX */
+	String prefix = "(ov)@+";
+
+	if (config.get("Features/EnableHalfOp", "false").toBool())
+		prefix = "(ohv)@%+";
+
+	isupport.add("PREFIX", prefix);
 }
 
 /**

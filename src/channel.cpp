@@ -25,6 +25,7 @@
 #include "base.hpp"
 #include "channel.hpp"
 #include "cmdmap.hpp"
+#include <iostream>
 
 /** channel mode definitions */
 namespace UnrealChannelProperties
@@ -152,8 +153,10 @@ UnrealChannel::Member* UnrealChannel::addMember(UnrealUser* uptr,
 		/* add member to channel */
 		members.add(uptr, cmptr);
 
-		//TODO: add channel into user's channel list, so we can access the
-		// channels a bit faster
+		/* add channel into user's channel list so we can access the channels
+		 * a bit faster
+		 */
+		uptr->channels << this;
 	}
 
 	return cmptr;
@@ -947,6 +950,36 @@ void UnrealChannel::setName(const String& chname)
 	unreal->channels.add(lower_cn, this);
 
 	name_ = chname;
+}
+
+/**
+ * Update channel topic.
+ *
+ * @param msg New channel topic
+ */
+void UnrealChannel::setTopic(const String& msg)
+{
+	topic_ = msg;
+}
+
+/**
+ * Update channel topic originator mask.
+ *
+ * @param mask Originator mask
+ */
+void UnrealChannel::setTopicMask(const String& mask)
+{
+	topic_mask_ = mask;
+}
+
+/**
+ * Update channel topic timestamp.
+ *
+ * @param ts New timestamp
+ */
+void UnrealChannel::setTopicTime(const UnrealTime& ts)
+{
+	topic_time_ = ts;
 }
 
 /**

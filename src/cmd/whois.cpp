@@ -27,6 +27,7 @@
 #include "command.hpp"
 #include "module.hpp"
 #include "stringlist.hpp"
+#include <iostream>
 
 /** Module informations */
 UnrealModule::Info modinf =
@@ -98,7 +99,51 @@ void uc_whois(UnrealUser* uptr, StringList* argv)
 						tuptr->hostname().c_str(),
 						tuptr->realname().c_str()));
 
-				// TODO: print channel list here
+				std::cout << "whois channels.size()="<<tuptr->channels.size()<<"\n";
+				/* collect channel list */
+				if (tuptr->channels.size() > 0)
+				{
+					String result;
+
+					for (List<UnrealChannel*>::Iterator chan
+							= tuptr->channels.begin();
+							chan != tuptr->channels.end(); chan++)
+					{
+						UnrealChannel* chptr = *chan;
+						UnrealChannel::Member* cmptr=chptr->findMember(tuptr);
+
+						std::cout << "whois channel <" << chptr->name() << ">\n";
+						if (chptr->isSecret() && !uptr->isOper())
+							continue; // don't show channels with secret flag
+
+						if (cmptr)
+						{
+							if (!result.empty())
+								result.append(1, ' ');
+							if (cmptr->isChanOp())
+								result.append(1, '@');
+							else if (cmptr->isHalfOp())
+								result.append(1, '%');
+							else if (cmptr->isVoiced())
+								result.append(1, '+');
+
+							result << chptr->name();
+							std::cout << "whois channel cmptr is valid <" << chptr->name() << ">\n";
+						}
+
+						if (result.length() >= 420)
+							uptr->sendreply(RPL_WHOISCHANNELS,
+								String::format(MSG_WHOISCHANNELS,
+									tuptr->nick().c_str(),
+									result.c_str()));
+					}
+
+					if (result.length() > 0)
+						uptr->sendreply(RPL_WHOISCHANNELS,
+							String::format(MSG_WHOISCHANNELS,
+								tuptr->nick().c_str(),
+								result.c_str()));
+				}
 
 				// TODO: replace server info with informations of target server
 				uptr->sendreply(RPL_WHOIS_SERVER,

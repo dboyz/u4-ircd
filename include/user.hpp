@@ -82,8 +82,11 @@ public:
 	bool isAway();
 	bool isInvisible();
 	bool isOper();
+	void joinChannel(const String& chname, const String& key);
 	UnrealTime lastActionTime();
 	UnrealTime lastPongTime();
+	void leaveChannel(const String& chname, const String& message,
+			const String& type);
 	UnrealListener* listener();
 	String lowerNick();
 	Bitmask<uint16_t>& modes();

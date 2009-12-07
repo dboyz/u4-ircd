@@ -323,6 +323,71 @@ bool UnrealUser::isOper()
 }
 
 /**
+ * Join user into a channel.
+ *
+ * @param chname Channel name to enter
+ * @param key (optional) channel key
+ */
+void UnrealUser::joinChannel(const String& chname, const String& key)
+{
+	UnrealChannel* chptr = UnrealChannel::find(chname);
+	uint8_t flags = 0;
+
+	if (!chptr)
+	{
+		chptr = new UnrealChannel(chname);
+		flags = UnrealChannel::Member::ChanOp;
+	}
+	else if (chptr->isKey() && key != chptr->key() && !isOper())
+	{
+		sendreply(ERR_BADCHANNELKEY,
+			String::format(MSG_BADCHANNELKEY,
+				chptr->name().c_str()));
+		return;
+	}
+	else if (chptr->isLimit() && chptr->members.size() >= chptr->limit()
+		&& !isOper())
+	{
+		sendreply(ERR_CHANNELISFULL,
+			String::format(MSG_CHANNELISFULL,
+				chptr->name().c_str()));
+		return;
+	}
+
+	/* add us to the channel */
+	chptr->addMember(this, flags);
+
+	/* let anyone know that we're joining */
+	chptr->sendlocalreply(this, CMD_JOIN, String());
+
+	if (chptr->creationTime().toTS() > 0)
+		chptr->sendreply(this, RPL_CHANNELCREATED,
+			String::format(MSG_CHANNELCREATED,
+				chptr->creationTime().toTS()));
+
+	StringList tmp_strl;
+	tmp_strl << "0" << chptr->name();
+
+	/* look up some commands */
+	UnrealUserCommand* ucptr;
+	UnrealUserCommand::Function fn;
+
+	/* sending names */
+	if ((ucptr = UnrealUserCommand::find(CMD_NAMES)))
+	{
+		fn = ucptr->fn();
+		fn(this, &tmp_strl);
+	}
+
+	/* and the topic */
+	if ((ucptr = UnrealUserCommand::find(CMD_TOPIC)))
+	{
+		fn = ucptr->fn();
+		fn(this, &tmp_strl);
+	}
+}
+
+/**
  * Returns the last action timestamp.
  *
  * @return UnrealTime
@@ -340,6 +405,43 @@ UnrealTime UnrealUser::lastActionTime()
 UnrealTime UnrealUser::lastPongTime()
 {
 	return last_pong_time_;
+}
+
+/**
+ * Leave user from channel.
+ *
+ * @param chname Channel name to leave
+ * @param message Leave message
+ * @param type Specify QUIT, KICK or PART
+ */
+void UnrealUser::leaveChannel(const String& chname, const String& message,
+	const String& type)
+{
+	UnrealChannel* chptr = UnrealChannel::find(chname);
+
+	if (chptr)
+	{
+		UnrealChannel::Member* cmptr = chptr->findMember(this);
+
+		if (!cmptr)
+			chptr->sendreply(this, ERR_NOTONCHANNEL, MSG_NOTONCHANNEL);
+		else
+		{
+			String msg;
+
+			if (!message.empty())
+				msg = ":" + message;
+
+			if (type == CMD_PART || type == CMD_QUIT)
+				chptr->sendlocalreply(this, type, msg);
+
+			chptr->removeMember(this);
+
+			/* if the channel got empty, delete it */
+			if (chptr->members.size() == 0)
+				delete chptr;
+		}
+	}
 }
 
 /**
@@ -420,24 +522,6 @@ void UnrealUser::parseModeChange(StringList* argv)
 	/* mode table */
 	UnrealUserModeTable& modetab = UnrealUserProperties::ModeTable;
 
-	std::cout << "-- parseModeChange()\n";
-	std::cout << "   print modetab:\n";
-
-	for (UnrealUserModeTable::Iterator i = modetab.begin(); i != modetab.end(); i++)
-	{
-		std::cout << "      iter ch=" << (i->first).mode_char
-				<< " fl=" << i->second << "\n";
-	}
-
-	std::cout << "   print current modes <" << modes_.value() << ">\n";
-
-	for (UnrealUserModeTable::Iterator i = modetab.begin(); i != modetab.end(); i++)
-	{
-		if (modes_.isset(i->second))
-			std::cout << "      has set ch=" << (i->first).mode_char
-				<< " fl=" << i->second << "\n";
-	}
-
 	for (String::Iterator ch = flagset.begin(); ch != flagset.end(); ch++)
 	{
 		if (*ch == '+' || *ch == '-')
@@ -455,9 +539,6 @@ void UnrealUser::parseModeChange(StringList* argv)
 
 			UnrealUserMode umo = modetab.lookup(*ch);
 			uint16_t fl = modetab.value(umo);
-
-			std::cout<<"parseModeChange() ch="<<umo.mode_char
-					<< " fl=" << fl << "\n";
 
 			if (last_state != state)
 			{

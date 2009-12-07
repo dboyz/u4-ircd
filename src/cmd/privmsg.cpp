@@ -82,7 +82,26 @@ void uc_privmsg(UnrealUser* uptr, StringList* argv)
 
 			if (target.at(0) == '#')
 			{
-				// TODO: relay channel message
+				UnrealChannel* chptr = UnrealChannel::find(target);
+
+				if (!chptr)
+				{
+					uptr->sendreply(ERR_NOSUCHCHANNEL,
+						String::format(MSG_NOSUCHCHANNEL,
+							target.c_str()));
+				}
+				else
+				{
+					if (!chptr->canSend(uptr, argv->at(2)))
+						uptr->sendreply(ERR_CANNOTSENDTOCHAN,
+							String::format(MSG_CANNOTSENDTOCHAN,
+								chptr->name().c_str()));
+					else
+						chptr->sendlocalreply(uptr, CMD_PRIVMSG,
+							String::format(":%s",
+								argv->at(2).c_str()),
+							true);
+				}
 			}
 			else
 			{

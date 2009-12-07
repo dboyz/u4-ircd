@@ -88,10 +88,13 @@ MODULEDIR=src/modules
 pkglib_LTLIBRARIES = \
 	m_admin.la \
 	m_away.la \
+	m_join.la \
 	m_lusers.la \
 	m_mode.la \
+	m_names.la \
 	m_nick.la \
 	m_notice.la \
+	m_part.la \
 	m_pong.la \
 	m_privmsg.la \
 	m_quit.la \
@@ -113,6 +116,11 @@ m_away_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_away_la_LIBADD = $(unrealircd_LDADD)
 m_away_la_LDFLAGS = -module -avoid-version -shared
 
+m_join_la_SOURCES = src/cmd/join.cpp
+m_join_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
+m_join_la_LIBADD = $(unrealircd_LDADD)
+m_join_la_LDFLAGS = -module -avoid-version -shared
+
 m_lusers_la_SOURCES = src/cmd/lusers.cpp
 m_lusers_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_lusers_la_LIBADD = $(unrealircd_LDADD)
@@ -123,6 +131,11 @@ m_mode_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_mode_la_LIBADD = $(unrealircd_LDADD)
 m_mode_la_LDFLAGS = -module -avoid-version -shared
 
+m_names_la_SOURCES = src/cmd/names.cpp
+m_names_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
+m_names_la_LIBADD = $(unrealircd_LDADD)
+m_names_la_LDFLAGS = -module -avoid-version -shared
+
 m_nick_la_SOURCES = src/cmd/nick.cpp
 m_nick_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_nick_la_LIBADD = $(unrealircd_LDADD)
@@ -132,6 +145,11 @@ m_notice_la_SOURCES = src/cmd/notice.cpp
 m_notice_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_notice_la_LIBADD = $(unrealircd_LDADD)
 m_notice_la_LDFLAGS = -module -avoid-version -shared
+
+m_part_la_SOURCES = src/cmd/part.cpp
+m_part_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
+m_part_la_LIBADD = $(unrealircd_LDADD)
+m_part_la_LDFLAGS = -modules -avoid-version -shared
 
 m_pong_la_SOURCES = src/cmd/pong.cpp
 m_pong_la_CPPFLAGS = $(unrealircd_CPPFLAGS)

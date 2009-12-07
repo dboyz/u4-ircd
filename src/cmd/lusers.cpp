@@ -70,7 +70,7 @@ void uc_lusers(UnrealUser* uptr, StringList* argv)
 			st.connections_unk));
 	uptr->sendreply(RPL_LUSERCHANNELS,
 		String::format(MSG_LUSERCHANNELS,
-				0)); //TODO: replace channel list size
+				unreal->channels.size()));
 	uptr->sendreply(RPL_LUSERME,
 		String::format(MSG_LUSERME,
 			st.users_local_cur,

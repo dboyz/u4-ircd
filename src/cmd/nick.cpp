@@ -113,6 +113,21 @@ void uc_nick(UnrealUser* uptr, StringList* argv)
 						argv->at(1).c_str()));
 
 		uptr->setNick(argv->at(1));
+
+		/* send this nick change to all users on common channels */
+		if (uptr->channels.size() > 0)
+		{
+			for (List<UnrealChannel*>::Iterator uci = uptr->channels.begin();
+					uci != uptr->channels.end(); uci++)
+			{
+				UnrealChannel* chptr = *uci;
+
+				chptr->sendlocalreply(uptr, CMD_NICK,
+						String::format(":%s",
+							argv->at(1).c_str()),
+						true);
+			}
+		}
 	}
 }
 

@@ -70,7 +70,41 @@ void uc_mode(UnrealUser* uptr, StringList* argv)
 
 		if (target.at(0) == '#')
 		{
-			// TODO: handle channel mode stuff
+			UnrealChannel* chptr = UnrealChannel::find(target);
+			UnrealChannel::Member* cmptr = 0;
+
+			if (!chptr)
+			{
+				uptr->sendreply(ERR_NOSUCHCHANNEL,
+					String::format(MSG_NOSUCHCHANNEL,
+						target.c_str()));
+			}
+			else if (!(cmptr = chptr->findMember(uptr)) && !uptr->isOper())
+			{
+				chptr->sendreply(uptr, ERR_NOTONCHANNEL, MSG_NOTONCHANNEL);
+			}
+			else if (argv->size() == 2)
+			{
+				chptr->sendreply(uptr, RPL_CHANNELMODEIS,
+					String::format(MSG_CHANNELMODEIS,
+						chptr->modestr().c_str()));
+				chptr->sendreply(uptr, RPL_CHANNELCREATED,
+					String::format(MSG_CHANNELCREATED,
+						chptr->creationTime().toTS()));
+			}
+			else if (!cmptr->isChanOp() && !uptr->isOper())
+			{
+				chptr->sendreply(uptr, ERR_CHANOPRIVSNEEDED,
+					MSG_CHANOPRIVSNEEDED);
+			}
+			else
+			{
+				/* propagate mode change; removed unrequired stuff from argv */
+				for (size_t i = 0; i < 2; i++)
+					argv->removeFirst();
+
+				chptr->parseModeChange(uptr, argv);
+			}
 		}
 		else
 		{

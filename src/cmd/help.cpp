@@ -1,7 +1,7 @@
 /*****************************************************************
  * Unreal Internet Relay Chat Daemon, Version 4
- * File         lsmod.cpp
- * Description  LSMOD command handler
+ * File         help.cpp
+ * Description  HELP command handler
  *
  * All parts of this program are Copyright(C) 2009 by their
  * respective authors and the UnrealIRCd development team.
@@ -32,7 +32,7 @@
 UnrealModule::Info modinf =
 {
 	/** Module name */
-	"LSMOD command handler",
+	"HELP command handler",
 
 	/** Module version */
 	"1.0",
@@ -45,49 +45,34 @@ UnrealModule::Info modinf =
 UnrealUserCommand* uc = 0;
 
 /**
- * LSMOD command handler for User connections.
- *
- * LSMOD lists all loaded modules that are loaded with the server.
+ * HELP command handler for User connections.
  *
  * Usage:
- * LSMOD
+ * HELP [<target>]
  *
  * Message example:
- * RMMOD
+ * HELP
  *
  * @param uptr Originating user
  * @param argv Argument list
  */
-void uc_lsmod(UnrealUser* uptr, StringList* argv)
+void uc_help(UnrealUser* uptr, StringList* argv)
 {
-	bool is_oper_only = !unreal->config.get("Features/UserLsmod", "false").toBool();
+	String target = unreal->config.get("Me/ServerName");
 
-	/* first, look if the command is available to operators only */
-	if (is_oper_only && !uptr->isOper())
-	{
-		uptr->sendreply(ERR_NOPRIVILEGES, MSG_NOPRIVILEGES);
-		return;
-	}
-	else
-	{
-		uptr->sendreply(CMD_NOTICE,
-			String::format(MSG_LSMODSTART,
-				unreal->modules.size()));
+	if (argv->size() >= 2)
+		target = argv->at(1);
 
-		for (List<UnrealModule*>::Iterator mi = unreal->modules.begin();
-				mi != unreal->modules.end(); mi++)
+	if (target == unreal->config.get("Me/ServerName"))
+	{
+		/* print all commands available on this server */
+		Map<String, UnrealUserCommand*>::Iterator cmd_iter;
+
+		for (cmd_iter = unreal->user_commands.begin();
+				cmd_iter != unreal->user_commands.end(); cmd_iter++)
 		{
-			UnrealModule* mptr = *mi;
-
-			uptr->sendreply(CMD_NOTICE,
-				String::format(MSG_LSMOD,
-					mptr->info.name.c_str(),
-					mptr->info.version.c_str(),
-					mptr->info.author.c_str(),
-					mptr->fileName().c_str()));
+			uptr->sendreply(CMD_NOTICE, (cmd_iter->first).c_str());
 		}
-
-		uptr->sendreply(CMD_NOTICE, MSG_LSMODEND);
 	}
 }
 
@@ -103,7 +88,7 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
 	module.info = modinf;
 
 	/* register command */
-	uc = new UnrealUserCommand(CMD_LSMOD, &uc_lsmod);
+	uc = new UnrealUserCommand(CMD_HELP, &uc_help);
 
 	return UnrealModule::Success;
 }

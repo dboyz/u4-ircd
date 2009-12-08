@@ -1,7 +1,7 @@
 /*****************************************************************
  * Unreal Internet Relay Chat Daemon, Version 4
- * File         lsmod.cpp
- * Description  LSMOD command handler
+ * File         info.cpp
+ * Description  INFO command handler
  *
  * All parts of this program are Copyright(C) 2009 by their
  * respective authors and the UnrealIRCd development team.
@@ -32,7 +32,7 @@
 UnrealModule::Info modinf =
 {
 	/** Module name */
-	"LSMOD command handler",
+	"INFO command handler",
 
 	/** Module version */
 	"1.0",
@@ -44,50 +44,58 @@ UnrealModule::Info modinf =
 /** Command Instance */
 UnrealUserCommand* uc = 0;
 
+StringList readInfoFile()
+{
+	StringList sl;
+
+	sl << "UnrealIRCd, Version 4";
+	sl << String("");
+	sl << "This program is free software; you can redistribute it and/or";
+	sl << "modify it under the terms of the GNU General Public License as";
+	sl << "published by the Free Software Foundation; either version 3, or";
+	sl << "(at your option) any later version.";
+	sl << String("");
+	sl << "UnrealIRCd 4 was written in C++ with a new, modern code base - ";
+	sl << "to make your IRC experience even better.";
+	sl << String("");
+	sl << "Thanks to all people who made this possible.";
+
+	return sl;
+}
 /**
- * LSMOD command handler for User connections.
- *
- * LSMOD lists all loaded modules that are loaded with the server.
+ * INFO command handler for User connections.
  *
  * Usage:
- * LSMOD
+ * INFO [<target>]
  *
  * Message example:
- * RMMOD
+ * INFO some.server.net
  *
  * @param uptr Originating user
  * @param argv Argument list
  */
-void uc_lsmod(UnrealUser* uptr, StringList* argv)
+void uc_info(UnrealUser* uptr, StringList* argv)
 {
-	bool is_oper_only = !unreal->config.get("Features/UserLsmod", "false").toBool();
+	String target = unreal->config.get("Me/ServerName");
 
-	/* first, look if the command is available to operators only */
-	if (is_oper_only && !uptr->isOper())
+	if (argv->size() >= 2)
+		target = argv->at(1);
+
+	if (target == unreal->config.get("Me/ServerName"))
 	{
-		uptr->sendreply(ERR_NOPRIVILEGES, MSG_NOPRIVILEGES);
-		return;
-	}
-	else
-	{
-		uptr->sendreply(CMD_NOTICE,
-			String::format(MSG_LSMODSTART,
-				unreal->modules.size()));
+		StringList output = readInfoFile();
 
-		for (List<UnrealModule*>::Iterator mi = unreal->modules.begin();
-				mi != unreal->modules.end(); mi++)
-		{
-			UnrealModule* mptr = *mi;
+		output << String("") << String("");
+		output << String::format("Revision: %s", _U4_VER_REVISION_);
+		output << String::format("Birth date: %s %s", __DATE__, __TIME__);
+		output << String::format("On-line since %s",
+				unreal->starttime.toString("%Y-%M-%dT%H:%M:%S %Z").c_str());
 
-			uptr->sendreply(CMD_NOTICE,
-				String::format(MSG_LSMOD,
-					mptr->info.name.c_str(),
-					mptr->info.version.c_str(),
-					mptr->info.author.c_str(),
-					mptr->fileName().c_str()));
-		}
+		/* now send it */
+		for (StringList::Iterator i = output.begin(); i != output.end(); i++)
+			uptr->sendreply(RPL_INFO, (*i).c_str());
 
-		uptr->sendreply(CMD_NOTICE, MSG_LSMODEND);
+		uptr->sendreply(RPL_ENDOFINFO, MSG_ENDOFINFO);
 	}
 }
 
@@ -103,7 +111,7 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
 	module.info = modinf;
 
 	/* register command */
-	uc = new UnrealUserCommand(CMD_LSMOD, &uc_lsmod);
+	uc = new UnrealUserCommand(CMD_INFO, &uc_info);
 
 	return UnrealModule::Success;
 }

@@ -666,7 +666,33 @@ const String& UnrealUser::realname()
 void UnrealUser::registerUser()
 {
 	UnrealConfig& cfg = unreal->config;
-	static String version = "unrealircd-4.0.0hgal";
+	String version = String::format("%s%s", _U4_VERSTR_, _U4_PATCHLEVEL_);
+
+	/* collect user mode flags */
+	String user_modes;
+
+	{
+		using namespace UnrealUserProperties;
+
+		for (UnrealUserModeTable::Iterator i = ModeTable.begin();
+				i != ModeTable.end(); i++)
+		{
+			user_modes.append(1, (i->first).mode_char);
+		}
+	}
+
+	/* collect channel mode flags */
+	String chan_modes;
+
+	{
+		using namespace UnrealChannelProperties;
+
+		for (UnrealChannelModeTable::Iterator i = ModeTable.begin();
+				i != ModeTable.end(); i++)
+		{
+			chan_modes.append(1, (i->first).mode_char);
+		}
+	}
 
 	sendreply(RPL_WELCOME,
 		String::format(MSG_WELCOME,
@@ -674,18 +700,18 @@ void UnrealUser::registerUser()
 			nickname_.c_str()));
 	sendreply(RPL_YOURHOST,
 		String::format(MSG_YOURHOST,
-			cfg.get("Me/ServerName", "not.configured").c_str(),
+			cfg.get("Me/ServerName").c_str(),
 			version.c_str()));
 	sendreply(RPL_CREATED,
 		String::format(MSG_CREATED,
-			unreal->starttime.toString("%Y-%M-%dT%H:%M:%S/%Z").c_str()));
+			unreal->starttime.toString("%Y-%M-%dT%H:%M:%S %Z").c_str()));
+
 	sendreply(RPL_MYINFO,
 		String::format(MSG_MYINFO,
-			cfg.get("Me/ServerName", "not.configured").c_str(),
+			cfg.get("Me/ServerName").c_str(),
 			version.c_str(),
-			"diow", /* to be changed .. */
-			"biklmnps",
-			"blkov"));
+			user_modes.c_str(),
+			chan_modes.c_str()));
 
 	/* send server features */
 	sendISupport();
@@ -708,8 +734,11 @@ void UnrealUser::registerUser()
 		fn(this, 0);
 	}
 
-	// no motd yet
-	sendreply(ERR_NOMOTD, MSG_NOMOTD);
+	/* message of the day */
+	if ((ucptr = UnrealUserCommand::find(CMD_MOTD)))
+		ucptr->fn()(this, 0);
+	else
+		sendreply(ERR_NOMOTD, MSG_NOMOTD);
 
 	/*
 	 * RPL_WELCOME

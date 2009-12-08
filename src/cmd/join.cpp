@@ -49,6 +49,7 @@ UnrealUserCommand* uc = 0;
  *
  * Usage:
  * JOIN #channel[,#channel2[,...]] [key1[,key2[,...]]]
+ * JOIN 0
  *
  * Message example:
  * JOIN #dev,#home
@@ -86,6 +87,20 @@ void uc_join(UnrealUser* uptr, StringList* argv)
 		{
 			String tmp_chan = *chan;
 			String key;
+
+			if (tmp_chan.empty())
+				continue;
+			else if (tmp_chan == "0")
+			{
+				/* leave all channels */
+				for (List<UnrealChannel*>::Iterator i = uptr->channels.begin();
+						i != uptr->channels.end(); i++)
+				{
+					uptr->leaveChannel((*i)->name(), String(), CMD_PART);
+				}
+
+				return;
+			}
 
 			/* if a key has been specified, extract it */
 			if (kl.size() > 0)

@@ -47,11 +47,11 @@ UnrealUserCommand* uc = 0;
 /**
  * INSMOD command handler for User connections.
  *
- * INSMOD allows IRC operators to load modules dynamically while
+ * INSMOD allows IRC operators to (re-)load modules dynamically while
  * the server is running.
  *
  * Usage:
- * INSMOD <filename>
+ * INSMOD <filename> ["reload"]
  *
  * Message example:
  * INSMOD /home/chris/lib/cmd/help.so
@@ -69,37 +69,62 @@ void uc_insmod(UnrealUser* uptr, StringList* argv)
 	}
 	else
 	{
-		UnrealModule* mptr = new UnrealModule(argv->at(1));
+		UnrealModule* mptr = UnrealModule::find(argv->at(1));
+		bool do_reload = (argv->size() > 2 && argv->at(2) == "reload");
+		String errStr;
 
-		if (!mptr->isLoaded())
+		if (mptr)
 		{
-			String errStr = mptr->errorString();
+			if (do_reload)
+			{
+				/* destroy module object */
+				unreal->modules.remove(mptr);
+				delete mptr;
 
-			uptr->sendreply(CMD_NOTICE,
-				String::format(MSG_INSMODFAILED,
-					errStr.c_str()));
+				/* and load it again */
+				mptr = new UnrealModule(argv->at(1));
 
-			unreal->log.write(UnrealLog::Normal, "Warning: Loading module "
-					"failed: %s (INSMOD from %s)",
-					errStr.c_str(),
-					uptr->nick().c_str());
+				if (!mptr->isLoaded())
+				{
+					errStr = mptr->errorString();
+					delete mptr;
+				}
+				else
+					unreal->modules << mptr;
+			}
+			else
+				errStr = "Module is already loaded.";
 
-			delete mptr;
+			if (errStr.empty())
+				uptr->sendreply(CMD_NOTICE,
+					String::format(MSG_INSMODOK,
+						mptr->info.name.c_str(),
+						mptr->info.version.c_str()));
+			else
+				uptr->sendreply(CMD_NOTICE,
+					String::format(MSG_INSMODFAILED,
+						errStr.c_str()));
 		}
 		else
 		{
-			uptr->sendreply(CMD_NOTICE,
-				String::format(MSG_INSMODOK,
-					mptr->info.name.c_str(),
-					mptr->info.version.c_str()));
+			mptr = new UnrealModule(argv->at(1));
 
-			unreal->log.write(UnrealLog::Debug, "Loading Module \"%s\" "
-				"(INSMOD from %s)",
-				mptr->fileName().c_str(),
-				uptr->nick().c_str());
+			if (!mptr->isLoaded())
+			{
+				uptr->sendreply(CMD_NOTICE,
+					String::format(MSG_INSMODFAILED,
+						mptr->errorString().c_str()));
+				delete mptr;
+			}
+			else
+			{
+				uptr->sendreply(CMD_NOTICE,
+					String::format(MSG_INSMODOK,
+						mptr->info.name.c_str(),
+						mptr->info.version.c_str()));
 
-			/* add to module list */
-			unreal->modules << mptr;
+				unreal->modules << mptr;
+			}
 		}
 	}
 }

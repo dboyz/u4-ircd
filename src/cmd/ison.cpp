@@ -1,7 +1,7 @@
 /*****************************************************************
  * Unreal Internet Relay Chat Daemon, Version 4
- * File         lsmod.cpp
- * Description  LSMOD command handler
+ * File         ison.cpp
+ * Description  ISON command handler
  *
  * All parts of this program are Copyright(C) 2009 by their
  * respective authors and the UnrealIRCd development team.
@@ -32,7 +32,7 @@
 UnrealModule::Info modinf =
 {
 	/** Module name */
-	"LSMOD command handler",
+	"ISON command handler",
 
 	/** Module version */
 	"1.0",
@@ -45,50 +45,41 @@ UnrealModule::Info modinf =
 UnrealUserCommand* uc = 0;
 
 /**
- * LSMOD command handler for User connections.
- *
- * LSMOD lists all loaded modules that are loaded with the server.
+ * ISON command handler for User connections.
  *
  * Usage:
- * LSMOD
+ * ISON <nick> [<nick2>[ <nick3>[ ...]]]
  *
  * Message example:
- * RMMOD
+ * ISON Stealth Syzop
  *
  * @param uptr Originating user
  * @param argv Argument list
  */
-void uc_lsmod(UnrealUser* uptr, StringList* argv)
+void uc_ison(UnrealUser* uptr, StringList* argv)
 {
-	bool is_oper_only = !unreal->config.get("Features/UserLsmod", "false").toBool();
-
-	/* first, look if the command is available to operators only */
-	if (is_oper_only && !uptr->isOper())
+	if (argv->size() < 2)
 	{
-		uptr->sendreply(ERR_NOPRIVILEGES, MSG_NOPRIVILEGES);
-		return;
+		uptr->sendreply(ERR_NEEDMOREPARAMS,
+				String::format(MSG_NEEDMOREPARAMS,
+						CMD_ISON));
 	}
-	else
+
+	StringList nicks;
+
+	for (StringList::Iterator i = argv->begin() + 1; i != argv->end(); i++)
 	{
-		uptr->sendreply(CMD_NOTICE,
-			String::format(MSG_LSMODSTART,
-				unreal->modules.size()));
+		UnrealUser* tuptr = UnrealUser::find(*i);
 
-		for (List<UnrealModule*>::Iterator mi = unreal->modules.begin();
-				mi != unreal->modules.end(); mi++)
-		{
-			UnrealModule* mptr = *mi;
-
-			uptr->sendreply(CMD_NOTICE,
-				String::format(MSG_LSMOD,
-					mptr->info.name.c_str(),
-					mptr->info.version.c_str(),
-					mptr->info.author.c_str(),
-					mptr->fileName().c_str()));
-		}
-
-		uptr->sendreply(CMD_NOTICE, MSG_LSMODEND);
+		if (tuptr)
+			nicks << tuptr->nick();
 	}
+
+	/* just send a reply when we do have a few nicks there */
+	if (nicks.size() > 0)
+		uptr->sendreply(RPL_ISON,
+			String::format(MSG_ISON,
+				nicks.join(" ").c_str()));
 }
 
 /**
@@ -103,7 +94,7 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
 	module.info = modinf;
 
 	/* register command */
-	uc = new UnrealUserCommand(CMD_LSMOD, &uc_lsmod);
+	uc = new UnrealUserCommand(CMD_ISON, &uc_ison);
 
 	return UnrealModule::Success;
 }

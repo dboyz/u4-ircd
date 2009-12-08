@@ -63,13 +63,13 @@ void uc_ping(UnrealUser* uptr, StringList* argv)
 		uptr->sendreply(ERR_NEEDMOREPARAMS,
 				String::format(MSG_NEEDMOREPARAMS,
 						CMD_PING));
+		return;
 	}
 
 	// TODO: if <server2> is set, send that PING request to that server
-	String origin = argv->at(1);
 
 	uptr->sendreply(CMD_PONG,
-		String::format(":%s", origin.c_str()));
+		String::format(":%s", argv->at(1).c_str()));
 }
 
 /**

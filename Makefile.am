@@ -55,7 +55,8 @@ pkginclude_HEADERS = \
 	include/string.hpp \
 	include/stringlist.hpp \
 	include/time.hpp \
-	include/user.hpp
+	include/user.hpp \
+	include/version.hpp
 
 unrealircd_SOURCES = \
 	src/base.cpp \
@@ -88,13 +89,17 @@ MODULEDIR=src/modules
 pkglib_LTLIBRARIES = \
 	m_admin.la \
 	m_away.la \
+	m_help.la \
+	m_info.la \
 	m_insmod.la \
+	m_ison.la \
 	m_join.la \
 	m_kick.la \
 	m_list.la \
 	m_lsmod.la \
 	m_lusers.la \
 	m_mode.la \
+	m_motd.la \
 	m_names.la \
 	m_nick.la \
 	m_notice.la \
@@ -107,6 +112,7 @@ pkglib_LTLIBRARIES = \
 	m_topic.la \
 	m_user.la \
 	m_userhost.la \
+	m_version.la \
 	m_whois.la
 
 #m_null_la_SOURCES = $(MODULEDIR)/m_null.cpp
@@ -123,10 +129,25 @@ m_away_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_away_la_LIBADD = $(unrealircd_LDADD)
 m_away_la_LDFLAGS = -module -avoid-version -shared
 
+m_help_la_SOURCES = src/cmd/help.cpp
+m_help_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
+m_help_la_LIBADD = $(unrealircd_LDADD)
+m_help_la_LDFLAGS = -module -avoid-version -shared
+
+m_info_la_SOURCES = src/cmd/info.cpp
+m_info_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
+m_info_la_LIBADD = $(unrealircd_LDADD)
+m_info_la_LDFLAGS = -module -avoid-version -shared
+
 m_insmod_la_SOURCES = src/cmd/insmod.cpp
 m_insmod_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_insmod_la_LIBADD = $(unrealircd_LDADD)
 m_insmod_la_LDFLAGS = -module -avoid-version -shared
+
+m_ison_la_SOURCES = src/cmd/ison.cpp
+m_ison_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
+m_ison_la_LIBADD = $(unrealircd_LDADD)
+m_ison_la_LDFLAGS = -module -avoid-version -shared
 
 m_join_la_SOURCES = src/cmd/join.cpp
 m_join_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
@@ -157,6 +178,11 @@ m_mode_la_SOURCES = src/cmd/mode.cpp
 m_mode_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_mode_la_LIBADD = $(unrealircd_LDADD)
 m_mode_la_LDFLAGS = -module -avoid-version -shared
+
+m_motd_la_SOURCES = src/cmd/motd.cpp
+m_motd_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
+m_motd_la_LIBADD = $(unrealircd_LDADD)
+m_motd_la_LDFLAGS = -module -avoid-version -shared
 
 m_names_la_SOURCES = src/cmd/names.cpp
 m_names_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
@@ -217,6 +243,11 @@ m_userhost_la_SOURCES = src/cmd/userhost.cpp
 m_userhost_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_userhost_la_LIBADD = $(unrealircd_LDADD)
 m_userhost_la_LDFLAGS = -module -avoid-version -shared
+
+m_version_la_SOURCES = src/cmd/version.cpp
+m_version_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
+m_version_la_LIBADD = $(unrealircd_LDADD)
+m_version_la_LDFLAGS = -module -avoid-version -shared
 
 m_whois_la_SOURCES = src/cmd/whois.cpp
 m_whois_la_CPPFLAGS = $(unrealircd_CPPFLAGS)

@@ -40,6 +40,7 @@
 #include "stringlist.hpp"
 #include "time.hpp"
 #include "user.hpp"
+#include "version.hpp"
 
 /**
  * UnrealBase acts as the global ircd instance.

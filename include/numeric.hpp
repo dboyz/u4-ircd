@@ -49,6 +49,7 @@ enum IRCNumeric
 
 	RPL_AWAY					= 301,
 	RPL_USERHOST				= 302,
+	RPL_ISON					= 303,
 	RPL_UNAWAY					= 305,
 	RPL_NOWAWAY					= 306,
 	RPL_WHOIS_USER				= 311,
@@ -70,6 +71,11 @@ enum IRCNumeric
 	RPL_ENDOFNAMES				= 366,
 	RPL_BANLIST					= 367,
 	RPL_ENDOFBANLIST			= 368,
+	RPL_INFO					= 371,
+	RPL_MOTD					= 372,
+	RPL_ENDOFINFO				= 374,
+	RPL_MOTDSTART				= 375,
+	RPL_ENDOFMOTD				= 376,
 	RPL_YOUREOPER				= 381,
 
 	ERR_NOSUCHNICK				= 401,
@@ -104,7 +110,7 @@ enum IRCNumeric
 #define MSG_WELCOME				":Welcome to the %s IRC network, %s"
 #define MSG_YOURHOST			":Your host is %s, running version %s"
 #define MSG_CREATED				":This server was created %s"
-#define MSG_MYINFO				"%s %s %s %s %s"
+#define MSG_MYINFO				"%s %s %s %s"
 #define MSG_ISUPPORT			"%s :are supported by this server"
 #define MSG_LUSERS				":There are %d users and %d invisible on %d "\
 								"servers"
@@ -119,6 +125,7 @@ enum IRCNumeric
 								" total connections since server was started)"
 #define MSG_AWAY				"%s :%s"
 #define MSG_USERHOST			":%s%s=%s%s@%s"
+#define MSG_ISON				":%s"
 #define MSG_UNAWAY				":You are not longer marked as being away"
 #define MSG_NOWAWAY				":You have been marked as being away (%s)"
 #define MSG_WHOIS_USER			"%s %s %s * :%s"
@@ -135,11 +142,16 @@ enum IRCNumeric
 #define MSG_NOTOPIC				":No topic is set."
 #define MSG_TOPIC				":%s"
 #define MSG_TOPICLASTCHANGED	"%s %d"
-#define MSG_VERSION				"unrealircd-%s %s :devbuild"
+#define MSG_VERSION				"%s%s %s :%s"
 #define MSG_NAMREPLY			"= %s :%s"
 #define MSG_ENDOFNAMES			"%s :End of /NAMES list."
 #define MSG_BANLIST				"%s %s %d"
 #define MSG_ENDOFBANLIST		":End of channel ban list"
+#define MSG_INFO				":%s"
+#define MSG_MOTD				":- %s"
+#define MSG_ENDOFINFO			":End of /INFO command."
+#define MSG_MOTDSTART			":- %s Message of the Day - "
+#define MSG_ENDOFMOTD			":End of /MOTD command."
 #define MSG_YOUREOPER			":You're now an IRC operator"
 
 #define MSG_NOSUCHNICK			"%s :No such nick"
@@ -148,7 +160,7 @@ enum IRCNumeric
 #define MSG_CANNOTSENDTOCHAN	"%s :Cannot send to channel"
 #define MSG_NOTEXTTOSEND		":No text to send"
 #define MSG_UNKNOWNCOMMAND		"%s :Unknown command"
-#define MSG_NOMOTD				":No MOTD"
+#define MSG_NOMOTD				":No MOTD available"
 #define MSG_NOADMININFO			"%s :No administrative info available"
 #define MSG_INVALIDNICK			"%s :Invalid nickname"
 #define MSG_NICKNAMEINUSE		"%s :Nickname is already in use"

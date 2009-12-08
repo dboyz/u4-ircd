@@ -1,7 +1,7 @@
 /*****************************************************************
  * Unreal Internet Relay Chat Daemon, Version 4
- * File         lsmod.cpp
- * Description  LSMOD command handler
+ * File         version.cpp
+ * Description  VERSION command handler
  *
  * All parts of this program are Copyright(C) 2009 by their
  * respective authors and the UnrealIRCd development team.
@@ -32,7 +32,7 @@
 UnrealModule::Info modinf =
 {
 	/** Module name */
-	"LSMOD command handler",
+	"VERSION command handler",
 
 	/** Module version */
 	"1.0",
@@ -45,49 +45,32 @@ UnrealModule::Info modinf =
 UnrealUserCommand* uc = 0;
 
 /**
- * LSMOD command handler for User connections.
- *
- * LSMOD lists all loaded modules that are loaded with the server.
+ * VERSION command handler for User connections.
  *
  * Usage:
- * LSMOD
+ * VERSION [<target>]
  *
  * Message example:
- * RMMOD
+ * VERSION
  *
  * @param uptr Originating user
  * @param argv Argument list
  */
-void uc_lsmod(UnrealUser* uptr, StringList* argv)
+void uc_version(UnrealUser* uptr, StringList* argv)
 {
-	bool is_oper_only = !unreal->config.get("Features/UserLsmod", "false").toBool();
+	String target = unreal->config.get("Me/ServerName");
 
-	/* first, look if the command is available to operators only */
-	if (is_oper_only && !uptr->isOper())
+	if (argv->size() >= 2)
+		target = argv->at(1);
+
+	if (target == unreal->config.get("Me/ServerName"))
 	{
-		uptr->sendreply(ERR_NOPRIVILEGES, MSG_NOPRIVILEGES);
-		return;
-	}
-	else
-	{
-		uptr->sendreply(CMD_NOTICE,
-			String::format(MSG_LSMODSTART,
-				unreal->modules.size()));
-
-		for (List<UnrealModule*>::Iterator mi = unreal->modules.begin();
-				mi != unreal->modules.end(); mi++)
-		{
-			UnrealModule* mptr = *mi;
-
-			uptr->sendreply(CMD_NOTICE,
-				String::format(MSG_LSMOD,
-					mptr->info.name.c_str(),
-					mptr->info.version.c_str(),
-					mptr->info.author.c_str(),
-					mptr->fileName().c_str()));
-		}
-
-		uptr->sendreply(CMD_NOTICE, MSG_LSMODEND);
+		uptr->sendreply(RPL_VERSION,
+			String::format(MSG_VERSION,
+				_U4_VERSTR_,
+				_U4_PATCHLEVEL_,
+				unreal->config.get("Me/ServerName").c_str(),
+				_U4_VER_REVISION_));
 	}
 }
 
@@ -103,7 +86,7 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
 	module.info = modinf;
 
 	/* register command */
-	uc = new UnrealUserCommand(CMD_LSMOD, &uc_lsmod);
+	uc = new UnrealUserCommand(CMD_VERSION, &uc_version);
 
 	return UnrealModule::Success;
 }

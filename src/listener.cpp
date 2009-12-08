@@ -187,8 +187,9 @@ void UnrealListener::handleDataResponse(UnrealSocket* sptr, String& data)
 	 */
 	unreal->log.write(UnrealLog::Debug, ">> %s", data.c_str());
 
-	if (tokens.size() < (shift + 1))
-		return; // invalid command
+	// check prefix
+	if (tokens.at(0).at(0) == ':' && tokens.size() >= 2)
+		shift++;
 
 	String cmd = tokens.at(shift + 0).toUpper();
 

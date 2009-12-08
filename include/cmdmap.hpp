@@ -34,8 +34,14 @@
 #define CMD_HELP		"HELP"
 #define TOK_HELP		"HLP"
 
+#define CMD_INFO		"INFO"
+#define TOK_INFO		"INF"
+
 #define CMD_INSMOD		"INSMOD"
 #define TOK_INSMOD		"IMO"
+
+#define CMD_ISON		"ISON"
+#define TOK_ISON		"ISON"
 
 #define CMD_JOIN		"JOIN"
 #define TOK_JOIN		"J"
@@ -55,8 +61,11 @@
 #define CMD_MODE		"MODE"
 #define TOK_MODE		"M"
 
-#define CMD_MODMNG		"MODMNG"
-#define TOK_MODMNG		"MG"
+#define CMD_MODULES		"MODULES"
+#define TOK_MODULES		"ML"
+
+#define CMD_MOTD		"MOTD"
+#define TOK_MOTD		"MOTD"
 
 #define CMD_NAMES		"NAMES"
 #define TOK_NAMES		"NM"

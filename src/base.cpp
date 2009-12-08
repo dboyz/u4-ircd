@@ -391,7 +391,10 @@ void UnrealBase::printConfig()
  */
 void UnrealBase::printVersion()
 {
-	std::cout << "UnrealIRCd 4.0.0-alpha, Built "
+	std::cout << "UnrealIRCd "
+			  << _U4_VERSION_
+			  << _U4_PATCHLEVEL_
+			  << ", Built "
 			  << __DATE__
 			  << " "
 			  << __TIME__
@@ -433,7 +436,7 @@ void UnrealBase::setupISupport()
 	isupport.add("KICKLEN", config.get("Limits/Kicklen", "250"));
 	isupport.add("CHANNELLEN", config.get("Limits/Channellen", "200"));
 	isupport.add("CHANTYPES", "#");
-	isupport.add("STATUSMSG", "%@+");
+	isupport.add("STATUSMSG", "@%+");
 	isupport.add("CHANMODES", "b,k,l,imnsp"); // TODO: dynamic generation
 	isupport.add("CASEMAPPING", "rfc1459");
 	isupport.add("NETWORK", config.get("Me/Network", "ExampleNet"));

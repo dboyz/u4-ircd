@@ -190,7 +190,18 @@ void UnrealUser::exitClient(const String& message)
 
 	/* close socket */
 	if (socket_->is_open())
-		socket_->close();
+	{
+		UnrealSocket::ErrorCode ec;
+		socket_->close(ec);
+
+		if (ec)
+		{
+			unreal->log.write(UnrealLog::Debug, "UnrealUser::exitClient(): "
+					"close() returned with errcode %d (%s)",
+					ec.value(),
+					ec.message().c_str());
+		}
+	}
 }
 
 /**
@@ -263,6 +274,9 @@ void UnrealUser::handleResolveResponse(const UnrealResolver::ErrorCode& ec,
 
 	/* revoke auth flag for DNS lookup */
 	auth_flags_.revoke(AFDNS);
+
+	if (auth_flags_.value() == 0)
+		sendPing();
 }
 
 /**
@@ -352,6 +366,8 @@ void UnrealUser::joinChannel(const String& chname, const String& key)
 				chptr->name().c_str()));
 		return;
 	}
+	else if (chptr->findMember(this))
+		return; /* ignore this join-attempt */
 
 	/* add us to the channel */
 	chptr->addMember(this, flags);

@@ -48,19 +48,33 @@ UnrealUserCommand* uc = 0;
  * LIST command handler for User connections.
  *
  * Usage:
- * LIST [<channel[,channel[,...]]>] [<server>]
+ * LIST [<param>]
  *
  * Message example:
- * LIST
+ * LIST >100		; Lists all channels with at more than 100 users in it
  *
  * @param uptr Originating user
  * @param argv Argument list
  */
 void uc_list(UnrealUser* uptr, StringList* argv)
 {
-	// TODO: add options. The usage above is extracted from RFC 1459.
-	// Syntax like >100 for listing channels with more than hundred users
-	// seem to be an extension of newer RFCs
+	/*
+	 * RFC1459/RFC2812 do not provide any details about additional parameters
+	 * on the LIST command. A few IRC clients use >123 or <123 to specify that
+	 * they just want to get a list of channels with more or less than the
+	 * specified amount of users in the channel.
+	 */
+	uint32_t min_users = 0, max_users = 0;
+
+	if (argv->size() >= 2)
+	{
+		String& arg = argv->at(1);
+
+		if (arg.at(0) == '<')
+			min_users = arg.mid(1).toUInt();
+		else if (arg.at(0) == '>')
+			max_users = arg.mid(1).toUInt();
+	}
 
 	uptr->sendreply(RPL_LISTSTART, MSG_LISTSTART);
 
@@ -71,11 +85,15 @@ void uc_list(UnrealUser* uptr, StringList* argv)
 
 		if (chptr->isPrivate() || chptr->isSecret())
 			continue; /* ignore these */
+		else if ((min_users > 0 && chptr->members.size() > min_users)
+				|| (max_users > 0 && chptr->members.size() < max_users))
+			continue; /* gently ignore channels that don't fit */
 
 		uptr->sendreply(RPL_LIST,
 			String::format(MSG_LIST,
 				chptr->name().c_str(),
 				chptr->members.size(),
+				chptr->modestr().c_str(),
 				chptr->topic().c_str()));
 	}
 

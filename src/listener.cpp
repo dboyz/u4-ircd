@@ -245,6 +245,14 @@ void UnrealListener::handleDataResponse(UnrealSocket* sptr, String& data)
  */
 void UnrealListener::handleError(UnrealSocket* sptr, const ErrorCode& ec)
 {
+	ErrorCode edupl = ec;
+
+	unreal->log.write(UnrealLog::Debug, "UnrealListener::handleError(): "
+			"fd %d, errno %d, errstr (%s)",
+			sptr->native(),
+			edupl.value(),
+			edupl.message().c_str());
+
 	onError(this, ec);
 }
 
@@ -409,7 +417,7 @@ StringList UnrealListener::splitLine(String& data)
 
 	for (size_t i = 0; i < tokens.size(); i++)
 	{
-		if (tokens.at(i).left(1) == ":")
+		if (tokens.at(i).at(0) == ':' && i > 0)
 		{
 			String long_arg = tokens.at(i).mid(1);
 

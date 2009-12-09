@@ -25,8 +25,12 @@
 #include "base.hpp"
 #include "cmdmap.hpp"
 #include "command.hpp"
+#include "limits.hpp"
 #include "module.hpp"
 #include "stringlist.hpp"
+
+/** specify the default prefix for non-identified user names */
+#define DEFAULT_NONIDENT_PREFIX		"~"
 
 /** Module informations */
 UnrealModule::Info modinf =
@@ -65,18 +69,17 @@ void uc_user(UnrealUser* uptr, StringList* argv)
 	{
 		if (uptr->ident().empty())
 		{
-			/* hyperion-style ident prefix */
-			String ident = "u=" + argv->at(1);
+			String& u_prefix = unreal->config.get("Features/nonident_prefix",
+					DEFAULT_NONIDENT_PREFIX);
+			String ident = u_prefix + argv->at(1);
 			uptr->setIdent(ident);
 		}
 
-		size_t userlen = unreal->config.get("Limits/Userlen", "10").toUInt();
-
 		/* trim the ident if it's too long */
-		if (uptr->ident().length() > userlen)
+		if (uptr->ident().length() > _U4_USERLEN_)
 		{
 			String tmp = uptr->ident();
-			uptr->setIdent(tmp.left(userlen));
+			uptr->setIdent(tmp.left(_U4_USERLEN_));
 		}
 
 		uptr->setRealname(argv->at(argv->size() - 1));

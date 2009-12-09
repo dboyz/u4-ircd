@@ -75,11 +75,9 @@ void uc_ison(UnrealUser* uptr, StringList* argv)
 			nicks << tuptr->nick();
 	}
 
-	/* just send a reply when we do have a few nicks there */
-	if (nicks.size() > 0)
-		uptr->sendreply(RPL_ISON,
-			String::format(MSG_ISON,
-				nicks.join(" ").c_str()));
+	uptr->sendreply(RPL_ISON,
+		String::format(MSG_ISON,
+			nicks.join(" ").c_str()));
 }
 
 /**

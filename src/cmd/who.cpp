@@ -1,7 +1,7 @@
 /*****************************************************************
  * Unreal Internet Relay Chat Daemon, Version 4
- * File         join.cpp
- * Description  JOIN command handler
+ * File         who.cpp
+ * Description  WHO command handler
  *
  * All parts of this program are Copyright(C) 2009 by their
  * respective authors and the UnrealIRCd development team.
@@ -32,7 +32,7 @@
 UnrealModule::Info modinf =
 {
 	/** Module name */
-	"JOIN command handler",
+	"WHO command handler",
 
 	/** Module version */
 	"1.0",
@@ -45,81 +45,69 @@ UnrealModule::Info modinf =
 UnrealUserCommand* uc = 0;
 
 /**
- * JOIN command handler for User connections.
+ * WHO command handler for User connections.
  *
  * Usage:
- * JOIN #channel[,#channel2[,...]] [key1[,key2[,...]]]
- * JOIN 0
+ * WHO [<mask>] ["o"]
  *
  * Message example:
- * JOIN #dev,#home
+ * WHO #test
  *
  * @param uptr Originating user
  * @param argv Argument list
  */
-void uc_join(UnrealUser* uptr, StringList* argv)
+void uc_who(UnrealUser* uptr, StringList* argv)
 {
-	if (argv->size() < 2)
+	bool want_oper = (argv->size() >= 3 && argv->at(2) == "o");
+	String mask = "*";
+
+	if (argv->size() >= 2)
+		mask = argv->at(1);
+
+	/* TODO: this is a very minimal WHO implementation. No mask matching
+	 * has been added yet.
+	 */
+	if (mask.at(0) == '#')
 	{
-		uptr->sendreply(ERR_NEEDMOREPARAMS,
-			String::format(MSG_NEEDMOREPARAMS,
-				CMD_JOIN));
-	}
-	else
-	{
-		StringList cl, kl;
+		UnrealChannel* chptr = UnrealChannel::find(mask);
 
-		if (argv->at(1).contains(","))
-			cl = argv->at(1).split(",");
-		else
-			cl << argv->at(1);
-
-		/* get keys if any */
-		if (argv->size() > 2)
+		if (chptr)
 		{
-			if (argv->at(2).contains(","))
-				kl = argv->at(2).split(",");
-			else
-				kl << argv->at(2);
-		}
+			/* define whether the user can receive invisible entries */
+			bool can_recv_inv = (chptr->findMember(uptr) || uptr->isOper());
 
-		for (StringList::Iterator chan = cl.begin(); chan != cl.end(); chan++)
-		{
-			String tmp_chan = *chan;
-			String key;
-
-			if (tmp_chan.empty())
-				continue;
-			else if (tmp_chan == "0")
+			for (UnrealChannel::MemberIterator i = chptr->members.begin();
+					i != chptr->members.end(); i++)
 			{
-				/* leave all channels */
-				for (List<UnrealChannel*>::Iterator i = uptr->channels.begin();
-						i != uptr->channels.end();)
-				{
-					uptr->leaveChannel((*i)->name(), String(), CMD_PART);
+				UnrealUser* tuptr = i->first;
 
-					/* reset the iterator */
-					i = uptr->channels.begin();
-				}
+				if (tuptr->isInvisible() && !can_recv_inv)
+					continue;
+				else if (want_oper && !tuptr->isOper())
+					continue;
 
-				return;
+				String status = (tuptr->isAway() ? "G" : "H");
+
+				if (tuptr->isOper())
+					status.append(1, '*');
+
+				uptr->sendreply(RPL_WHOREPLY,
+					String::format(MSG_WHOREPLY,
+						chptr->name().c_str(),
+						tuptr->ident().c_str(),
+						tuptr->hostname().c_str(),
+						unreal->config.get("Me/ServerName").c_str(),
+						tuptr->nick().c_str(),
+						status.c_str(),
+						0,
+						tuptr->realname().c_str()));
 			}
-
-			/* if a key has been specified, extract it */
-			if (kl.size() > 0)
-				key = kl.takeFirst();
-
-			/* if no channel prefix was provided, add it */
-			if (tmp_chan.at(0) != '#')
-				tmp_chan.prepend("#");
-
-			/*
-			 * Support for local channels is not provided anymore.
-			 */
-
-			uptr->joinChannel(tmp_chan, key);
 		}
 	}
+
+	uptr->sendreply(RPL_ENDOFWHO,
+		String::format(MSG_ENDOFWHO,
+			mask.c_str()));
 }
 
 /**
@@ -134,7 +122,7 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
 	module.info = modinf;
 
 	/* register command */
-	uc = new UnrealUserCommand(CMD_JOIN, &uc_join);
+	uc = new UnrealUserCommand(CMD_WHO, &uc_who);
 
 	return UnrealModule::Success;
 }

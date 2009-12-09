@@ -56,24 +56,22 @@ void UnrealSocket::handleRead(const ErrorCode& ec, size_t bytes_read)
 
 		onError(this, ec);
 
-		/* notify on connection loss */
-		switch (edupl.value())
+		if (is_open())
 		{
-			case boost::asio::error::eof:
-			case boost::asio::error::connection_reset:
-			case boost::asio::error::connection_aborted:
-			case boost::asio::error::network_reset:
-			case boost::asio::error::network_unreachable:
-			case boost::asio::error::bad_descriptor:
-			case boost::asio::error::broken_pipe:
-			case boost::asio::error::host_unreachable:
-			case boost::asio::error::timed_out:
-				onDisconnected(this);
-				break;
+			ErrorCode edupl;
+			close(edupl);
 
-			default:
-				break;
+			if (edupl)
+			{
+				unreal->log.write(UnrealLog::Normal, "UnrealSocket::handle"
+						"Read(): Error on close(): %d (%s)",
+						edupl.value(),
+						edupl.message().c_str());
+			}
 		}
+
+		/* notify on connection loss */
+		onDisconnected(this);
 	}
 	else
 	{
@@ -110,24 +108,22 @@ void UnrealSocket::handleWrite(const ErrorCode& ec, size_t bytes_written)
 
 		onError(this, ec);
 
-		/* notify on connection loss */
-		switch (edupl.value())
+		if (is_open())
 		{
-			case boost::asio::error::eof:
-			case boost::asio::error::connection_reset:
-			case boost::asio::error::connection_aborted:
-			case boost::asio::error::network_reset:
-			case boost::asio::error::network_unreachable:
-			case boost::asio::error::bad_descriptor:
-			case boost::asio::error::broken_pipe:
-			case boost::asio::error::host_unreachable:
-			case boost::asio::error::timed_out:
-				onDisconnected(this);
-				break;
+			ErrorCode edupl;
+			close(edupl);
 
-			default:
-				break;
+			if (edupl)
+			{
+				unreal->log.write(UnrealLog::Normal, "UnrealSocket::handle"
+						"Write(): Error on close(): %d (%s)",
+						edupl.value(),
+						edupl.message().c_str());
+			}
 		}
+
+		/* notify on connection loss */
+		onDisconnected(this);
 	}
 
 	/* add actual amount of data that has been written on the socket */

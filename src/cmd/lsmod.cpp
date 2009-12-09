@@ -81,10 +81,10 @@ void uc_lsmod(UnrealUser* uptr, StringList* argv)
 
 			uptr->sendreply(CMD_NOTICE,
 				String::format(MSG_LSMOD,
+					mptr->fileName().c_str(),
 					mptr->info.name.c_str(),
 					mptr->info.version.c_str(),
-					mptr->info.author.c_str(),
-					mptr->fileName().c_str()));
+					mptr->info.author.c_str()));
 		}
 
 		uptr->sendreply(CMD_NOTICE, MSG_LSMODEND);

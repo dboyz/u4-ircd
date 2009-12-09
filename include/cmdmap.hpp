@@ -109,6 +109,9 @@
 #define CMD_VERSION		"VERSION"
 #define TOK_VERSION		"VER"
 
+#define CMD_WHO			"WHO"
+#define TOK_WHO			"WH"
+
 #define CMD_WHOIS		"WHOIS"
 #define TOK_WHOIS		"W"
 

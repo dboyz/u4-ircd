@@ -2,6 +2,26 @@
   UnrealIRCd 4 ChangeLog
 -------------------------------------------------------------------------------
 
+  2009-12-09 09:50 +0100  Christian Jurk <commx@commx.ws>
+    >> src/user.cpp: Fixed issue when connecting users are getting
+       disconnected because of "Ping timeout". That happened when
+       the DNS resolver reply returned just _after_ USER and PONG
+       were received;
+       Made user prefix for non-identified users configurable via
+       configuration;
+       Fixed joinChannel() to check if the users is already a channel
+       member
+    >> src/cmd/ison.cpp: Reply now even if there are no matching
+       nicknames found
+    >> src/socket.cpp: Close socket now on all possible socket errors
+    >> src/listener.cpp: Did some more error checking
+    >> src/cmd/list.cpp: Added the possibility to specify to list
+       channels with more or less a specified amount of users
+    >> src/cmd/names.cpp: Fixed prefix for NAMES replies (regarding
+       secret and private channels, as they specify a different one)
+    >> src/cmd/who.cpp: Added basic WHO command handler
+    >> include/limits.hpp: Added handy macros for limitations
+
   2009-12-07 11:04 +0100  Christian Jurk <commx@commx.ws>
     >> src/user.cpp: Fixed output for QUIT message on channels;
        Removed a few debug messages;

@@ -23,6 +23,7 @@
  ******************************************************************/
 
 #include "base.hpp"
+#include "limits.hpp"
 #include <cstdlib>
 #include <iostream>
 
@@ -428,16 +429,16 @@ void UnrealBase::setupISupport()
 
 	isupport.add("SILENCE", "0");
 	isupport.add("MODES", "6");
-	isupport.add("MAXCHANNELS", config.get("Limits/MaxChannels", "20"));
-	isupport.add("MAXBANS", config.get("Limits/MaxBans", "30"));
-	isupport.add("NICKLEN", config.get("Limits/Nicklen", "18"));
-	isupport.add("TOPICLEN", config.get("Limits/Topiclen", "250"));
-	isupport.add("AWAYLEN", config.get("Limits/Awaylen", "250"));
-	isupport.add("KICKLEN", config.get("Limits/Kicklen", "250"));
-	isupport.add("CHANNELLEN", config.get("Limits/Channellen", "200"));
+	isupport.add("MAXCHANNELS", config.get("limits/max_channels", "20"));
+	isupport.add("MAXBANS", config.get("limits/max_bans", "30"));
+	isupport.add("NICKLEN", config.get("limits/nicklen", "18"));
+	isupport.add("TOPICLEN", config.get("limits/topiclen", "250"));
+	isupport.add("AWAYLEN", config.get("limits/awaylen", "250"));
+	isupport.add("KICKLEN", config.get("limits/kicklen", "250"));
+	isupport.add("CHANNELLEN", config.get("limits/channellen", "200"));
 	isupport.add("CHANTYPES", "#");
 	isupport.add("STATUSMSG", "@%+");
-	isupport.add("CHANMODES", "b,k,l,imnsp"); // TODO: dynamic generation
+	isupport.add("CHANMODES", "b,k,l,imnsp");
 	isupport.add("CASEMAPPING", "rfc1459");
 	isupport.add("NETWORK", config.get("Me/Network", "ExampleNet"));
 

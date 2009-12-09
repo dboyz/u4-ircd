@@ -27,6 +27,7 @@
 #include "command.hpp"
 #include "module.hpp"
 #include "stringlist.hpp"
+#include <iostream>
 
 /** Module informations */
 UnrealModule::Info modinf =
@@ -53,13 +54,11 @@ bool is_valid_nick(const String& str)
 {
 	String allowed = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234"
 					 "56789-_|^()[]{}\\`´'";
-	size_t nicklen = static_cast<size_t>(unreal->config.get("Limits/Nicklen",
-			"18").toUInt());
 
 	String trstr = str;
 	trstr = trstr.trimmed();
 
-	if (trstr.length() > nicklen)
+	if (trstr.length() > _U4_NICKLEN_)
 		return false;
 
 	for (size_t i = 0; i < trstr.length(); i++)

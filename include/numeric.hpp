@@ -55,6 +55,7 @@ enum IRCNumeric
 	RPL_WHOIS_USER				= 311,
 	RPL_WHOIS_SERVER			= 312,
 	RPL_WHOIS_OPERATOR			= 313,
+	RPL_ENDOFWHO				= 315,
 	RPL_WHOIS_IDLE				= 317,
 	RPL_ENDOFWHOIS				= 318,
 	RPL_WHOISCHANNELS			= 319,
@@ -67,6 +68,7 @@ enum IRCNumeric
 	RPL_TOPIC					= 332,
 	RPL_TOPICLASTCHANGED		= 333,
 	RPL_VERSION					= 351,
+	RPL_WHOREPLY				= 352,
 	RPL_NAMREPLY				= 353,
 	RPL_ENDOFNAMES				= 366,
 	RPL_BANLIST					= 367,
@@ -131,11 +133,12 @@ enum IRCNumeric
 #define MSG_WHOIS_USER			"%s %s %s * :%s"
 #define MSG_WHOIS_SERVER		"%s %s :%s"
 #define MSG_WHOIS_OPERATOR		"%s :is an IRC operator"
+#define MSG_ENDOFWHO			"%s :End of /WHO list."
 #define MSG_WHOIS_IDLE			"%s %d %d :seconds idle, signon time"
 #define MSG_ENDOFWHOIS			"%s :End of /WHOIS list."
 #define MSG_WHOISCHANNELS		"%s :%s"
 #define MSG_LISTSTART			"Channel :Users  Name"
-#define MSG_LIST				"%s %d :%s"
+#define MSG_LIST				"%s %d :[+%s] %s"
 #define MSG_LISTEND				":End of /LIST"
 #define MSG_CHANNELMODEIS		"+%s"
 #define MSG_CHANNELCREATED		"%d"
@@ -143,7 +146,8 @@ enum IRCNumeric
 #define MSG_TOPIC				":%s"
 #define MSG_TOPICLASTCHANGED	"%s %d"
 #define MSG_VERSION				"%s%s %s :%s"
-#define MSG_NAMREPLY			"= %s :%s"
+#define MSG_WHOREPLY			"%s %s %s %s %s %s :%d %s"
+#define MSG_NAMREPLY			"%c %s :%s"
 #define MSG_ENDOFNAMES			"%s :End of /NAMES list."
 #define MSG_BANLIST				"%s %s %d"
 #define MSG_ENDOFBANLIST		":End of channel ban list"
@@ -188,7 +192,7 @@ enum IRCNumeric
 #define MSG_RMMODNOTFOUND		":Unable to locate module: %s"
 #define MSG_RMMODOK				":Unloading module \"%s\""
 #define MSG_LSMODSTART			":---- Active server modules (%d)"
-#define MSG_LSMOD				":%s Version %s Author %s File %s"
+#define MSG_LSMOD				":%s: \2%s\2 (Version \2%s\2) (Author: \2%s\2)"
 #define MSG_LSMODEND			":End of /LSMOD."
 
 #endif /* _UNREALIRCD_NUMERIC_HPP */

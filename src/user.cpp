@@ -858,7 +858,7 @@ void UnrealUser::registerUser()
 			version.c_str()));
 	sendreply(RPL_CREATED,
 		String::format(MSG_CREATED,
-			unreal->starttime.toString("%Y-%M-%dT%H:%M:%S %Z").c_str()));
+			unreal->me.bootTime().toString("%Y-%M-%dT%H:%M:%S %Z").c_str()));
 
 	sendreply(RPL_MYINFO,
 		String::format(MSG_MYINFO,

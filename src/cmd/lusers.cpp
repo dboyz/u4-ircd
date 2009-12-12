@@ -61,7 +61,7 @@ void uc_lusers(UnrealUser* uptr, StringList* argv)
 		String::format(MSG_LUSERS,
 			(unreal->users.size() - st.users_inv),
 			st.users_inv,
-			st.servers));
+			unreal->servers.size()));
 	uptr->sendreply(RPL_LUSEROPS,
 		String::format(MSG_LUSEROPS,
 			st.operators));

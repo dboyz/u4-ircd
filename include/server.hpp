@@ -1,7 +1,7 @@
 /*****************************************************************
  * Unreal Internet Relay Chat Daemon, Version 4
- * File         stats.hpp
- * Description  Statistical stuff
+ * File         server.hpp
+ * Description  Server representation
  *
  * All parts of this program are Copyright(C) 2009 by their
  * respective authors and the UnrealIRCd development team.
@@ -22,51 +22,46 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#ifndef _UNREALIRCD_STATS_HPP
-#define _UNREALIRCD_STATS_HPP
+#ifndef _UNREALIRCD_SERVER_HPP
+#define _UNREALIRCD_SERVER_HPP
 
 #include "platform.hpp"
-#include <cstring>
+#include "string.hpp"
+#include "time.hpp"
 
 /**
- * Local statistics that allows us to query statistical stuff quickly.
+ * A server representation on the network.
  */
-struct UnrealLocalStat
+class UnrealServer
 {
-	UnrealLocalStat()
-	{
-		std::memset(this, 0, sizeof(UnrealLocalStat));
-	}
+public:
+	UnrealServer(const String& sname = String());
+	UnrealTime bootTime();
+	UnrealTime linkTime();
+	const String& name();
+	const uint32_t& numeric();
+	UnrealServer* uplink();
+	void setBootTime(const UnrealTime& ts);
+	void setLinkTime(const UnrealTime& ts);
+	void setName(const String& sname);
+	void setNumeric(const uint32_t& num);
+	void setUplink(UnrealServer* ulptr);
 
-	/** invisible user count */
-	uint32_t users_inv;
+private:
+	/** server name */
+	String name_;
 
-	/** max global user count */
-	uint32_t users_max;
+	/** server numeric */
+	uint32_t numeric_;
 
-	/** local user count */
-	uint32_t users_local_cur;
+	/** server uplink */
+	UnrealServer* uplink_;
 
-	/** max local user count */
-	uint32_t users_local_max;
+	/** server boot timestamp */
+	UnrealTime boot_time_;
 
-	/** unknown connection count */
-	uint32_t connections_unk;
-
-	/** current total connection count */
-	uint32_t connections_cur;
-
-	/** max connection count */
-	uint32_t connections_max;
-
-	/** local server count */
-	uint32_t servers_local;
-
-	/** IRC operator count */
-	uint32_t operators;
-
-	/** total connection count */
-	uint32_t connections_total;
+	/** server link timestamp */
+	UnrealTime link_time_;
 };
 
-#endif /* _UNREALIRCD_STATS_HPP */
+#endif /* _UNREALIRCD_SERVER_HPP */

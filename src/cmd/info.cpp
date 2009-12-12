@@ -76,12 +76,12 @@ StringList readInfoFile()
  */
 void uc_info(UnrealUser* uptr, StringList* argv)
 {
-	String target = unreal->config.get("Me/ServerName");
+	String target = unreal->me.name();
 
 	if (argv->size() >= 2)
 		target = argv->at(1);
 
-	if (target == unreal->config.get("Me/ServerName"))
+	if (target == unreal->me.name())
 	{
 		StringList output = readInfoFile();
 
@@ -89,7 +89,7 @@ void uc_info(UnrealUser* uptr, StringList* argv)
 		output << String::format("Revision: %s", _U4_VER_REVISION_);
 		output << String::format("Birth date: %s %s", __DATE__, __TIME__);
 		output << String::format("On-line since %s",
-				unreal->starttime.toString("%Y-%M-%dT%H:%M:%S %Z").c_str());
+			unreal->me.bootTime().toString("%Y-%M-%dT%H:%M:%S %Z").c_str());
 
 		/* now send it */
 		for (StringList::Iterator i = output.begin(); i != output.end(); i++)

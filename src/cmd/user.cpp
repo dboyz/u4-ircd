@@ -69,7 +69,7 @@ void uc_user(UnrealUser* uptr, StringList* argv)
 	{
 		if (uptr->ident().empty())
 		{
-			String& u_prefix = unreal->config.get("Features/nonident_prefix",
+			String u_prefix = unreal->config.get("Features/nonident_prefix",
 					DEFAULT_NONIDENT_PREFIX);
 			String ident = u_prefix + argv->at(1);
 			uptr->setIdent(ident);

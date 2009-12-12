@@ -25,6 +25,7 @@
 #include "base.hpp"
 #include "cmdmap.hpp"
 #include "command.hpp"
+#include "limits.hpp"
 #include "module.hpp"
 #include "stringlist.hpp"
 #include <iostream>

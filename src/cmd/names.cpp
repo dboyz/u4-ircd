@@ -79,6 +79,14 @@ void uc_names(UnrealUser* uptr, StringList* argv)
 			if (chptr)
 			{
 				String buf;
+				char prefix;
+
+				if (chptr->isSecret())
+					prefix = '@';
+				else if (chptr->isPrivate())
+					prefix = '*';
+				else
+					prefix = '=';
 
 				for (UnrealChannel::MemberIterator cm = chptr->members.begin();
 						cm != chptr->members.end(); cm++)
@@ -101,6 +109,7 @@ void uc_names(UnrealUser* uptr, StringList* argv)
 					{
 						uptr->sendreply(RPL_NAMREPLY,
 							String::format(MSG_NAMREPLY,
+								prefix,
 								chptr->name().c_str(),
 								buf.trimmed().c_str()));
 
@@ -113,6 +122,7 @@ void uc_names(UnrealUser* uptr, StringList* argv)
 				if (trbuf.length() > 0)
 					uptr->sendreply(RPL_NAMREPLY,
 						String::format(MSG_NAMREPLY,
+							prefix,
 							chptr->name().c_str(),
 							trbuf.c_str()));
 

@@ -122,6 +122,12 @@ public:
 private:
 	void checkAuthTimeout(const UnrealSocket::ErrorCode& ec);
 	void checkPingTimeout(const UnrealSocket::ErrorCode& ec);
+	void checkRemoteIdent();
+	void destroyIdentRequest();
+	void handleIdentCheckConnected(UnrealSocket* sptr);
+	void handleIdentCheckError(UnrealSocket* sptr,
+			const UnrealSocket::ErrorCode& ec);
+	void handleIdentCheckRead(UnrealSocket* sptr, String& data);
 	void handleResolveResponse(const UnrealResolver::ErrorCode& ec,
 			UnrealResolver::Iterator response);
 	void resolveHostname();

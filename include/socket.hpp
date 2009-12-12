@@ -25,7 +25,9 @@
 #ifndef _UNREALIRCD_SOCKET_HPP
 #define _UNREALIRCD_SOCKET_HPP
 
+#include "map.hpp"
 #include "platform.hpp"
+#include "resolver.hpp"
 #include "string.hpp"
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
@@ -59,8 +61,15 @@ public:
 	/** alias the socket class for use with shared_ptr */
 	typedef boost::shared_ptr<UnrealSocket> SocketPtr;
 
+	/** alias the endpoint type */
+	typedef tcp::endpoint Endpoint;
+
 public:
 	UnrealSocket();
+	~UnrealSocket();
+	void connect(Endpoint& endpoint);
+	void connect(const String& hostname, const uint16_t& portnum);
+	void destroyResolverQuery();
 	UnrealSocketTrafficType traffic();
 	void waitForLine();
 	void write(const String& data);
@@ -82,7 +91,10 @@ public:
 	boost::signals2::signal<void(UnrealSocket*, String&)> onRead;
 
 private:
+	void handleConnect(const ErrorCode& ec, UnrealResolver::Iterator ep_iter);
 	void handleRead(const ErrorCode& ec, size_t bytes_read);
+	void handleResolveResponse(const ErrorCode& ec,
+			UnrealResolver::Iterator ep_iter);
 	void handleWrite(const ErrorCode& ec, size_t bytes_written);
 
 private:
@@ -92,5 +104,7 @@ private:
 	/** traffic on the socket */
 	UnrealSocketTrafficType traffic_;
 };
+
+extern Map<UnrealSocket*, UnrealResolver*> resolver_queries;
 
 #endif /* _UNREALIRCD_SOCKET_HPP */

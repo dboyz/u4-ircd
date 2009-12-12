@@ -27,8 +27,8 @@
 #include "user.hpp"
 #include <iostream>
 
-/** active resolver queries map */
-Map<UnrealSocket*, UnrealResolver*> resolver_queries;
+/** ident check query map */
+Map<UnrealUser*, UnrealSocket*> icheck_queries;
 
 /** user mode definitions */
 namespace UnrealUserProperties
@@ -64,15 +64,6 @@ UnrealUser::UnrealUser(UnrealSocket* sptr)
  */
 UnrealUser::~UnrealUser()
 {
-	if (resolver_queries.contains(socket_))
-	{
-		UnrealResolver* rq = resolver_queries[socket_];
-
-		resolver_queries.remove(socket_);
-
-		delete rq;
-	}
-
 	unreal->stats.users_local_cur--;
 
 	if (isInvisible())
@@ -81,6 +72,10 @@ UnrealUser::~UnrealUser()
 		unreal->stats.connections_unk--;
 	if (isOper())
 		unreal->stats.operators--;
+
+	/*
+	 * Resolver queries are destroyed with the Socket now.
+	 */
 }
 
 /**
@@ -99,6 +94,14 @@ void UnrealUser::auth()
 
 	/* give the user some time to register */
 	scheduleAuthTimeout();
+
+std::cout<<"UnrealUser::auth() FD="<<socket_->native()<<"\n";
+	/* remote ident check, if enabled */
+	if (unreal->config.get("Features/enable_ident_check", "true").toBool())
+	{
+		send("NOTICE AUTH :*** Checking Ident");
+		checkRemoteIdent();
+	}
 }
 
 /**
@@ -163,6 +166,35 @@ void UnrealUser::checkPingTimeout(const UnrealSocket::ErrorCode& ec)
 }
 
 /**
+ * Initiates remote ident check.
+ */
+void UnrealUser::checkRemoteIdent()
+{
+	UnrealSocket* sptr = new UnrealSocket();
+
+	sptr->onConnected
+		.connect(boost::bind(&UnrealUser::handleIdentCheckConnected,
+			this, _1));
+	sptr->onRead
+		.connect(boost::bind(&UnrealUser::handleIdentCheckRead,
+			this, _1, _2));
+	sptr->onError
+		.connect(boost::bind(&UnrealUser::handleIdentCheckError,
+			this, _1, _2));
+
+	tcp::endpoint endpoint = socket_->remote_endpoint();
+	endpoint.port(113);
+
+	/* connect to remote ident server */
+	sptr->connect(endpoint);
+
+	/* add ident check to query map */
+	icheck_queries.add(this, sptr);
+
+	auth_flags_ << AFIdent;
+}
+
+/**
  * Returns the connection time for this user.
  *
  * @return UnrealTime
@@ -170,6 +202,34 @@ void UnrealUser::checkPingTimeout(const UnrealSocket::ErrorCode& ec)
 UnrealTime UnrealUser::connectionTime()
 {
 	return connection_time_;
+}
+
+/**
+ * Destroy the remote ident request session.
+ *
+ * @param sptr Socket pointer
+ */
+void UnrealUser::destroyIdentRequest()
+{
+	UnrealSocket* sptr = 0;
+
+	if (icheck_queries.contains(this))
+	{
+		sptr = icheck_queries[this];
+		icheck_queries.remove(this);
+
+		delete sptr;
+	}
+	else
+	{
+		unreal->log.write(UnrealLog::Normal, "Warning: destroyIdentRequest() "
+				"for non-existing icheck entry!");
+	}
+
+	auth_flags_.revoke(AFIdent);
+
+	if (auth_flags_.value() == 0)
+		sendPing();
 }
 
 /**
@@ -233,6 +293,96 @@ UnrealUser* UnrealUser::find(const String& nickname)
 }
 
 /**
+ * Asyncronous callback that is called once the remote ident check
+ * socket is connected and ready to send the request.
+ *
+ * @param sptr Pointer to Socket
+ */
+void UnrealUser::handleIdentCheckConnected(UnrealSocket* sptr)
+{
+	String request_str;
+
+	request_str.sprintf("%d, %d",
+		socket_->remote_endpoint().port(),
+		socket_->local_endpoint().port());
+
+	/* send ident request */
+	sptr->write(request_str);
+}
+
+/**
+ * Asyncronous callback that indicates that an error occured while trying
+ * to connect/read data from the ident check socket.
+ *
+ * @param sptr Pointer to Socket
+ * @param ec Error code
+ */
+void UnrealUser::handleIdentCheckError(UnrealSocket* sptr,
+	const UnrealSocket::ErrorCode& ec)
+{
+	send("NOTICE AUTH :*** No ident response");
+	destroyIdentRequest();
+}
+
+/**
+ * Asyncronous callback that indicates that we received an response message
+ * from the remote ident server.
+ *
+ * @param sptr Pointer to Socket
+ * @param data Last line read from socket
+ */
+void UnrealUser::handleIdentCheckRead(UnrealSocket* sptr, String& data)
+{
+	StringList tokens = data.split(":");
+	bool haveError = false;
+
+	if (tokens.size() >= 3)
+	{
+		StringList ports = tokens.at(0).split(",");
+		uint16_t local_port = 0, remote_port = 0;
+
+		if (ports.size() >= 2)
+		{
+			remote_port = ports.at(0).trimmed().toUInt16();
+			local_port = ports.at(1).trimmed().toUInt16();
+
+			std::cout << sptr->local_endpoint().port() << "=="
+				<< local_port
+				<< ", "
+				<< sptr->remote_endpoint().port()
+				<< "=="
+				<< remote_port
+				<<"\n";
+
+			String replCmd = tokens.at(1).trimmed();
+
+			if (replCmd == "USERID" && tokens.size() >= 4)
+			{
+				String username = tokens.at(3).trimmed();
+					std::cout<<"username=("<<username<<")\n";
+				/* ident reply was OK, set the username */
+				setIdent("i=" + username);
+			}
+			else
+			{
+				haveError = true;
+			}
+		}
+		else
+		{
+			haveError = true;
+		}
+	}
+
+	if (haveError)
+		send("NOTICE AUTH :*** No valid ident response");
+	else
+		send("NOTICE AUTH :*** Got ident response");
+
+	destroyIdentRequest();
+}
+
+/**
  * Callback for resolver response.
  *
  * @param ec boost error_code
@@ -258,19 +408,7 @@ void UnrealUser::handleResolveResponse(const UnrealResolver::ErrorCode& ec,
 	}
 
 	/* remove the previously allocated resolver */
-	if (!resolver_queries.contains(socket_))
-	{
-		unreal->log.write(UnrealLog::Normal, "Error: Can't find resolver "
-				"allocated for socket %d", socket_->native());
-	}
-	else
-	{
-		UnrealResolver* rq = resolver_queries.value(socket_);
-
-		resolver_queries.remove(socket_);
-
-		delete rq;
-	}
+	socket_->destroyResolverQuery();
 
 	/* revoke auth flag for DNS lookup */
 	auth_flags_.revoke(AFDNS);

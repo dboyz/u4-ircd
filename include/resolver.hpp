@@ -25,6 +25,7 @@
 #ifndef _UNREALIRCD_RESOLVER_HPP
 #define _UNREALIRCD_RESOLVER_HPP
 
+#include "map.hpp"
 #include "string.hpp"
 #include <boost/asio.hpp>
 #include <boost/signals2.hpp>
@@ -47,7 +48,7 @@ public:
 public:
 	UnrealResolver();
 	void query(tcp::endpoint& endpoint);
-	void query(const String& hostname, const uint16_t port);
+	void query(const String& hostname, const uint16_t& port);
 
 public:
 	/** emitted when we got an result, or an error occured */

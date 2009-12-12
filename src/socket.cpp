@@ -23,7 +23,12 @@
  ******************************************************************/
 
 #include "base.hpp"
+#include "resolver.hpp"
 #include "socket.hpp"
+#include <iostream>
+
+/** active resolver queries map */
+Map<UnrealSocket*, UnrealResolver*> resolver_queries;
 
 /**
  * UnrealSocket constructor.
@@ -33,6 +38,123 @@
 UnrealSocket::UnrealSocket()
 	: tcp::socket(unreal->ios_pool.getIOService())
 { }
+
+/**
+ * UnrealSocket destructor.
+ */
+UnrealSocket::~UnrealSocket()
+{
+	destroyResolverQuery();
+
+	if (is_open())
+	{
+		ErrorCode ec;
+		close(ec);
+
+		if (ec)
+		{
+			unreal->log.write(UnrealLog::Debug, "~UnrealSocket(): close() "
+					"failed: %d (%s)", ec.value(), ec.message().c_str());
+		}
+	}
+}
+
+/**
+ * Inititate a asyncronous connection to an external host using an endpoint.
+ *
+ * @param endpoint Endpoint to connect to
+ */
+void UnrealSocket::connect(Endpoint& endpoint)
+{
+	async_connect(endpoint,
+		boost::bind(&UnrealSocket::handleConnect,
+			this,
+			boost::asio::placeholders::error,
+			UnrealResolver::Iterator()));
+}
+
+/**
+ * Inititate a asyncronous connection to an external host using hostname
+ * and port.
+ *
+ * @param hostname Hostname or IP address to connect to
+ * @param port Port number to connect to
+ */
+void UnrealSocket::connect(const String& hostname, const uint16_t& portnum)
+{
+	UnrealResolver* rq = new UnrealResolver();
+
+	rq->onResolve.connect(boost::bind(&UnrealSocket::handleResolveResponse,
+		this,
+		boost::asio::placeholders::error,
+		boost::asio::placeholders::iterator));
+
+	rq->query(hostname, portnum);
+
+	/* store it somewhere */
+	resolver_queries.add(this, rq);
+}
+
+/**
+ * Destroy resolver query.
+ */
+void UnrealSocket::destroyResolverQuery()
+{
+	if (resolver_queries.contains(this))
+	{
+		UnrealResolver* rq = resolver_queries[this];
+
+		resolver_queries.remove(this);
+
+		delete rq;
+	}
+}
+
+/**
+ * Asyncronous connect callback.
+ * This tries to connect to requested host and starts asyncronous reading.
+ * Once connect failed, it tries the next endpoint returned from the resolver.
+ *
+ * @param ec boost error code
+ * @param ep_iter Resolver endpoint iterator
+ */
+void UnrealSocket::handleConnect(const ErrorCode& ec,
+	UnrealResolver::Iterator ep_iter)
+{
+	if (!ec)
+	{
+		onConnected(this);
+
+		/* wait for lines to be read */
+		waitForLine();
+	}
+	else if (ep_iter != UnrealResolver::Iterator())
+	{
+		if (is_open())
+		{
+			ErrorCode edupl;
+			close(edupl);
+
+			if (edupl)
+			{
+				unreal->log.write(UnrealLog::Debug, "UnrealSocket::handle"
+						"Connect(): close() failed: %d (%s)",
+						edupl.value(),
+						edupl.message().c_str());
+			}
+		}
+
+		/* next endpoint */
+		Endpoint endpoint = *ep_iter;
+		async_connect(endpoint,
+			boost::bind(&UnrealSocket::handleConnect,
+				this,
+				boost::asio::placeholders::error,
+				++ep_iter));
+	}
+	else
+		onError(this, ec);
+}
 
 /**
  * Callback for asyncronous reading on the socket.
@@ -88,6 +210,30 @@ void UnrealSocket::handleRead(const ErrorCode& ec, size_t bytes_read)
 		/* wait for the next line */
 		waitForLine();
 	}
+}
+
+void UnrealSocket::handleResolveResponse(const ErrorCode& ec,
+	UnrealResolver::Iterator ep_iter)
+{
+	if (!ec)
+	{
+		onConnecting(this);
+
+		// connect to endpoint
+		Endpoint endpoint = *ep_iter;
+		async_connect(endpoint,
+			boost::bind(&UnrealSocket::handleConnect,
+				this,
+				boost::asio::placeholders::error,
+				++ep_iter));
+	}
+	else
+	{
+		onError(this, ec);
+	}
+
+	/* remove the resolver query */
+	destroyResolverQuery();
 }
 
 /**

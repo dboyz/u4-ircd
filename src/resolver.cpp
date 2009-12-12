@@ -25,6 +25,9 @@
 #include "base.hpp"
 #include "resolver.hpp"
 
+/**
+ * UnrealResolver constructor.
+ */
 UnrealResolver::UnrealResolver()
 	: tcp::resolver(unreal->ios_pool.getIOService())
 { }
@@ -55,7 +58,7 @@ void UnrealResolver::query(tcp::endpoint& endpoint)
 /**
  * Initiate an DNS query w/ host/port.
  */
-void UnrealResolver::query(const String& hostname, const uint16_t port)
+void UnrealResolver::query(const String& hostname, const uint16_t& port)
 {
 	Query query(hostname, String(port));
 

@@ -35,6 +35,7 @@
 #include "log.hpp"
 #include "map.hpp"
 #include "module.hpp"
+#include "server.hpp"
 #include "stats.hpp"
 #include "string.hpp"
 #include "stringlist.hpp"
@@ -94,14 +95,17 @@ public:
 	/** user command mapping */
 	Map<String, UnrealUserCommand*> user_commands;
 
-	/** server start timestamp */
-	UnrealTime starttime;
+	/** server mapping */
+	Map<uint32_t, UnrealServer*> servers;
 
 	/** iSupport features */
 	UnrealISupport isupport;
 
 	/** server statistics */
 	UnrealLocalStat stats;
+
+	/** local server entry */
+	UnrealServer me;
 
 private:
 	void checkConfig();
@@ -116,6 +120,7 @@ private:
 	void printVersion();
 	void setupISupport();
 	void setupListener();
+	void setupServer();
 
 private:
 	/** fork() state */

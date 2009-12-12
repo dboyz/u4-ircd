@@ -50,6 +50,7 @@ pkginclude_HEADERS = \
 	include/numeric.hpp \
 	include/platform.hpp \
 	include/resolver.hpp \
+	include/server.hpp \
 	include/socket.hpp \
 	include/stats.hpp \
 	include/string.hpp \
@@ -68,6 +69,7 @@ unrealircd_SOURCES = \
 	src/log.cpp \
 	src/module.cpp \
 	src/resolver.cpp \
+	src/server.cpp \
 	src/socket.cpp \
 	src/string.cpp \
 	src/stringlist.cpp \

@@ -42,8 +42,6 @@ UnrealBase::UnrealBase(int cnt, char** vec)
 	/* make this UnrealBase globally available */
 	unreal = this;
 
-	starttime = UnrealTime::now();
-
 	for (int i = 0; i < cnt; i++)
 		argv << String(vec[i]);
 
@@ -80,6 +78,9 @@ UnrealBase::UnrealBase(int cnt, char** vec)
 
 	/* build ISupport map */
 	setupISupport();
+
+	/* setup local server entry */
+	setupServer();
 
 	if (fork_state_ == Daemon)
 	{
@@ -172,7 +173,7 @@ void UnrealBase::exit(int code)
  */
 void UnrealBase::finish()
 {
-	//..
+	//...
 }
 
 /**
@@ -517,4 +518,32 @@ void UnrealBase::setupListener()
 		/* append listener to list */
 		listeners << lptr;
 	}
+}
+
+/**
+ * Setup local server entry.
+ */
+void UnrealBase::setupServer()
+{
+	me.setName(config.get("Me/ServerName"));
+
+	if (me.name().empty())
+	{
+		log.write(UnrealLog::Normal, "Fatal: Me::ServerName not specified.");
+		exit(1);
+	}
+
+	me.setNumeric(config.get("Me/Numeric", "0").toUInt());
+
+	if (me.numeric() == 0)
+	{
+		log.write(UnrealLog::Normal, "Fatal: Me::Numeric is an invalid server "
+				"numeric. Please use a number between 1 and 4096.");
+		exit(1);
+	}
+
+	me.setBootTime(UnrealTime::now());
+
+	/* add into the server list */
+	servers.add(me.numeric(), &me);
 }

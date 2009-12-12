@@ -2,6 +2,10 @@
   UnrealIRCd 4 ChangeLog
 -------------------------------------------------------------------------------
 
+  2009-12-12 13:37 +0100  Christian Jurk <commx@commx.ws>
+    >> src/server.cpp, include/server.hpp: Added server stuff
+    >> src/base.hpp: Replaced starttime with local server entry
+
   2009-12-09 09:50 +0100  Christian Jurk <commx@commx.ws>
     >> src/user.cpp: Fixed issue when connecting users are getting
        disconnected because of "Ping timeout". That happened when

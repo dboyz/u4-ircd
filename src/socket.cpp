@@ -23,6 +23,7 @@
  ******************************************************************/
 
 #include "base.hpp"
+#include "ioservice.hpp"
 #include "resolver.hpp"
 #include "socket.hpp"
 #include <iostream>
@@ -35,8 +36,8 @@ Map<UnrealSocket*, UnrealResolver*> resolver_queries;
  *
  * @param io_service I/O service to attach event notification calls to
  */
-UnrealSocket::UnrealSocket()
-	: tcp::socket(unreal->ios_pool.getIOService())
+UnrealSocket::UnrealSocket(UnrealIOService& ios)
+	: tcp::socket(ios), strand_(ios)
 { }
 
 /**
@@ -45,18 +46,26 @@ UnrealSocket::UnrealSocket()
 UnrealSocket::~UnrealSocket()
 {
 	destroyResolverQuery();
+}
+
+/**
+ * Close the socket safely.
+ *
+ * @return True if the close succeed, otherwise false
+ */
+bool UnrealSocket::closeSafe()
+{
+	onDisconnected(this);
 
 	if (is_open())
 	{
-		ErrorCode ec;
-		close(ec);
+		ErrorCode errc;
+		close(errc);
 
-		if (ec)
-		{
-			unreal->log.write(UnrealLog::Debug, "~UnrealSocket(): close() "
-					"failed: %d (%s)", ec.value(), ec.message().c_str());
-		}
+		return (errc.value() == 0);
 	}
+	else
+		return true;
 }
 
 /**
@@ -66,11 +75,13 @@ UnrealSocket::~UnrealSocket()
  */
 void UnrealSocket::connect(Endpoint& endpoint)
 {
+	// XXX: boost examples use shared_from_this() instead of "this"
+	// looks like it's because of shared_ptr's
 	async_connect(endpoint,
-		boost::bind(&UnrealSocket::handleConnect,
+		strand_.wrap(boost::bind(&UnrealSocket::handleConnect,
 			this,
 			boost::asio::placeholders::error,
-			UnrealResolver::Iterator()));
+			UnrealResolver::Iterator())));
 }
 
 /**
@@ -82,7 +93,7 @@ void UnrealSocket::connect(Endpoint& endpoint)
  */
 void UnrealSocket::connect(const String& hostname, const uint16_t& portnum)
 {
-	UnrealResolver* rq = new UnrealResolver();
+	UnrealResolver* rq = new UnrealResolver((UnrealIOService&)get_io_service());
 
 	rq->onResolve.connect(boost::bind(&UnrealSocket::handleResolveResponse,
 		this,
@@ -101,13 +112,7 @@ void UnrealSocket::connect(const String& hostname, const uint16_t& portnum)
 void UnrealSocket::destroyResolverQuery()
 {
 	if (resolver_queries.contains(this))
-	{
-		UnrealResolver* rq = resolver_queries[this];
-
-		resolver_queries.remove(this);
-
-		delete rq;
-	}
+		resolver_queries.free(this);
 }
 
 /**
@@ -130,27 +135,13 @@ void UnrealSocket::handleConnect(const ErrorCode& ec,
 	}
 	else if (ep_iter != UnrealResolver::Iterator())
 	{
-		if (is_open())
-		{
-			ErrorCode edupl;
-			close(edupl);
-
-			if (edupl)
-			{
-				unreal->log.write(UnrealLog::Debug, "UnrealSocket::handle"
-						"Connect(): close() failed: %d (%s)",
-						edupl.value(),
-						edupl.message().c_str());
-			}
-		}
-
 		/* next endpoint */
 		Endpoint endpoint = *ep_iter;
 		async_connect(endpoint,
-			boost::bind(&UnrealSocket::handleConnect,
+			strand_.wrap(boost::bind(&UnrealSocket::handleConnect,
 				this,
 				boost::asio::placeholders::error,
-				++ep_iter));
+				++ep_iter)));
 	}
 	else
 		onError(this, ec);
@@ -176,33 +167,21 @@ void UnrealSocket::handleRead(const ErrorCode& ec, size_t bytes_read)
 		unreal->log.write(UnrealLog::Normal, "Error handling async_read on "
 				"socket %d: %s (%d)", native(), errmsg.c_str(), edupl.value());
 
+		if (unreal->users.contains(this))
+			unreal->users[this]->exit(ec);
+
+		closeSafe();
 		onError(this, ec);
-
-		if (is_open())
-		{
-			ErrorCode edupl;
-			close(edupl);
-
-			if (edupl)
-			{
-				unreal->log.write(UnrealLog::Normal, "UnrealSocket::handle"
-						"Read(): Error on close(): %d (%s)",
-						edupl.value(),
-						edupl.message().c_str());
-			}
-		}
-
-		/* notify on connection loss */
-		onDisconnected(this);
 	}
 	else
 	{
-		static String buffer;
+		String buffer;
 		std::istream is(&streambuf_);
 		std::getline(is, buffer);
+		size_t trpos = buffer.find_last_not_of("\r\n");
 
-		/* clean whitespace */
-		buffer = buffer.trimmed();
+		if (trpos != String::npos)
+			buffer.erase(trpos + 1);
 
 		if (buffer.length() > 0)
 			onRead(this, buffer);
@@ -222,10 +201,10 @@ void UnrealSocket::handleResolveResponse(const ErrorCode& ec,
 		// connect to endpoint
 		Endpoint endpoint = *ep_iter;
 		async_connect(endpoint,
-			boost::bind(&UnrealSocket::handleConnect,
+			strand_.wrap(boost::bind(&UnrealSocket::handleConnect,
 				this,
 				boost::asio::placeholders::error,
-				++ep_iter));
+				++ep_iter)));
 	}
 	else
 	{
@@ -252,24 +231,11 @@ void UnrealSocket::handleWrite(const ErrorCode& ec, size_t bytes_written)
 		unreal->log.write(UnrealLog::Normal, "Error handling async_write on "
 				"socket %d: %s (%d)", native(), errmsg.c_str(), edupl.value());
 
+		if (unreal->users.contains(this))
+			unreal->users[this]->exit(ec);
+
+		closeSafe();
 		onError(this, ec);
-
-		if (is_open())
-		{
-			ErrorCode edupl;
-			close(edupl);
-
-			if (edupl)
-			{
-				unreal->log.write(UnrealLog::Normal, "UnrealSocket::handle"
-						"Write(): Error on close(): %d (%s)",
-						edupl.value(),
-						edupl.message().c_str());
-			}
-		}
-
-		/* notify on connection loss */
-		onDisconnected(this);
 	}
 
 	/* add actual amount of data that has been written on the socket */
@@ -294,10 +260,11 @@ void UnrealSocket::waitForLine()
 {
 	boost::asio::async_read_until(*this,
 		streambuf_,
-		"\n",
-		boost::bind(&UnrealSocket::handleRead, this,
+		'\n',
+		strand_.wrap(boost::bind(&UnrealSocket::handleRead,
+			this,
 			boost::asio::placeholders::error,
-			boost::asio::placeholders::bytes_transferred));
+			boost::asio::placeholders::bytes_transferred)));
 }
 
 /**
@@ -312,9 +279,10 @@ void UnrealSocket::write(const String& data)
 
 	boost::asio::async_write(*this,
 		boost::asio::buffer(buffer.c_str(), buffer.length()),
-			boost::bind(&UnrealSocket::handleWrite, this,
+			strand_.wrap(boost::bind(&UnrealSocket::handleWrite,
+				this,
 				boost::asio::placeholders::error,
-				boost::asio::placeholders::bytes_transferred));
+				boost::asio::placeholders::bytes_transferred)));
 
 	/* debug message */
 	unreal->log.write(UnrealLog::Debug, "<< %s", data.c_str());

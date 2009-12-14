@@ -26,6 +26,7 @@
 #include "stringlist.hpp"
 #include <cstdarg>
 #include <sstream>
+#include <iostream>
 
 /**
  * Construct a string, copying the contents of a zero-terminated char pointer.
@@ -202,7 +203,18 @@ String String::left(size_t count)
  */
 String String::mid(size_t start, size_t count)
 {
-	return this->substr(start, count);
+	String result;
+
+	try
+	{
+		result = this->substr(start, count);
+	}
+	catch (std::exception& ec)
+	{
+		std::cout<<"String::mid() EXCEPTION: "<<ec.what()<<"\n";
+	}
+
+	return result;
 }
 
 /**

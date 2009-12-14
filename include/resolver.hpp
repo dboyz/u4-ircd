@@ -25,6 +25,7 @@
 #ifndef _UNREALIRCD_RESOLVER_HPP
 #define _UNREALIRCD_RESOLVER_HPP
 
+#include "ioservice.hpp"
 #include "map.hpp"
 #include "string.hpp"
 #include <boost/asio.hpp>
@@ -39,6 +40,9 @@ public:
 	/** alias errorcode class */
 	typedef boost::system::error_code ErrorCode;
 
+	/** alias endpoint type */
+	typedef tcp::endpoint Endpoint;
+
 	/** alias the resolver iterator */
 	typedef tcp::resolver::iterator Iterator;
 
@@ -46,13 +50,16 @@ public:
 	typedef tcp::resolver::query Query;
 
 public:
-	UnrealResolver();
-	void query(tcp::endpoint& endpoint);
+	UnrealResolver(UnrealIOService& ios);
+	void query(Endpoint& endpoint);
 	void query(const String& hostname, const uint16_t& port);
 
 public:
 	/** emitted when we got an result, or an error occured */
 	boost::signals2::signal<void(const ErrorCode&, Iterator)> onResolve;
+
+	/** strand */
+	boost::asio::io_service::strand strand_;
 
 private:
 	void handleResult(const ErrorCode& ec, Iterator ep_iter);

@@ -25,12 +25,12 @@
 #ifndef _UNREALIRCD_LISTENER_HPP
 #define _UNREALIRCD_LISTENER_HPP
 
+#include "ioservice.hpp"
 #include "list.hpp"
 #include "socket.hpp"
 #include "string.hpp"
 #include "stringlist.hpp"
 #include <boost/asio.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/signals2.hpp>
 
 using namespace boost::asio::ip;
@@ -45,11 +45,9 @@ public:
 	/** alias error code class */
 	typedef boost::system::error_code ErrorCode;
 
-	/** alias the listener class for use with shared_ptr */
-	typedef boost::shared_ptr<UnrealListener> ListenerPtr;
-
 public:
-	UnrealListener(const String& address, const uint16_t& port);
+	UnrealListener(UnrealIOService& ios, const String& address,
+			const uint16_t& port);
 	~UnrealListener();
 
 	void addConnection(UnrealSocket* sptr);
@@ -77,7 +75,7 @@ public:
 	boost::signals2::signal<void(UnrealListener*, const ErrorCode&)> onError;
 
 	/** emitted when the listener got a new connection */
-	boost::signals2::signal<void(UnrealListener*, UnrealSocket*)>
+	boost::signals2::signal<void(UnrealListener*, const UnrealSocket*)>
 		onNewConnection;
 
 private:
@@ -101,6 +99,8 @@ private:
 	/** max amount of connections allowed for this listener */
 	uint32_t max_connections_;
 
+	/** strand */
+	boost::asio::io_service::strand strand_;
 };
 
 #endif /* _UNREALIRCD_LISTENER_HPP */

@@ -36,9 +36,11 @@
  * @param address Address used for binding
  * @param port Port number used for binding
  */
-UnrealListener::UnrealListener(const String& address, const uint16_t& port)
-	: tcp::acceptor(unreal->ios_pool.getIOService()), type_(LClient),
-	address_(address), port_(port), ping_freq_(0), max_connections_(0)
+UnrealListener::UnrealListener(UnrealIOService& ios, const String& address,
+		const uint16_t& port)
+	: tcp::acceptor(ios), type_(LClient),
+	address_(address), port_(port), ping_freq_(0), max_connections_(0),
+	strand_(ios)
 { }
 
 /**
@@ -47,11 +49,10 @@ UnrealListener::UnrealListener(const String& address, const uint16_t& port)
 UnrealListener::~UnrealListener()
 {
 	for (List<UnrealSocket*>::Iterator i = connections.begin();
-			i != connections.end(); i++)
+			i != connections.end(); ++i)
+	{
 		delete *i;
-
-	connections.clear();
-	close();
+	}
 }
 
 /**
@@ -155,11 +156,6 @@ void UnrealListener::handleAccept(UnrealSocket* sptr, const ErrorCode& ec)
 				"Error encountered: %s", errmsg.c_str());
 
 		onError(this, ec);
-
-		/*
-		 * USUALLY, `sptr' should be free'd after leaving this method, as it's
-		 * not left referenced anywhere.
-		 */
 	}
 	else
 	{
@@ -283,6 +279,8 @@ uint32_t UnrealListener::pingFrequency()
  */
 void UnrealListener::removeConnection(UnrealSocket* sptr)
 {
+	std::cout<<String::format("removeConnection()");
+
 	/* if an user, remove it from the userlist */
 	if (unreal->users.contains(sptr))
 	{
@@ -304,9 +302,6 @@ void UnrealListener::removeConnection(UnrealSocket* sptr)
 	unreal->stats.connections_cur--;
 
 	connections.remove(sptr);
-
-	/* free some memory */
-	delete sptr;
 }
 
 /**
@@ -315,10 +310,9 @@ void UnrealListener::removeConnection(UnrealSocket* sptr)
 void UnrealListener::run()
 {
 	ErrorCode ec;
-
-	tcp::resolver resolver(io_service());
-	tcp::resolver::query query(address_, String(port_));
-	tcp::endpoint endpoint = *resolver.resolve(query, ec);
+	UnrealResolver resolv((UnrealIOService&)get_io_service());
+	UnrealResolver::Query query(address_, String(port_));
+	UnrealResolver::Endpoint endpoint = *resolv.resolve(query, ec);
 
 	if (ec)
 	{
@@ -417,7 +411,9 @@ StringList UnrealListener::splitLine(String& data)
 
 	for (size_t i = 0; i < tokens.size(); i++)
 	{
-		if (tokens.at(i).at(0) == ':' && i > 0)
+		if (tokens.at(i).empty())
+			continue;
+		else if (tokens.at(i).at(0) == ':' && i > 0)
 		{
 			String long_arg = tokens.at(i).mid(1);
 
@@ -454,8 +450,9 @@ UnrealListener::ListenerType UnrealListener::type()
  */
 void UnrealListener::waitForAccept()
 {
-	UnrealSocket* sptr = new UnrealSocket();
+	UnrealSocket* sptr = new UnrealSocket(unreal->ios_pool.getIOService());
 
-	async_accept(*sptr, boost::bind(&UnrealListener::handleAccept,
-			this, sptr, boost::asio::placeholders::error));
+	async_accept(*sptr,
+		strand_.wrap(boost::bind(&UnrealListener::handleAccept,
+			this, sptr, boost::asio::placeholders::error)));
 }

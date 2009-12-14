@@ -37,6 +37,7 @@
 #include "string.hpp"
 #include "stringlist.hpp"
 #include "time.hpp"
+#include "timer.hpp"
 #include <boost/asio.hpp>
 
 /**
@@ -74,6 +75,7 @@ public:
 	Bitmask<uint8_t>& authflags();
 	const String& awayMessage();
 	UnrealTime connectionTime();
+	void exit(const UnrealSocket::ErrorCode& ec);
 	void exitClient(const String& message);
 	static UnrealUser* find(UnrealSocket* sptr);
 	static UnrealUser* find(const String& nickname);
@@ -175,7 +177,7 @@ private:
 	String away_message_;
 
 	/** timeout timer */
-	boost::asio::deadline_timer timer_;
+	UnrealTimer timer_;
 };
 
 namespace UnrealUserProperties

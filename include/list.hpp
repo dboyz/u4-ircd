@@ -64,6 +64,24 @@ public:
 	}
 
 	/**
+	 * Remove an element from the list and free the memory allocated to it.
+	 *
+	 * @param el Element to be removed
+	 */
+	void free(const _ElementType& el)
+	{
+		for (Iterator i = this->begin(); i != this->end(); i++)
+		{
+			if (*i == el)
+			{
+				this->erase(i);
+				delete el;
+				return;
+			}
+		}
+	}
+
+	/**
 	 * Returns the position of the specified Element.
 	 *
 	 * @param el Element to find

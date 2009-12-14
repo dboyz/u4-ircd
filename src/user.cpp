@@ -56,7 +56,7 @@ namespace UnrealUserProperties
  */
 UnrealUser::UnrealUser(UnrealSocket* sptr)
 	: socket_(sptr), connection_time_(UnrealTime::now()),
-	  timer_(unreal->ios_pool.getIOService())
+	  timer_((UnrealIOService&)sptr->get_io_service())
 { }
 
 /**
@@ -72,10 +72,6 @@ UnrealUser::~UnrealUser()
 		unreal->stats.connections_unk--;
 	if (isOper())
 		unreal->stats.operators--;
-
-	/*
-	 * Resolver queries are destroyed with the Socket now.
-	 */
 }
 
 /**
@@ -95,13 +91,9 @@ void UnrealUser::auth()
 	/* give the user some time to register */
 	scheduleAuthTimeout();
 
-std::cout<<"UnrealUser::auth() FD="<<socket_->native()<<"\n";
 	/* remote ident check, if enabled */
-	if (unreal->config.get("Features/enable_ident_check", "true").toBool())
-	{
-		send("NOTICE AUTH :*** Checking Ident");
+	if (unreal->config.get("Features/EnableIdentCheck", "true").toBool())
 		checkRemoteIdent();
-	}
 }
 
 /**
@@ -170,7 +162,9 @@ void UnrealUser::checkPingTimeout(const UnrealSocket::ErrorCode& ec)
  */
 void UnrealUser::checkRemoteIdent()
 {
-	UnrealSocket* sptr = new UnrealSocket();
+	UnrealSocket* sptr = new UnrealSocket(unreal->ios_pool.getIOService());
+
+	send("NOTICE AUTH :*** Checking Ident");
 
 	sptr->onConnected
 		.connect(boost::bind(&UnrealUser::handleIdentCheckConnected,
@@ -182,7 +176,7 @@ void UnrealUser::checkRemoteIdent()
 		.connect(boost::bind(&UnrealUser::handleIdentCheckError,
 			this, _1, _2));
 
-	tcp::endpoint endpoint = socket_->remote_endpoint();
+	UnrealSocket::Endpoint endpoint = socket_->remote_endpoint();
 	endpoint.port(113);
 
 	/* connect to remote ident server */
@@ -213,11 +207,18 @@ void UnrealUser::destroyIdentRequest()
 {
 	UnrealSocket* sptr = 0;
 
+	send("NOTICE AUTH :Destroying Ident request...");
+
 	if (icheck_queries.contains(this))
 	{
 		sptr = icheck_queries[this];
 		icheck_queries.remove(this);
 
+		sptr->onConnected.disconnect_all_slots();
+		sptr->onConnecting.disconnect_all_slots();
+		sptr->onDisconnected.disconnect_all_slots();
+		sptr->onError.disconnect_all_slots();
+		sptr->onRead.disconnect_all_slots();
 		delete sptr;
 	}
 	else
@@ -230,6 +231,32 @@ void UnrealUser::destroyIdentRequest()
 
 	if (auth_flags_.value() == 0)
 		sendPing();
+
+	send("NOTICE AUTH :Ident request destroyed.");
+}
+
+void UnrealUser::exit(const UnrealSocket::ErrorCode& ec)
+{
+	String message;
+
+	if (ec)
+	{
+		UnrealSocket::ErrorCode edupl = ec;
+		message.sprintf("Read error: %d (%s)", edupl.value(),
+				edupl.message().c_str());
+	}
+	else
+		message = "Exiting";
+
+	/* broadcast quit on all channels */
+	while (channels.size() > 0)
+	{
+		UnrealChannel* chptr = channels.at(0);
+		std::cout<<"UnrealUser::exit chan<"<<chptr->name()<<">\n";
+		leaveChannel(chptr->name(), message, CMD_QUIT);
+	}
+	//std::cout<<"UnrealUser::exit, chansize="<<channels.size()<<"\n";
+	//leaveChannel("#test", message, CMD_QUIT);
 }
 
 /**
@@ -239,19 +266,18 @@ void UnrealUser::destroyIdentRequest()
  */
 void UnrealUser::exitClient(const String& message)
 {
-	String reply;
-
-	reply.sprintf("ERROR :Closing link: %s by %s (%s)",
-		nickname_.empty() ? "*" : nickname_.c_str(),
-		unreal->config.get("Me/ServerName", "not.configured").c_str(),
-		message.c_str());
-
-	send(reply);
-
 	/* close socket */
 	if (socket_->is_open())
 	{
+		String reply;
 		UnrealSocket::ErrorCode ec;
+
+		reply.sprintf("ERROR :Closing link: %s by %s (%s)",
+			nickname_.empty() ? "*" : nickname_.c_str(),
+			unreal->config.get("Me/ServerName", "not.configured").c_str(),
+			message.c_str());
+
+		send(reply);
 		socket_->close(ec);
 
 		if (ec)
@@ -301,6 +327,8 @@ UnrealUser* UnrealUser::find(const String& nickname)
 void UnrealUser::handleIdentCheckConnected(UnrealSocket* sptr)
 {
 	String request_str;
+
+	send("NOTICE AUTH :Connected to your ident server, requesting username...");
 
 	request_str.sprintf("%d, %d",
 		socket_->remote_endpoint().port(),
@@ -570,6 +598,7 @@ UnrealTime UnrealUser::lastPongTime()
 void UnrealUser::leaveChannel(const String& chname, const String& message,
 	const String& type)
 {
+	std::cout<<"UnrealUser::leaveChannel <"<<chname<<"> with message <"<<message<<">\n";
 	UnrealChannel* chptr = UnrealChannel::find(chname);
 
 	if (chptr)
@@ -582,7 +611,15 @@ void UnrealUser::leaveChannel(const String& chname, const String& message,
 		{
 			String msg;
 
-			if (!message.empty())
+			chptr->removeMember(this);
+
+			/* if the channel got empty, delete it */
+			if (chptr->members.size() == 0)
+			{
+				delete chptr;
+				return;
+			}
+			else if (!message.empty())
 				msg = " :" + message;
 
 			if (type == CMD_PART)
@@ -606,12 +643,6 @@ void UnrealUser::leaveChannel(const String& chname, const String& message,
 					uptr->send(reply);
 				}
 			}
-
-			chptr->removeMember(this);
-
-			/* if the channel got empty, delete it */
-			if (chptr->members.size() == 0)
-				delete chptr;
 		}
 	}
 }
@@ -913,8 +944,17 @@ void UnrealUser::registerUser()
  */
 void UnrealUser::resolveHostname()
 {
-	tcp::endpoint endpoint = socket_->remote_endpoint();
-	UnrealResolver* rq = new UnrealResolver();
+	tcp::endpoint endpoint;
+
+	try
+	{
+		endpoint = socket_->remote_endpoint();
+	}
+	catch (std::exception& ex)
+	{
+		std::cout<<"resolveHostname() Exception: "<<ex.what()<<"\n";
+	}
+	UnrealResolver* rq = new UnrealResolver(unreal->ios_pool.getIOService());
 
 	rq->onResolve.connect(boost::bind(&UnrealUser::handleResolveResponse,
 		this,

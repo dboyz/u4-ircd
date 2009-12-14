@@ -1,7 +1,7 @@
 /*****************************************************************
  * Unreal Internet Relay Chat Daemon, Version 4
- * File         limits.hpp
- * Description  Default limitations for various things
+ * File         timer.hpp
+ * Description  Asyncronous timing events
  *
  * All parts of this program are Copyright(C) 2009 by their
  * respective authors and the UnrealIRCd development team.
@@ -22,30 +22,20 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#ifndef _UNREALIRCD_LIMITS_HPP
-#define _UNREALIRCD_LIMITS_HPP
+#ifndef _UNREALIRCD_TIMER_HPP
+#define _UNREALIRCD_TIMER_HPP
 
-#include "base.hpp"
+#include "ioservice.hpp"
+#include <boost/asio.hpp>
 
-/** maximum buffer size for IRC contents, as defined by RFC 1459 */
-#define _U4_BUFSIZE_	512
+class UnrealTimer
+	: public boost::asio::deadline_timer
+{
+public:
+	UnrealTimer(UnrealIOService& ios);
 
-/** nick length limit */
-#define _U4_NICKLEN_	unreal->config.get("limits/nicklen", 18).toUInt()
+public:
+	boost::asio::io_service::strand strand;
+};
 
-/** user (ident) length limit */
-#define _U4_USERLEN_	unreal->config.get("limits/userlen", 10).toUInt()
-
-/** topic length limit */
-#define _U4_TOPICLEN_	unreal->config.get("limits/topiclen", 250).toUInt()
-
-/** away message length limit */
-#define _U4_AWAYLEN_	unreal->config.get("limits/awaylen", 250).toUInt()
-
-/** kick message length limit */
-#define _U4_KICKLEN_	unreal->config.get("limits/kicklen", 250).toUInt()
-
-/** channel name length limit */
-#define _U4_CHANNELLEN_ unreal->config.get("limits/channellen", 200).toUInt()
-
-#endif /* _UNREALIRCD_LIMITS_HPP */
+#endif /* _UNREALIRCD_TIMER_HPP */

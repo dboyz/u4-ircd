@@ -63,6 +63,8 @@ UnrealBase::UnrealBase(int cnt, char** vec)
 	/* setup IO service pool */
 	size_t io_pool_size = static_cast<size_t>(
 			config.get("Me/IOPoolSize", "1").toUInt());
+	size_t io_threads = static_cast<size_t>(
+			config.get("Me/Threads", "0").toUInt());
 
 	if (ios_pool.size() == 0)
 	{
@@ -70,8 +72,9 @@ UnrealBase::UnrealBase(int cnt, char** vec)
 			<< "Critical: IOPoolSize is set to 0, exiting. Please increase "
 			   "that value in your server configuration file.";
 	}
-	else if (ios_pool.size() != io_pool_size)
-		ios_pool.resize(io_pool_size);
+	else if (ios_pool.size() != io_pool_size
+			|| ios_pool.threads() != io_threads)
+		ios_pool.resize(io_threads, io_pool_size);
 
 	/* setup Listeners */
 	setupListener();
@@ -498,7 +501,8 @@ void UnrealBase::setupListener()
 			"1024").toUInt();
 
 		/* Setup the Listener */
-		UnrealListener::ListenerPtr lptr(new UnrealListener(addr, port.toUInt16()));
+		UnrealListener* lptr = new UnrealListener(ios_pool.getIOService(),
+				addr, port.toUInt16());
 		UnrealListener::ListenerType ltype;
 
 		if (type.toLower() == "server")

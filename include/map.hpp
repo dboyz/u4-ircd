@@ -88,6 +88,24 @@ public:
 	}
 
 	/**
+	 * Remove the Element with the specified Key from the map
+	 * and free it's allocated memory.
+	 * Just use this for pointer elements!
+	 *
+	 * @param key Key of Element to be removed
+	 */
+	void free(const _KeyType& key)
+	{
+		Iterator i = this->find(key);
+
+		if (i != this->end())
+		{
+			delete i->second;
+			this->erase(i);
+		}
+	}
+
+	/**
 	 * Return the Key of the specified Element.
 	 *
 	 * @param el Element to find

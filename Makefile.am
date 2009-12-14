@@ -56,6 +56,7 @@ pkginclude_HEADERS = \
 	include/string.hpp \
 	include/stringlist.hpp \
 	include/time.hpp \
+	include/timer.hpp \
 	include/user.hpp \
 	include/version.hpp
 
@@ -74,6 +75,7 @@ unrealircd_SOURCES = \
 	src/string.cpp \
 	src/stringlist.cpp \
 	src/time.cpp \
+	src/timer.cpp \
 	src/unreal.cpp \
 	src/user.cpp \
 	$(pkginclude_HEADERS)

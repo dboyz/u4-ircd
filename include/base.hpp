@@ -81,7 +81,7 @@ public:
 	UnrealIOServicePool ios_pool;
 
 	/** list with listeners */
-	List<UnrealListener::ListenerPtr> listeners;
+	List<UnrealListener*> listeners;
 
 	/** user mapping */
 	Map<UnrealSocket*, UnrealUser*> users;

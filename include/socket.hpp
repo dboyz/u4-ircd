@@ -25,12 +25,13 @@
 #ifndef _UNREALIRCD_SOCKET_HPP
 #define _UNREALIRCD_SOCKET_HPP
 
+#include "ioservice.hpp"
+#include "limits.hpp"
 #include "map.hpp"
 #include "platform.hpp"
 #include "resolver.hpp"
 #include "string.hpp"
 #include <boost/asio.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/signals2.hpp>
 
 using namespace boost::asio::ip;
@@ -58,15 +59,13 @@ public:
 	/** alias error code class */
 	typedef boost::system::error_code ErrorCode;
 
-	/** alias the socket class for use with shared_ptr */
-	typedef boost::shared_ptr<UnrealSocket> SocketPtr;
-
 	/** alias the endpoint type */
 	typedef tcp::endpoint Endpoint;
 
 public:
-	UnrealSocket();
+	UnrealSocket(UnrealIOService& ios);
 	~UnrealSocket();
+	bool closeSafe();
 	void connect(Endpoint& endpoint);
 	void connect(const String& hostname, const uint16_t& portnum);
 	void destroyResolverQuery();
@@ -100,6 +99,9 @@ private:
 private:
 	/** stream buffer */
 	boost::asio::streambuf streambuf_;
+
+	/** strand */
+	boost::asio::io_service::strand strand_;
 
 	/** traffic on the socket */
 	UnrealSocketTrafficType traffic_;

@@ -28,8 +28,8 @@
 /**
  * UnrealResolver constructor.
  */
-UnrealResolver::UnrealResolver()
-	: tcp::resolver(unreal->ios_pool.getIOService())
+UnrealResolver::UnrealResolver(UnrealIOService& ios)
+	: tcp::resolver(ios), strand_(ios)
 { }
 
 /**
@@ -46,13 +46,13 @@ void UnrealResolver::handleResult(const ErrorCode& ec, Iterator ep_iter)
 /**
  * Initiate an DNS query using an endpoint specification
  */
-void UnrealResolver::query(tcp::endpoint& endpoint)
+void UnrealResolver::query(Endpoint& endpoint)
 {
 	async_resolve(endpoint,
-		boost::bind(&UnrealResolver::handleResult,
+		strand_.wrap(boost::bind(&UnrealResolver::handleResult,
 			this,
 			boost::asio::placeholders::error,
-			boost::asio::placeholders::iterator));
+			boost::asio::placeholders::iterator)));
 }
 
 /**
@@ -63,8 +63,8 @@ void UnrealResolver::query(const String& hostname, const uint16_t& port)
 	Query query(hostname, String(port));
 
 	async_resolve(query,
-		boost::bind(&UnrealResolver::handleResult,
+		strand_.wrap(boost::bind(&UnrealResolver::handleResult,
 			this,
 			boost::asio::placeholders::error,
-			boost::asio::placeholders::iterator));
+			boost::asio::placeholders::iterator)));
 }

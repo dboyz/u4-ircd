@@ -2,6 +2,19 @@
   UnrealIRCd 4 ChangeLog
 -------------------------------------------------------------------------------
 
+  2009-12-14 20:00 +0100  Christian Jurk <commx@commx.ws>
+    >> UnrealUser: Added exit() function to exit an
+       client based on an error code
+    >> UnrealIOServicePool: Both the amount of threads and IO services
+       can be specified; they're controlled via Me::IOPoolSize
+       and Me::Threads
+    >> UnrealListener: Added asio's strand controller to ensure that
+       threads never modify the same part of memory concurrently
+    >> UnrealSocket: Added asio's strand controller
+    >> UnrealResolver: Added asio's strand controller
+    >> UnrealTimer: Added UnrealTimer class with strand controller
+    >> ... and a lot of small fixes :)
+
   2009-12-12 13:37 +0100  Christian Jurk <commx@commx.ws>
     >> src/server.cpp, include/server.hpp: Added server stuff
     >> src/base.hpp: Replaced starttime with local server entry

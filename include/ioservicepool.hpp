@@ -25,34 +25,44 @@
 #ifndef _UNREALIRCD_IOSERVICEPOOL_HPP
 #define _UNREALIRCD_IOSERVICEPOOL_HPP
 
+#include "ioservice.hpp"
 #include "list.hpp"
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread.hpp>
 
-/** default I/O service pool size */
-#define IOSERVICEPOOL_DEFAULT_SIZE	1
+/** default amount of threads */
+#define IOSERVICEPOOL_DEFAULT_THREADS	1
+
+/** default amount of IO services */
+#define IOSERVICEPOOL_DEFAULT_IOSSIZE	1
 
 /**
  * The UnrealIOServicePool class provides an I/O service pool that dispenses
- * operations on Sockets, Timers, etc. to multiple threads.
+ * operations on Sockets, Timers, etc. to multiple threads and/or IO services.
  */
 class UnrealIOServicePool
 {
 public:
-	UnrealIOServicePool(size_t poolsize = IOSERVICEPOOL_DEFAULT_SIZE);
+	UnrealIOServicePool(size_t nthreads = IOSERVICEPOOL_DEFAULT_THREADS,
+			size_t nios = IOSERVICEPOOL_DEFAULT_IOSSIZE);
 
-	boost::asio::io_service& getIOService();
-	void resize(size_t new_size);
+	UnrealIOService& getIOService();
+	void resize(size_t nthreads, size_t nios);
 	void run();
 	size_t size();
 	void stop();
+	size_t threads();
 
 private:
-	/** alias shared_ptr for asio::io_service */
-	typedef boost::shared_ptr<boost::asio::io_service> IOServicePtr;
+	/** alias shared_ptr for UnrealIOService */
+	typedef boost::shared_ptr<UnrealIOService> IOServicePtr;
 
-	/** alias shared_ptr for asio::io_service::work */
-	typedef boost::shared_ptr<boost::asio::io_service::work> WorkPtr;
+	/** alias shared_ptr for UnrealIOService::Work */
+	typedef boost::shared_ptr<UnrealIOService::Work> WorkPtr;
+
+	/** alias shared_ptr for boost::thread */
+	typedef boost::shared_ptr<boost::thread> ThreadPtr;
 
 private:
 	/** I/O service pool */
@@ -60,6 +70,9 @@ private:
 
 	/** I/O service work */
 	List<WorkPtr> works_;
+
+	/** threads size */
+	size_t threads_size_;
 
 	/** next I/O service to be used */
 	size_t next_io_service_;

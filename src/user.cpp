@@ -851,7 +851,7 @@ const String& UnrealUser::realname()
 void UnrealUser::registerUser()
 {
 	UnrealConfig& cfg = unreal->config;
-	String version = String::format("%s%s", _U4_VERSTR_, _U4_PATCHLEVEL_);
+	String version = String(PACKAGE_VERSTR PACKAGE_PATCHLEVEL);
 
 	/* collect user mode flags */
 	String user_modes;

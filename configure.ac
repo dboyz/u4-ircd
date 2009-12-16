@@ -23,10 +23,22 @@
  ##################################################################
 
 AC_PREREQ([2.13])
-AC_INIT([unrealircd-cpp], [0.1], [http://bugs.unrealircd.org/])
+AC_INIT([unrealircd-cpp], [4.0.0], [http://bugs.unrealircd.org/])
 AC_CONFIG_SRCDIR([src/unreal.cpp])
 AC_CONFIG_HEADERS([include/config.h])
 AM_INIT_AUTOMAKE
+
+# VCS or includes/hgrev.hpp
+AM_CONDITIONAL([VCS],[test -e .hg])
+AS_IF([test -e .hg],[
+	AC_DEFINE([HAVE_PACKAGE_CHANGESET], [1], [Define if PACKAGE_CHANGESET should be used])
+])
+
+# versioning
+AC_DEFINE([PACKAGE_VERSION_MAJOR], [4], [Major version number])
+AC_DEFINE([PACKAGE_VERSION_MINOR], [0], [Minor version number])
+AC_DEFINE([PACKAGE_VERSION_RELEASE], [0], [Release number. i.e., bugfix release number])
+
 
 # Checks for programs.
 AC_PROG_CXX

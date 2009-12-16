@@ -257,3 +257,20 @@ m_whois_la_SOURCES = src/cmd/whois.cpp
 m_whois_la_CPPFLAGS = $(unrealircd_CPPFLAGS)
 m_whois_la_LIBADD = $(unrealircd_LDADD)
 m_whois_la_LDFLAGS = -module -avoid-version -shared
+
+
+# only define repo vars if needed
+NEED_HGREV_HPP = 
+if VCS
+NEED_HGREV_HPP += include/hgrev.hpp
+endif
+
+include/hgrev.hpp: .hg/dirstate
+	cd $(top_srcdir)
+	printf \#define\ PACKAGE_CHANGESET\  > $(top_srcdir)/include/hgrev.hpp
+	hg id -i >> $(top_srcdir)/include/hgrev.hpp
+
+# there must be something cleaner than this.
+# there must be some type of Makefile-time
+# file generation.
+$(unrealircd_SOURCES): $(NEED_HGREV_HPP)

@@ -25,13 +25,44 @@
 #ifndef _UNREALIRCD_VERSION_HPP
 #define _UNREALIRCD_VERSION_HPP
 
-#define _U4_VERSION_		"4.0.0"
-#define _U4_VERSTR_			"unrealircd-4.0.0"
-#define _U4_PATCHLEVEL_		"+alpha_hgrev-tip"
+/**
+   Most definitions that would be found in this file
+   are defined in configure.ac. The defined variables include:
+   
+   Integer macros testable by modules:
+   PACKAGE_VERSION_MAJOR
+   PACKAGE_VERSION_MINOR
+   PACKAGE_VERSINO_RELEASE
 
-#define _U4_VER_MAJOR_		4
-#define _U4_VER_MINOR_		0
-#define _U4_VER_RELEASE_	0
-#define _U4_VER_REVISION_	"3295b424b4d0"
+   Generic, possibly useful macros:
+   PACKAGE the name of this package
+   PACKAGE_VERSION the version as a string
+ */
+
+/**
+   Do not confuse config.h with config.hpp.
+   This config.h is the information that ./configure
+   transfers to us.
+*/
+extern "C"
+{
+#include "config.h"
+}
+
+/**
+   The PACKAGE_CHANGESET macro is available if the HAVE_PACKAGE_CHANGESET
+   macro is defined. You must confirm that HAVE_PACKAGE_CHANGESET is set
+   before just using PACKAGE_CHANGESET because releases will not need or
+   use the PACKAGE_CHANGESET macro because they are...  releases!
+ */
+#ifdef HAVE_PACKAGE_CHANGESET
+#include "hgrev.hpp"
+#endif
+
+/**
+   A replacement for PACKAGE_STRING which contains no spaces
+ */
+#define PACKAGE_VERSTR 		PACKAGE_TARNAME "-" PACKAGE_VERSION
+#define PACKAGE_PATCHLEVEL		"+alpha_hgrev-tip"
 
 #endif /* _UNREALIRCD_VERSION_HPP */

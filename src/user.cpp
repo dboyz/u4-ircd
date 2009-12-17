@@ -83,7 +83,7 @@ void UnrealUser::auth()
 				<< AFUser
 				<< AFDNS;
 
-	send("NOTICE AUTH :*** Looking up your hostname");
+	send(":%s NOTICE AUTH :*** Looking up your hostname", cfg.get("Me/ServerName").c_str());
 
 	/* resolve remote host */
 	resolveHostname();
@@ -164,7 +164,7 @@ void UnrealUser::checkRemoteIdent()
 {
 	UnrealSocket* sptr = new UnrealSocket(unreal->ios_pool.getIOService());
 
-	send("NOTICE AUTH :*** Checking Ident");
+	send(":%s NOTICE AUTH :*** Checking Ident", cfg.get("Me/ServerName").c_str());
 
 	sptr->onConnected
 		.connect(boost::bind(&UnrealUser::handleIdentCheckConnected,
@@ -207,7 +207,7 @@ void UnrealUser::destroyIdentRequest()
 {
 	UnrealSocket* sptr = 0;
 
-	send("NOTICE AUTH :Destroying Ident request...");
+	send(":%s NOTICE AUTH :Destroying Ident request...", cfg.get("Me/ServerName").c_str());
 
 	if (icheck_queries.contains(this))
 	{
@@ -232,7 +232,7 @@ void UnrealUser::destroyIdentRequest()
 	if (auth_flags_.value() == 0)
 		sendPing();
 
-	send("NOTICE AUTH :Ident request destroyed.");
+	send(":%s NOTICE AUTH :Ident request destroyed.", cfg.get("Me/ServerName").c_str());
 }
 
 void UnrealUser::exit(const UnrealSocket::ErrorCode& ec)
@@ -328,7 +328,7 @@ void UnrealUser::handleIdentCheckConnected(UnrealSocket* sptr)
 {
 	String request_str;
 
-	send("NOTICE AUTH :Connected to your ident server, requesting username...");
+	send(":%s NOTICE AUTH :Connected to your ident server, requesting username...", cfg.get("Me/ServerName").c_str());
 
 	request_str.sprintf("%d, %d",
 		socket_->remote_endpoint().port(),
@@ -348,7 +348,7 @@ void UnrealUser::handleIdentCheckConnected(UnrealSocket* sptr)
 void UnrealUser::handleIdentCheckError(UnrealSocket* sptr,
 	const UnrealSocket::ErrorCode& ec)
 {
-	send("NOTICE AUTH :*** No ident response");
+	send(":%s NOTICE AUTH :*** No ident response", cfg.get("Me/ServerName").c_str());
 	destroyIdentRequest();
 }
 
@@ -403,9 +403,9 @@ void UnrealUser::handleIdentCheckRead(UnrealSocket* sptr, String& data)
 	}
 
 	if (haveError)
-		send("NOTICE AUTH :*** No valid ident response");
+		send(":%s NOTICE AUTH :*** No valid ident response", cfg.get("Me/ServerName").c_str());
 	else
-		send("NOTICE AUTH :*** Got ident response");
+		send(":%s NOTICE AUTH :*** Got ident response", cfg.get("Me/ServerName").c_str());
 
 	destroyIdentRequest();
 }
@@ -421,7 +421,7 @@ void UnrealUser::handleResolveResponse(const UnrealResolver::ErrorCode& ec,
 {
 	if (ec)
 	{
-		send("NOTICE AUTH :Couldn't look up your hostname");
+		send(":%s NOTICE AUTH :Couldn't look up your hostname", cfg.get("Me/ServerName").c_str());
 	}
 	else
 	{
@@ -431,7 +431,8 @@ void UnrealUser::handleResolveResponse(const UnrealResolver::ErrorCode& ec,
 		setRealHostname(tmp);
 
 		/* let the user know about the success */
-		send(tmp.sprintf("NOTICE AUTH :*** Retrieved hostname (%s)",
+		send(tmp.sprintf(":%s NOTICE AUTH :*** Retrieved hostname (%s)",
+                cfg.get("Me/ServerName").c_str(),
 				hostname_.c_str()));
 	}
 

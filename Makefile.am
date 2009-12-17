@@ -267,8 +267,8 @@ endif
 
 include/hgrev.hpp: .hg/dirstate
 	cd $(top_srcdir)
-	printf \#define\ PACKAGE_CHANGESET\  > $(top_srcdir)/include/hgrev.hpp
-	hg id -i >> $(top_srcdir)/include/hgrev.hpp
+	echo \#define\ PACKAGE_CHANGESET\ \"$(hg -R $(top_srcdir) id -i)\" > $(top_srcdir)/include/hgrev.hpp
+
 
 # there must be something cleaner than this.
 # there must be some type of Makefile-time

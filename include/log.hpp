@@ -31,7 +31,7 @@
 class UnrealLog
 {
 public:
-	enum LogLevel { Normal, Debug };
+	enum LogLevel { Fatal, Error, Normal, Debug };
 
 public:
 	UnrealLog(const String& filename = String());
@@ -45,6 +45,9 @@ public:
 
 	UnrealLog& operator<<(const String& str);
 	UnrealLog& operator<<(LogLevel ll);
+
+private:
+	String levelToStr(LogLevel ll);
 
 private:
 	/** log file name */

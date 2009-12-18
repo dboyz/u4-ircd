@@ -100,6 +100,7 @@ public:
 	const String& realname();
 	void registerUser();
 	void send(const String& data);
+	void send(const char* fmt, ...);
 	void sendISupport();
 	void sendlocalreply(const String& cmd, const String& data);
 	void sendreply(IRCNumeric numeric, const String& data);

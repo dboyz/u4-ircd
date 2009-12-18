@@ -120,6 +120,7 @@ private:
 	void printVersion();
 	void setupISupport();
 	void setupListener();
+	void setupRlimit();
 	void setupServer();
 
 private:

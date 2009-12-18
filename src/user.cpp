@@ -24,7 +24,10 @@
 
 #include "base.hpp"
 #include "cmdmap.hpp"
+#include "limits.hpp"
 #include "user.hpp"
+#include <cstdarg>
+#include <cstdio>
 #include <iostream>
 
 /** ident check query map */
@@ -83,7 +86,8 @@ void UnrealUser::auth()
 				<< AFUser
 				<< AFDNS;
 
-	send(":%s NOTICE AUTH :*** Looking up your hostname", cfg.get("Me/ServerName").c_str());
+	send(":%s NOTICE AUTH :*** Looking up your hostname",
+	    unreal->config.get("Me/ServerName").c_str());
 
 	/* resolve remote host */
 	resolveHostname();
@@ -164,7 +168,8 @@ void UnrealUser::checkRemoteIdent()
 {
 	UnrealSocket* sptr = new UnrealSocket(unreal->ios_pool.getIOService());
 
-	send(":%s NOTICE AUTH :*** Checking Ident", cfg.get("Me/ServerName").c_str());
+	send(":%s NOTICE AUTH :*** Checking Ident",
+	    unreal->config.get("Me/ServerName").c_str());
 
 	sptr->onConnected
 		.connect(boost::bind(&UnrealUser::handleIdentCheckConnected,
@@ -207,7 +212,8 @@ void UnrealUser::destroyIdentRequest()
 {
 	UnrealSocket* sptr = 0;
 
-	send(":%s NOTICE AUTH :Destroying Ident request...", cfg.get("Me/ServerName").c_str());
+	send(":%s NOTICE AUTH :Destroying Ident request...",
+	    unreal->config.get("Me/ServerName").c_str());
 
 	if (icheck_queries.contains(this))
 	{
@@ -232,7 +238,8 @@ void UnrealUser::destroyIdentRequest()
 	if (auth_flags_.value() == 0)
 		sendPing();
 
-	send(":%s NOTICE AUTH :Ident request destroyed.", cfg.get("Me/ServerName").c_str());
+	send(":%s NOTICE AUTH :Ident request destroyed.",
+	    unreal->config.get("Me/ServerName").c_str());
 }
 
 void UnrealUser::exit(const UnrealSocket::ErrorCode& ec)
@@ -328,7 +335,8 @@ void UnrealUser::handleIdentCheckConnected(UnrealSocket* sptr)
 {
 	String request_str;
 
-	send(":%s NOTICE AUTH :Connected to your ident server, requesting username...", cfg.get("Me/ServerName").c_str());
+	send(":%s NOTICE AUTH :Connected to your ident server, requesting "
+	    "username...", unreal->config.get("Me/ServerName").c_str());
 
 	request_str.sprintf("%d, %d",
 		socket_->remote_endpoint().port(),
@@ -348,7 +356,9 @@ void UnrealUser::handleIdentCheckConnected(UnrealSocket* sptr)
 void UnrealUser::handleIdentCheckError(UnrealSocket* sptr,
 	const UnrealSocket::ErrorCode& ec)
 {
-	send(":%s NOTICE AUTH :*** No ident response", cfg.get("Me/ServerName").c_str());
+	send(":%s NOTICE AUTH :*** No ident response",
+	    unreal->config.get("Me/ServerName").c_str());
+
 	destroyIdentRequest();
 }
 
@@ -403,9 +413,11 @@ void UnrealUser::handleIdentCheckRead(UnrealSocket* sptr, String& data)
 	}
 
 	if (haveError)
-		send(":%s NOTICE AUTH :*** No valid ident response", cfg.get("Me/ServerName").c_str());
+		send(":%s NOTICE AUTH :*** No valid ident response",
+		    unreal->config.get("Me/ServerName").c_str());
 	else
-		send(":%s NOTICE AUTH :*** Got ident response", cfg.get("Me/ServerName").c_str());
+		send(":%s NOTICE AUTH :*** Got ident response",
+		    unreal->config.get("Me/ServerName").c_str());
 
 	destroyIdentRequest();
 }
@@ -421,7 +433,8 @@ void UnrealUser::handleResolveResponse(const UnrealResolver::ErrorCode& ec,
 {
 	if (ec)
 	{
-		send(":%s NOTICE AUTH :Couldn't look up your hostname", cfg.get("Me/ServerName").c_str());
+		send(":%s NOTICE AUTH :Couldn't look up your hostname",
+		    unreal->config.get("Me/ServerName").c_str());
 	}
 	else
 	{
@@ -431,9 +444,9 @@ void UnrealUser::handleResolveResponse(const UnrealResolver::ErrorCode& ec,
 		setRealHostname(tmp);
 
 		/* let the user know about the success */
-		send(tmp.sprintf(":%s NOTICE AUTH :*** Retrieved hostname (%s)",
-                cfg.get("Me/ServerName").c_str(),
-				hostname_.c_str()));
+		send(":%s NOTICE AUTH :*** Retrieved hostname (%s)",
+                unreal->config.get("Me/ServerName").c_str(),
+				hostname_.c_str());
 	}
 
 	/* remove the previously allocated resolver */
@@ -998,6 +1011,23 @@ void UnrealUser::schedulePingTimeout()
 void UnrealUser::send(const String& data)
 {
 	socket_->write(data);
+}
+
+/**
+ * Send data to the client, printf-style version.
+ *
+ * @param fmt Formatted data to send
+ */
+void UnrealUser::send(const char* fmt, ...)
+{
+	char buffer[_U4_BUFSIZE_];
+	va_list ap;
+
+	va_start(ap, fmt);
+	std::vsnprintf(buffer, sizeof(buffer), fmt, ap);
+	va_end(ap);
+
+	socket_->write(buffer);
 }
 
 /**

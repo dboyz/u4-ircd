@@ -24,6 +24,7 @@
 
 #include "string.hpp"
 #include "stringlist.hpp"
+#include <cstdio>
 #include <cstdarg>
 #include <sstream>
 #include <iostream>
@@ -179,7 +180,7 @@ String String::format(const char* fmt, ...)
 	va_list vl;
 
 	va_start(vl, fmt);
-	vsnprintf(buffer, SPRINTF_BUFFER_SIZE, fmt, vl);
+	std::vsnprintf(buffer, SPRINTF_BUFFER_SIZE, fmt, vl);
 	va_end(vl);
 
 	return buffer;
@@ -287,7 +288,7 @@ String& String::sprintf(const char* fmt, ...)
 	va_list vl;
 
 	va_start(vl, fmt);
-	vsnprintf(buffer, SPRINTF_BUFFER_SIZE, fmt, vl);
+	std::vsnprintf(buffer, SPRINTF_BUFFER_SIZE, fmt, vl);
 	va_end(vl);
 
 	assign(buffer);
@@ -389,6 +390,15 @@ String String::toLower()
 			*s = *s + 32;
 
 	return buf;
+}
+
+/**
+ * Convert string to size_t. size_t is usually defined as 64bit wide on 64bit
+ * platforms.
+ */
+size_t String::toSize()
+{
+	return toGenericType<size_t>();
 }
 
 /**

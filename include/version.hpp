@@ -63,6 +63,6 @@ extern "C"
    A replacement for PACKAGE_STRING which contains no spaces
  */
 #define PACKAGE_VERSTR 		PACKAGE_TARNAME "-" PACKAGE_VERSION
-#define PACKAGE_PATCHLEVEL		"+alpha_hgrev-tip"
+#define PACKAGE_PATCHLEVEL	"+alpha_hgrev-tip"
 
 #endif /* _UNREALIRCD_VERSION_HPP */

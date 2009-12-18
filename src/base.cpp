@@ -26,6 +26,7 @@
 #include "limits.hpp"
 #include <cstdlib>
 #include <iostream>
+#include <sys/resource.h>
 
 /** global UnrealBase object */
 UnrealBase* unreal = 0;
@@ -61,10 +62,8 @@ UnrealBase::UnrealBase(int cnt, char** vec)
 	initModes();
 
 	/* setup IO service pool */
-	size_t io_pool_size = static_cast<size_t>(
-			config.get("Me/IOPoolSize", "1").toUInt());
-	size_t io_threads = static_cast<size_t>(
-			config.get("Me/Threads", "0").toUInt());
+	size_t io_pool_size = config.get("Me/IOPoolSize", "1").toSize();
+	size_t io_threads = config.get("Me/Threads", "0").toSize();
 
 	if (ios_pool.size() == 0)
 	{
@@ -76,6 +75,9 @@ UnrealBase::UnrealBase(int cnt, char** vec)
 			|| ios_pool.threads() != io_threads)
 		ios_pool.resize(io_threads, io_pool_size);
 
+	/* fix resource limits */
+	setupRlimit();
+	
 	/* setup Listeners */
 	setupListener();
 
@@ -152,9 +154,9 @@ void UnrealBase::checkConfig()
  */
 void UnrealBase::checkPermissions()
 {
-	if (getuid() == 0)
+	if (getuid() == 0 || getgid() == 0)
 	{
-		std::cerr << "Fatal: Operation as root is not permitted."
+		std::cerr << "Fatal: Operation as root UID/GID is not permitted."
 				  << std::endl;
 		exit(1);
 	}
@@ -176,7 +178,11 @@ void UnrealBase::exit(int code)
  */
 void UnrealBase::finish()
 {
-	//...
+	for (List<UnrealListener*>::Iterator li = listeners.begin();
+			li != listeners.end(); ++li)
+	{
+		delete *li;
+	}
 }
 
 /**
@@ -220,8 +226,7 @@ void UnrealBase::initLog()
  */
 void UnrealBase::initModes()
 {
-	/* user modes */
-	if (true)
+	/* user modes; using an own scope */
 	{
 		using namespace UnrealUserProperties;
 
@@ -233,7 +238,6 @@ void UnrealBase::initModes()
 	}
 
 	/* channel modes */
-	if (true)
 	{
 		using namespace UnrealChannelProperties;
 
@@ -279,7 +283,8 @@ void UnrealBase::initModules()
 		}
 		else
 		{
-			log.write(UnrealLog::Debug, "Loading Module \"%s\"", (*miter).c_str());
+			log.write(UnrealLog::Debug, "Loading Module \"%s\"",
+			    (*miter).c_str());
 
 			/* add to module list */
 			modules << mptr;
@@ -350,25 +355,25 @@ void UnrealBase::printUsage()
 {
 	std::cout << "Usage: "
 			  << argv.at(0)
-			  << " [ -Cchv [ arguments ] ]"
+			  << " [ -CchiPv [ arguments ] ]"
 			  << std::endl
 			  << std::endl;
 	std::cout << "Available arguments:"
 			  << std::endl;
-	std::cout << "  -C, --check-config         Check your configuration file"
+	std::cout << "  -C, --check-config       Check your configuration file"
 			  << std::endl;
-	std::cout << "  -c, --config-file FILE     Specify an alternative config file"
+	std::cout << "  -c, --config-file FILE   Specify an alternative config file"
 			  << std::endl
-			  << "                             Default: "
+			  << "                           Default: "
 			  << CONFIG_DEFAULT_FILE
 			  << std::endl;
-	std::cout << "  -h, --help                 Print this overview"
+	std::cout << "  -h, --help               Print this overview"
 			  << std::endl;
-	std::cout << "  -i, --interactive          Don't daemonize"
+	std::cout << "  -i, --interactive        Don't daemonize"
 			  << std::endl;
-	std::cout << "  -P, --print-config         Print config map contents"
+	std::cout << "  -P, --print-config       Print config map contents"
 			  << std::endl;
-	std::cout << "  -v, --version              Print the program version"
+	std::cout << "  -v, --version            Print the program version"
 			  << std::endl;
 
 	exit();
@@ -386,11 +391,13 @@ void UnrealBase::printConfig()
 
 	for (; ci != cmap.end(); ci++)
 	{
-		std::cout << ci->first << "\n  => \"" << ci->second << "\"\n";
+		std::cout << ci->first << "\n  => String("
+		    << ci->second.length() << ") \"" << ci->second << "\"\n";
 	}
 
 	exit();
 }
+
 /**
  * Print the program version.
  */
@@ -521,6 +528,59 @@ void UnrealBase::setupListener()
 
 		/* append listener to list */
 		listeners << lptr;
+	}
+}
+
+/**
+ * Check and fix resource limits as provided by the operating system.
+ * That includes increasing the number of permitted open file descriptors
+ * to the value of Me::MaxConnections, if specified in the configuration file.
+ */
+void UnrealBase::setupRlimit()
+{
+	struct rlimit rlcore, rlnfiles;
+
+	rlcore.rlim_cur = RLIM_INFINITY;
+	if (setrlimit(RLIMIT_CORE, &rlcore) == -1)
+		log.write(UnrealLog::Fatal, "Couldn't update core resource limit");
+
+	/* fetch the maximum number of permitted open files */
+	if (getrlimit(RLIMIT_NOFILE, &rlnfiles) == -1)
+		log.write(UnrealLog::Fatal, "Couldn't get file descriptor limit");
+	else
+	{
+		size_t max_connections = config.get("Me/MaxConnections", "0").toSize();
+
+		if (rlnfiles.rlim_max < max_connections)
+		{
+			log.write(UnrealLog::Fatal, "Me::MaxConnections (%d) exceeds the "
+			    "resource limit on this system (%d). Please decrease the value "
+			    "in your configuration file.",
+			    max_connections,
+			    rlnfiles.rlim_max);
+		}
+
+		if (rlnfiles.rlim_cur < max_connections)
+		{
+			/* try to increase */
+			rlim_t old_lim = rlnfiles.rlim_cur;
+			rlnfiles.rlim_cur = rlnfiles.rlim_max;
+
+			if (setrlimit(RLIMIT_NOFILE, &rlnfiles) == -1)
+			{
+				log.write(UnrealLog::Fatal, "Couldn't update resource limit "
+				    "for the number of open file descriptors to %d: %s",
+				    rlnfiles.rlim_max,
+				    strerror(errno));
+			}
+			else
+			{
+				log.write(UnrealLog::Debug, "Increased rlimit for open file "
+				    "descriptors (%d) -> (%d)",
+				    old_lim,
+				    rlnfiles.rlim_cur);
+			}
+		}
 	}
 }
 

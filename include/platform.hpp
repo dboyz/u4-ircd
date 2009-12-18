@@ -31,44 +31,42 @@
 
 // OS related
 #if defined(_WIN32)
-
-#	include <windows.h>
-
-#	define OS_WINDOWS
-
-#	if defined(_WIN64)
-#		define OS_WIN64
-#	else
-#		define OS_WIN32
-#	endif
+#include <windows.h>
+#define OS_WINDOWS
+#if defined(_WIN64)
+#define OS_WIN64
+#else
+#define OS_WIN32
+#endif
 
 #elif defined(__linux__) || defined(__linux)
-
-	#define OS_LINUX
-
+#define OS_LINUX
+// TODO: include epoll/poll/select reactor
+#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+#if defined(__FreeBSD__)
+#define OS_FREEBSD
+#elif defined(__NetBSD__)
+#define OS_NETBSD
+#elif defined(__OpenBSD__)
+#define OS_OPENBSD
+#endif
+// TODO: include kqueue reactor
 #endif
 
 // compiler
 #if defined(_MSC_VER)
-
-	#define COMPILER_MSVC
-
-	typedef __int8 int8_t;
-	typedef __int16 int16_t;
-	typedef __int32 int32_t;
-	typedef __int64 int64_t;
-
-	typedef unsigned __int8 uint8_t;
-	typedef unsigned __int16 uint16_t;
-	typedef unsigned __int32 uint32_t;
-	typedef unsigned __int64 uint64_t;
-
+#define COMPILER_MSVC
+typedef __int8 int8_t;
+typedef __int16 int16_t;
+typedef __int32 int32_t;
+typedef __int64 int64_t;
+typedef unsigned __int8 uint8_t;
+typedef unsigned __int16 uint16_t;
+typedef unsigned __int32 uint32_t;
+typedef unsigned __int64 uint64_t;
 #elif defined(__GNUC__)
-
-	#define COMPILER_GCC
-
-	#include <inttypes.h>
-
+#define COMPILER_GCC
+#include <inttypes.h>
 #endif
 
 #endif /* _UNREALIRCD_PLATFORM_HPP */

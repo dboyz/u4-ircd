@@ -75,6 +75,7 @@ public:
 	int32_t toInt32();
 	int64_t toInt64();
 	String toLower();
+	size_t toSize();
 	uint32_t toUInt();
 	uint8_t toUInt8();
 	uint16_t toUInt16();

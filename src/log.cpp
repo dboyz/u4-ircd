@@ -63,6 +63,29 @@ const String& UnrealLog::fileName()
 }
 
 /**
+ * Return a readable version of the loglevel.
+ *
+ * @param ll Loglevel
+ * @return Readable string
+ */
+String UnrealLog::levelToStr(LogLevel ll)
+{
+	switch (ll)
+	{
+		case Fatal:
+			return "FATAL";
+		case Error:
+			return "ERROR";
+		case Normal:
+			return "";
+		case Debug:
+			return "***";
+		default:
+			return "";
+	}
+}
+
+/**
  * Open the log file.
  *
  * @return true if the file is opened successfully, otherwise false
@@ -101,7 +124,8 @@ void UnrealLog::write(LogLevel level, const char* fmt, ...)
 	static char buffer[2048];
 	va_list vl;
 
-	if (level > level_)
+	/* always print error/fatal messages */
+	if (level > level_ && (level != Error && level != Fatal))
 		return;
 
 	va_start(vl, fmt);
@@ -116,7 +140,9 @@ void UnrealLog::write(LogLevel level, const char* fmt, ...)
 	if (stream_.good())
 	{
 		stream_ << timeFmt
-				<< "  "
+				<< " "
+				<< levelToStr(level)
+				<< " "
 				<< buffer
 				<< std::endl;
 	}
@@ -125,10 +151,16 @@ void UnrealLog::write(LogLevel level, const char* fmt, ...)
 	if (unreal->fstate() != UnrealBase::Daemonized)
 	{
 		std::cout << timeFmt
-				  << "  "
+				  << " "
+				  << levelToStr(level)
+				  << " "
 				  << buffer
 				  << std::endl;
 	}
+
+	/* Fatal errors always have to terminate the program execution */
+	if (level == Fatal)
+		unreal->exit(1);
 }
 
 /**

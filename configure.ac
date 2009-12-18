@@ -26,7 +26,7 @@ AC_PREREQ([2.13])
 AC_INIT([unrealircd-cpp], [4.0.0], [http://bugs.unrealircd.org/])
 AC_CONFIG_SRCDIR([src/unreal.cpp])
 AC_CONFIG_HEADERS([include/config.h])
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([1.11])
 
 # VCS or includes/hgrev.hpp
 AM_CONDITIONAL([VCS],[test -e .hg])
@@ -70,5 +70,6 @@ AC_HEADER_STDBOOL
 
 # Checks for library functions.
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile
+src/cmd/Makefile])
 AC_OUTPUT

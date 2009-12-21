@@ -28,13 +28,13 @@
 #include "channel.hpp"
 #include "command.hpp"
 #include "config.hpp"
-#include "ioservicepool.hpp"
 #include "isupport.hpp"
 #include "list.hpp"
 #include "listener.hpp"
 #include "log.hpp"
 #include "map.hpp"
 #include "module.hpp"
+#include "reactorpool.hpp"
 #include "server.hpp"
 #include "stats.hpp"
 #include "string.hpp"
@@ -77,8 +77,8 @@ public:
 	/** list with modules */
 	List<UnrealModule*> modules;
 
-	/** IO service pool */
-	UnrealIOServicePool ios_pool;
+	/** Reactor pool */
+	UnrealReactorPool rpool;
 
 	/** list with listeners */
 	List<UnrealListener*> listeners;

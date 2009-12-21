@@ -25,6 +25,7 @@
 #ifndef _UNREALIRCD_EPOLL_HPP
 #define _UNREALIRCD_EPOLL_HPP
 
+#include "binder.hpp"
 #include "map.hpp"
 #include "platform.hpp"
 #include "reactor.hpp"
@@ -36,16 +37,24 @@ class UnrealEpollReactor
 	: public UnrealGenericReactor
 {
 public:
+	/** callback type definition */
+	typedef UnrealBinder2<
+		UnrealEpollReactor,
+		int,
+		uint32_t,
+		void> CallbackType;
+
+public:
 	UnrealEpollReactor();
 	~UnrealEpollReactor();
 	void dispatch();
-	bool observe(int fd, CallbackType* cb, 
+	bool observe(int fd, CallbackType cbptr, 
 	    uint32_t events = EventError | EventIn);
 	void run();
 	void stop();
 	bool stop(int fd);
 	uint32_t translateEvents(TranslationFlag ot, uint32_t ev);
-	String type();
+	static String type();
 
 private:
 	/** file descriptor for epoll_create() */
@@ -61,7 +70,7 @@ private:
 	bool active_;
 
 	/** callback vector */
-	Map<int, CallbackType*> callbacks_;
+	Map<int, CallbackType> callbacks_;
 };
 
 /* typedef the reactor */

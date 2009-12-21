@@ -24,6 +24,7 @@
 
 #include "base.hpp"
 #include "limits.hpp"
+#include "reactor.hpp"
 #include <cstdlib>
 #include <iostream>
 #include <sys/resource.h>
@@ -61,19 +62,18 @@ UnrealBase::UnrealBase(int cnt, char** vec)
 	/* initialize mode tables */
 	initModes();
 
-	/* setup IO service pool */
-	size_t io_pool_size = config.get("Me/IOPoolSize", "1").toSize();
-	size_t io_threads = config.get("Me/Threads", "0").toSize();
+	/* setup reactor pool */
+	size_t reactor_pool_size = config.get("Me/ReactorPoolSize", "1").toSize();
+	size_t reactor_threads = config.get("Me/Threads", "0").toSize();
 
-	if (ios_pool.size() == 0)
+	if (reactor_pool_size == 0)
 	{
-		log << UnrealLog::Normal
-			<< "Critical: IOPoolSize is set to 0, exiting. Please increase "
-			   "that value in your server configuration file.";
+		log.write(UnrealLog::Fatal, "Me::ReactorPoolSize is set to 0, exiting. "
+		    "Please increase that value in your server configuration file");
 	}
-	else if (ios_pool.size() != io_pool_size
-			|| ios_pool.threads() != io_threads)
-		ios_pool.resize(io_threads, io_pool_size);
+	else if (rpool.size() != reactor_pool_size
+			|| rpool.threads() != reactor_threads)
+		rpool.resize(reactor_threads, reactor_pool_size);
 
 	/* fix resource limits */
 	setupRlimit();
@@ -411,6 +411,9 @@ void UnrealBase::printVersion()
 			  << " "
 			  << __TIME__
 			  << std::endl;
+	std::cout << "Using event reactor: "
+			  << UnrealReactor::type()
+			  << std::endl;
 	std::cout << "Copyright (c) 2009 The UnrealIRCd Project" << std::endl;
 	std::cout << "http://www.unrealircd.com" << std::endl << std::endl;
 
@@ -427,7 +430,7 @@ void UnrealBase::printVersion()
  */
 void UnrealBase::run()
 {
-	ios_pool.run();
+	rpool.run();
 }
 
 /**
@@ -508,7 +511,7 @@ void UnrealBase::setupListener()
 			"1024").toUInt();
 
 		/* Setup the Listener */
-		UnrealListener* lptr = new UnrealListener(ios_pool.getIOService(),
+		UnrealListener* lptr = new UnrealListener(rpool.getReactor(),
 				addr, port.toUInt16());
 		UnrealListener::ListenerType ltype;
 

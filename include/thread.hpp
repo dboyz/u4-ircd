@@ -1,7 +1,7 @@
 /*****************************************************************
  * Unreal Internet Relay Chat Daemon, Version 4
- * File         timer.hpp
- * Description  Asyncronous timing events
+ * File         thread.hpp
+ * Description  Thread wrapper implementation
  *
  * All parts of this program are Copyright(C) 2009 by their
  * respective authors and the UnrealIRCd development team.
@@ -22,15 +22,9 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#ifndef _UNREALIRCD_TIMER_HPP
-#define _UNREALIRCD_TIMER_HPP
+#ifndef _UNREALIRCD_THREAD_HPP
+#define _UNREALIRCD_THREAD_HPP
 
-#include "reactor.hpp"
+#include "pthread.hpp"
 
-class UnrealTimer
-{
-public:
-	UnrealTimer(UnrealReactor& reactor);
-};
-
-#endif /* _UNREALIRCD_TIMER_HPP */
+#endif /* _UNREALIRCD_THREAD_HPP */

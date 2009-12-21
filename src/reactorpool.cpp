@@ -23,9 +23,9 @@
  ******************************************************************/
 
 #include "base.hpp"
+#include "binder.hpp"
 #include "reactorpool.hpp"
 #include <assert.h>
-#include <boost/thread.hpp>
 #include <iostream>
 
 /**
@@ -108,41 +108,28 @@ void UnrealReactorPool::resize(size_t nthreads, size_t nr)
 /**
  * Thread all reactors to work in background.
  */
-void UnrealIOServicePool::run()
+void UnrealReactorPool::run()
 {
-/*
 	List<ThreadPtr> threads;
-	size_t ios_pos = 0;
+	size_t reactor_pos = 0;
 
-	try
+	for (size_t i = 0; i < threads_size_; i++)
 	{
-		for (size_t i = 0; i < threads_size_; i++)
-		{
-			ThreadPtr thread(new boost::thread(
-				boost::bind(&UnrealIOService::run, io_services_[ios_pos])));
+		ThreadPtr thread(new UnrealThread(
+		    UnrealBinder0(&UnrealReactor::run, &reactors_[reactor_pos])));
 
-			threads << thread;
+		/* add to thread list */
+		threads << thread;
 
-			ios_pos++;
-
-			if (ios_pos >= io_services_.size())
-				ios_pos = 0;
-		}
-
-		for (size_t i = 0; i < threads.size(); i++)
-			threads[i]->join();
-
-		if (threads_size_ == 0)
-			io_services_[0]->run();
+		if (reactor_pos >= reactors_.size())
+			reactor_pos = 0;
 	}
-	catch (std::exception& ex)
-	{
-		unreal->log.write(UnrealLog::Normal, "Exception: [%s] - %s",
-				__PRETTY_FUNCTION__,
-				ex.what());
-	}
-*/
-	reactors_[0].run();
+
+	for (size_t i = 0; i < threads.size(); i++)
+		threads[i]->join();
+
+	if (threads_size_ == 0)
+		reactors_[0].run();
 }
 
 /**

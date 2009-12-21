@@ -1,7 +1,7 @@
 /*****************************************************************
  * Unreal Internet Relay Chat Daemon, Version 4
- * File         timer.hpp
- * Description  Asyncronous timing events
+ * File         pthread.cpp
+ * Description  Posix threads
  *
  * All parts of this program are Copyright(C) 2009 by their
  * respective authors and the UnrealIRCd development team.
@@ -22,15 +22,24 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#ifndef _UNREALIRCD_TIMER_HPP
-#define _UNREALIRCD_TIMER_HPP
+#include "pthread.hpp"
 
-#include "reactor.hpp"
-
-class UnrealTimer
+UnrealPosixThread::~UnrealPosixThread()
 {
-public:
-	UnrealTimer(UnrealReactor& reactor);
-};
+	if (!joined_)
+		::pthread_detach(&native_);
+}
 
-#endif /* _UNREALIRCD_TIMER_HPP */
+void UnrealPosixThread::join()
+{
+	if (!joined_)
+	{
+		::pthread_join(&native_, 0);
+		joined_ = true;
+	}
+}
+
+String UnrealPosixThread::type()
+{
+	return "pthreads";
+}

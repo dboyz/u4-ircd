@@ -23,8 +23,8 @@
  ******************************************************************/
 
 #include "base.hpp"
-#include "ioservice.hpp"
 #include "resolver.hpp"
+#include "reactor.hpp"
 #include "socket.hpp"
 #include <iostream>
 
@@ -36,8 +36,7 @@ Map<UnrealSocket*, UnrealResolver*> resolver_queries;
  *
  * @param io_service I/O service to attach event notification calls to
  */
-UnrealSocket::UnrealSocket(UnrealIOService& ios)
-	: tcp::socket(ios), strand_(ios)
+UnrealSocket::UnrealSocket(UnrealReactor& reactor)
 { }
 
 /**

@@ -27,11 +27,8 @@
 
 #include "list.hpp"
 #include "reactor.hpp"
-/*
-#include <boost/asio.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/thread.hpp>
-*/
+#include "thread.hpp"
+#include <memory>
 
 /** default amount of threads */
 #define REACTORPOOL_DEFAULT_THREADS	1
@@ -55,6 +52,10 @@ public:
 	size_t size();
 	void stop();
 	size_t threads();
+
+private:
+	/** alias thread ptr */
+	typedef std::auto_ptr<UnrealThread> ThreadPtr;
 
 private:
 	/** reactor pool */

@@ -25,7 +25,6 @@
 #ifndef _UNREALIRCD_LISTENER_HPP
 #define _UNREALIRCD_LISTENER_HPP
 
-#include "ioservice.hpp"
 #include "list.hpp"
 #include "reactor.hpp"
 #include "socket.hpp"

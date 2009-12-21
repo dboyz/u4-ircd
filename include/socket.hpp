@@ -25,16 +25,12 @@
 #ifndef _UNREALIRCD_SOCKET_HPP
 #define _UNREALIRCD_SOCKET_HPP
 
-#include "ioservice.hpp"
 #include "limits.hpp"
 #include "map.hpp"
 #include "platform.hpp"
+#include "reactor.hpp"
 #include "resolver.hpp"
 #include "string.hpp"
-#include <boost/asio.hpp>
-#include <boost/signals2.hpp>
-
-using namespace boost::asio::ip;
 
 /**
  * Define a traffic type, that is used to measure how many data
@@ -53,56 +49,18 @@ struct UnrealSocketTrafficType
 };
 
 class UnrealSocket
-	: public tcp::socket
 {
 public:
-	/** alias error code class */
-	typedef boost::system::error_code ErrorCode;
-
-	/** alias the endpoint type */
-	typedef tcp::endpoint Endpoint;
-
-public:
-	UnrealSocket(UnrealIOService& ios);
+	UnrealSocket(UnrealReactor& reactor);
 	~UnrealSocket();
 	bool closeSafe();
-	void connect(Endpoint& endpoint);
 	void connect(const String& hostname, const uint16_t& portnum);
 	void destroyResolverQuery();
 	UnrealSocketTrafficType traffic();
 	void waitForLine();
 	void write(const String& data);
 
-public:
-	/** emitted when a Socket starts connecting */
-	boost::signals2::signal<void(UnrealSocket*)> onConnecting;
-
-	/** emitted when a Socket is connected to the Endpoint */
-	boost::signals2::signal<void(UnrealSocket*)> onConnected;
-
-	/** emitted when a Socket lost the connection */
-	boost::signals2::signal<void(UnrealSocket*)> onDisconnected;
-
-	/** emitted when an Error occured */
-	boost::signals2::signal<void(UnrealSocket*, const ErrorCode&)> onError;
-
-	/** emitted when new data is available for reading */
-	boost::signals2::signal<void(UnrealSocket*, String&)> onRead;
-
 private:
-	void handleConnect(const ErrorCode& ec, UnrealResolver::Iterator ep_iter);
-	void handleRead(const ErrorCode& ec, size_t bytes_read);
-	void handleResolveResponse(const ErrorCode& ec,
-			UnrealResolver::Iterator ep_iter);
-	void handleWrite(const ErrorCode& ec, size_t bytes_written);
-
-private:
-	/** stream buffer */
-	boost::asio::streambuf streambuf_;
-
-	/** strand */
-	boost::asio::io_service::strand strand_;
-
 	/** traffic on the socket */
 	UnrealSocketTrafficType traffic_;
 };

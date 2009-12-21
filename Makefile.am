@@ -64,6 +64,7 @@ pkginclude_HEADERS = \
 	include/module.hpp \
 	include/numeric.hpp \
 	include/platform.hpp \
+	include/pthread.hpp \
 	include/reactor.hpp \
 	include/reactorpool.hpp \
 	include/resolver.hpp \
@@ -72,6 +73,7 @@ pkginclude_HEADERS = \
 	include/stats.hpp \
 	include/string.hpp \
 	include/stringlist.hpp \
+	include/thread.hpp \
 	include/time.hpp \
 	include/timer.hpp \
 	include/user.hpp \
@@ -86,6 +88,7 @@ unrealircd_SOURCES = \
 	src/listener.cpp \
 	src/log.cpp \
 	src/module.cpp \
+	src/pthread.cpp \
 	src/reactorpool.cpp \
 	src/resolver.cpp \
 	src/server.cpp \

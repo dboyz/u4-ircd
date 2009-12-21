@@ -25,6 +25,7 @@
 #ifndef _UNREALIRCD_REACTOR_HPP
 #define _UNREALIRCD_REACTOR_HPP
 
+#include "binder.hpp"
 #include "platform.hpp"
 #include "string.hpp"
 
@@ -54,8 +55,6 @@ public:
 		Native   // output type: native flags
 	};
 
-	typedef void (CallbackType)(int, uint32_t);
-
 public:
 	virtual bool observe(int fd, uint32_t events)
 	{ return false; }
@@ -63,8 +62,19 @@ public:
 	{ return false; }
 	virtual uint32_t translateEvents(TranslationFlag ot, uint32_t ev)
 	{ return -1; }
-	virtual String type()
+	static String type()
 	{ return "(generic)"; }
 };
+
+/**
+ * Include platform-specific event reactor.
+ */
+#include "config.h"
+
+#if defined(EVREACT_EPOLL)
+#include "epoll.hpp"
+#else
+#error No suitable event reactor found
+#endif
 
 #endif /* _UNREALIRCD_REACTOR_HPP */

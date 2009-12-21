@@ -56,6 +56,7 @@ UnrealEpollReactor::UnrealEpollReactor()
  */
 UnrealEpollReactor::~UnrealEpollReactor()
 {
+	stop();
 	close(epoll_fd_);
 	delete[] events_;
 }
@@ -75,6 +76,7 @@ void UnrealEpollReactor::dispatch()
 		ev = &events_[i];
 
 		/* notify callback */
+		//(*callbacks_[ev->data.fd])(1, 12);
 		callbacks_[ev->data.fd](ev->data.fd, ev->events);
 	}
 }
@@ -83,10 +85,11 @@ void UnrealEpollReactor::dispatch()
  * Observe the specified file descriptor for events.
  *
  * @param fd File descriptor to observe
+ * @param cbptr Callback pointer
  * @param events Generic event mask with flags to check for
  * @return True if the event has been registered successfully, otherwise false
  */
-bool UnrealEpollReactor::observe(int fd, CallbackType* cb, uint32_t events)
+bool UnrealEpollReactor::observe(int fd, CallbackType cbptr, uint32_t events)
 {
 	struct epoll_event evs;
 	int ep_result;
@@ -96,7 +99,7 @@ bool UnrealEpollReactor::observe(int fd, CallbackType* cb, uint32_t events)
 	ep_result = epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, fd, &evs);
 
 	if (ep_result == 0)
-		callbacks_.add(fd, cb);
+		callbacks_.add(fd, cbptr);
 
 	return (ep_result == 0);
 }

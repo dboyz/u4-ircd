@@ -1,6 +1,6 @@
 /*****************************************************************
  * Unreal Internet Relay Chat Daemon, Version 4
- * File         ioservicepool.cpp
+ * File         reactorpool.cpp
  * Description  An object representing a set of worker threads
  *
  * All parts of this program are Copyright(C) 2009 by their
@@ -23,90 +23,81 @@
  ******************************************************************/
 
 #include "base.hpp"
-#include "ioservicepool.hpp"
+#include "reactorpool.hpp"
 #include <assert.h>
 #include <boost/thread.hpp>
 #include <iostream>
 
 /**
- * UnrealIOServicePool constructor.
+ * UnrealReactorPool constructor.
  *
- * The IOServicePool allows us to use all CPU cores effectively for
+ * The ReactorPool allows us to use all CPU cores effectively for
  * multithreading.
  *
- * @param threads Number of threads to allocate
- * @param iossize Number of IO services to allocate
+ * @param nthreads Number of threads to allocate
+ * @param nr Number of event reactors to allocate
  */
-UnrealIOServicePool::UnrealIOServicePool(size_t nthreads, size_t nios)
-	: threads_size_(nthreads), next_io_service_(0)
+UnrealReactorPool::UnrealReactorPool(size_t nthreads, size_t nr)
+	: threads_size_(nthreads), next_reactor_(0)
 {
 	assert(nios > 0);
 
 	/* allocate the IO services */
 	for (size_t i = 0; i < nios; i++)
 	{
-		IOServicePtr iosptr(new UnrealIOService());
-		io_services_ << iosptr;
-
-		WorkPtr workptr(new UnrealIOService::Work(*iosptr));
-		works_ << workptr;
+		UnrealReactor react;
+		reactors_ << react;
 	}
 }
 
 /**
- * Returns an IO service from the list to be used.
- * A round-robin scheme distributes work on the IO services.
+ * Returns an reactor from the list to be used.
+ * A round-robin scheme distributes work on the reactors.
  *
- * @return IO service reference
+ * @return Reactor reference
  */
-UnrealIOService& UnrealIOServicePool::getIOService()
+UnrealReactor& UnrealReactorPool::getReactor()
 {
-	UnrealIOService& ios = *io_services_[next_io_service_];
+	UnrealReactor& react = reactors_[next_reactor_];
 
 	/* increment counter */
-	next_io_service_++;
+	next_reactor_++;
 
-	if (next_io_service_ >= io_services_.size())
-		next_io_service_ = 0;
+	if (next_reactor_ >= reactors_.size())
+		next_reactor_ = 0;
 
-	return ios;
+	return react;
 }
 
 /**
- * Resize the number of IO services in pool.
+ * Resize the number of reactors in pool.
  *
  * Please note: If `new_size' is less the current pool size, all current
  * IO services are stopped.
  *
- * @param new_size New pool size
+ * @param nthreads New number of threads
+ * @param nr New number of reactors
  */
-void UnrealIOServicePool::resize(size_t nthreads, size_t nios)
+void UnrealReactorPool::resize(size_t nthreads, size_t nr)
 {
-    if (nios > io_services_.size())
+    if (nios > reactors_.size())
     {
-        size_t diff = nios - io_services_.size();
+        size_t diff = nr - reactors_.size();
 
         for (size_t i = 0; i < diff; i++)
         {
-            IOServicePtr iosptr(new UnrealIOService());
-            io_services_ << iosptr;
-
-            WorkPtr workptr(new UnrealIOService::Work(*iosptr));
-            works_ << workptr;
+			UnrealReactor react;
+			reactors_ << react;
         }
     }
-    else if (nios < io_services_.size())
+    else if (nr < reactors_.size())
     {
-        /* stop all running IO services */
-        stop();
+        size_t diff = reactors_.size() - nr;
 
-        size_t diff = io_services_.size() - nios;
-
-        /* remove the difference amount of IO services */
+        /* remove the difference amount of reactors */
         for (size_t i = 0; i < diff; i++)
         {
-            io_services_.removeFirst();
-            works_.removeFirst();
+            reactors_.removeFirst();
         }
     }
 
@@ -115,14 +106,14 @@ void UnrealIOServicePool::resize(size_t nthreads, size_t nios)
 }
 
 /**
- * Thread all IO services to work in background.
+ * Thread all reactors to work in background.
  */
 void UnrealIOServicePool::run()
 {
+/*
 	List<ThreadPtr> threads;
 	size_t ios_pos = 0;
 
-	/* allocate threads */
 	try
 	{
 		for (size_t i = 0; i < threads_size_; i++)
@@ -130,7 +121,6 @@ void UnrealIOServicePool::run()
 			ThreadPtr thread(new boost::thread(
 				boost::bind(&UnrealIOService::run, io_services_[ios_pos])));
 
-			/* append the thread */
 			threads << thread;
 
 			ios_pos++;
@@ -139,7 +129,6 @@ void UnrealIOServicePool::run()
 				ios_pos = 0;
 		}
 
-		/* wait for all threads in the pool to exit */
 		for (size_t i = 0; i < threads.size(); i++)
 			threads[i]->join();
 
@@ -152,26 +141,28 @@ void UnrealIOServicePool::run()
 				__PRETTY_FUNCTION__,
 				ex.what());
 	}
+*/
+	reactors_[0].run();
 }
 
 /**
- * Returns the current size of allocated IO services.
+ * Returns the current size of allocated reactors.
  *
  * @return Pool size
  */
-size_t UnrealIOServicePool::size()
+size_t UnrealReactorPool::size()
 {
-	return io_services_.size();
+	return reactors_.size();
 }
 
 /**
- * Stop all running IO services.
+ * Stop all running reactors.
  */
-void UnrealIOServicePool::stop()
+void UnrealReactorPool::stop()
 {
-	for (size_t i = 0; i < io_services_.size(); i++)
+	for (size_t i = 0; i < reactors_.size(); i++)
 	{
-		io_services_[i]->stop();
+		reactors_[i].stop();
 	}
 }
 
@@ -180,7 +171,7 @@ void UnrealIOServicePool::stop()
  *
  * @return Amount of running threads
  */
-size_t UnrealIOServicePool::threads()
+size_t UnrealReactorPool::threads()
 {
 	return threads_size_;
 }

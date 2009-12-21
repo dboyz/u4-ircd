@@ -27,6 +27,7 @@
 
 #include "ioservice.hpp"
 #include "list.hpp"
+#include "reactor.hpp"
 #include "socket.hpp"
 #include "string.hpp"
 #include "stringlist.hpp"
@@ -46,7 +47,7 @@ public:
 	typedef boost::system::error_code ErrorCode;
 
 public:
-	UnrealListener(UnrealIOService& ios, const String& address,
+	UnrealListener(UnrealReactor& reactor, const String& address,
 			const uint16_t& port);
 	~UnrealListener();
 
@@ -98,9 +99,6 @@ private:
 
 	/** max amount of connections allowed for this listener */
 	uint32_t max_connections_;
-
-	/** strand */
-	boost::asio::io_service::strand strand_;
 };
 
 #endif /* _UNREALIRCD_LISTENER_HPP */

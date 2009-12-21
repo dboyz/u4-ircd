@@ -54,7 +54,6 @@ pkginclude_HEADERS = \
 	include/command.hpp \
 	include/config.hpp \
 	include/epoll.hpp \
-	include/ioservicepool.hpp \
 	include/isupport.hpp \
 	include/list.hpp \
 	include/listener.hpp \
@@ -66,6 +65,7 @@ pkginclude_HEADERS = \
 	include/numeric.hpp \
 	include/platform.hpp \
 	include/reactor.hpp \
+	include/reactorpool.hpp \
 	include/resolver.hpp \
 	include/server.hpp \
 	include/socket.hpp \
@@ -83,10 +83,10 @@ unrealircd_SOURCES = \
 	src/command.cpp \
 	src/config.cpp \
 	src/epoll.cpp \
-	src/ioservicepool.cpp \
 	src/listener.cpp \
 	src/log.cpp \
 	src/module.cpp \
+	src/reactorpool.cpp \
 	src/resolver.cpp \
 	src/server.cpp \
 	src/socket.cpp \

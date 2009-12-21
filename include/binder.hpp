@@ -62,7 +62,7 @@ template<class ClassType, typename ReturnType = void>
 class UnrealBinder0
 {
 public:
-	UnrealBind0(ReturnType (ClassType::*mf)(), ClassType* cl)
+	UnrealBinder0(ReturnType (ClassType::*mf)(), ClassType* cl)
 			: member_(mf), cl_(cl)
 	{ }
 
@@ -83,7 +83,7 @@ template<class ClassType, typename Arg1Type, typename ReturnType = void>
 class UnrealBinder1
 {
 public:
-	UnrealBind1(ReturnType (ClassType::*mf)(Arg1Type), ClassType* cl)
+	UnrealBinder1(ReturnType (ClassType::*mf)(Arg1Type), ClassType* cl)
 			: member_(mf), cl_(cl)
 	{ }
 
@@ -105,13 +105,25 @@ template<class ClassType, typename Arg1Type, typename Arg2Type,
 class UnrealBinder2
 {
 public:
-	UnrealBind2(ReturnType (ClassType::*mf)(Arg1Type, Arg2Type), ClassType* cl)
+	UnrealBinder2(ReturnType (ClassType::*mf)(Arg1Type, Arg2Type) = NULL,
+	    ClassType* cl = NULL)
 			: member_(mf), cl_(cl)
 	{ }
 
-	ReturnType operator()(Arg1Type arg1, Arg2Type arg2)
+	void bind(ReturnType (ClassType::*mf)(Arg1Type, Arg2Type), ClassType* cl)
 	{
-		(cl_->*member_)(arg1, arg2);
+		member_ = mf;
+		cl_ = cl;
+	}
+
+	inline ReturnType emit(Arg1Type arg1, Arg2Type arg2)
+	{
+		return (cl_->*member_)(arg1, arg2);
+	}
+
+	inline ReturnType operator()(Arg1Type arg1, Arg2Type arg2)
+	{
+		return emit(arg1, arg2);
 	}
 
 private:

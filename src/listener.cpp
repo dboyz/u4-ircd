@@ -36,7 +36,7 @@
  * @param address Address used for binding
  * @param port Port number used for binding
  */
-UnrealListener::UnrealListener(UnrealIOService& ios, const String& address,
+UnrealListener::UnrealListener(UnrealReactor& reactor, const String& address,
 		const uint16_t& port)
 	: tcp::acceptor(ios), type_(LClient),
 	address_(address), port_(port), ping_freq_(0), max_connections_(0),

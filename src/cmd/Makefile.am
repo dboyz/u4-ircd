@@ -24,7 +24,7 @@
 
 AM_DEFAULT_SOURCE_EXT = .cpp
 AM_CPPFLAGS = @BOOST_CPPFLAGS@
-AM_CXXFLAGS = -Wall
+AM_CXXFLAGS = @PTHREAD_CFLAGS@ -Wall
 #AM_CXXFLAGS = -std=c++0x -Wall
 
 # http://www.flameeyes.eu/autotools-mythbuster/libtool/index.html#libtool.plugins.dlopen

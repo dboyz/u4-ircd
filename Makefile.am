@@ -31,12 +31,12 @@ INCLUDES = -I$(top_srcdir)/include
 
 AM_DEFAULT_SOURCE_EXT = .cpp
 AM_CPPFLAGS = @BOOST_CPPFLAGS@
-AM_CXXFLAGS = -Wall
+AM_CXXFLAGS = @PTHREAD_CFLAGS@ -Wall
 #AM_CXXFLAGS = -std=c++0x -Wall
 
 # http://www.flameeyes.eu/autotools-mythbuster/libtool/index.html#libtool.plugins.dlopen
 #AM_LDFLAGS = @BOOST_LDFLAGS@ -module -avoid-version -shared
-LIBS = @LTDL_LIBS@ @BOOST_ASIO_LIB@ @BOOST_SYSTEM_LIB@ @BOOST_THREAD_LIB@ -ldl
+LIBS = @LTDL_LIBS@ @PTHREAD_LIBS@ @BOOST_ASIO_LIB@ @BOOST_SYSTEM_LIB@ @BOOST_THREAD_LIB@ -ldl
 
 #
 # Binaries:

@@ -57,6 +57,13 @@ AC_CHECK_HEADER([ltdl.h],
   [LIBLTDL=])
 AC_SUBST([LTDL_LIBS], [${LIBLTDL}])
 
+# get pthreads
+ACX_PTHREAD([],
+	[
+		AC_MSG_ERROR([I need pthreads])
+	])
+AC_SUBST([CC],[${PTHREAD_CC}])
+
 # boost modules
 AX_BOOST_BASE([1.39])
 AX_BOOST_ASIO

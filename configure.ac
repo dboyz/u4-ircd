@@ -57,14 +57,42 @@ AC_CHECK_HEADER([ltdl.h],
   [LIBLTDL=])
 AC_SUBST([LTDL_LIBS], [${LIBLTDL}])
 
-# get pthreads
+# pthreads
 ACX_PTHREAD([],
 	[
 		AC_MSG_ERROR([I need pthreads])
 	])
 AC_SUBST([CC],[${PTHREAD_CC}])
 
-# boost modules
+#
+# epoll()/select() implementation choice
+#
+
+# epoll()
+AC_ARG_ENABLE([epoll],
+	[AS_HELP_STRING([--enable-epoll], [Choose epoll() for the server's socket ``reactor'' engine (default)])],
+	[enable_epoll=$enableval],
+	[enable_epoll=maybe])
+AX_HAVE_EPOLL([have_epoll=yes],
+	[have_epoll=no
+	AS_IF([test "x$enable_epoll" = "xyes"], 
+		AC_MSG_ERROR([epoll() ``reactor'' selected but not available]))	
+	])
+
+# foo()
+
+AC_MSG_CHECKING([which socket ``reactor'' engine to use])
+# choose impl
+AS_IF([test "x$enable_foo" = "xyes" && test "x$have_foo" = "xyes"],
+		[AC_DEFINE([EVREACT_FOO],[1], [Choose foo as a reactor engine])
+			reactor="foo"],
+	[test "x$enable_epoll" != "xno" && test "x$have_epoll" = "xyes"],
+		[AC_DEFINE([EVREACT_EPOLL],[1], [Choose epoll() as a reactor engine])
+			reactor="epoll()"],
+	[AC_MSG_ERROR([All potential reactors are disabled. Try to enable a reactor such as with --enable-epoll.])])
+AC_MSG_RESULT([$reactor])
+
+# boost modules -- supposedly to be removed soon, possibly temporarily
 AX_BOOST_BASE([1.39])
 AX_BOOST_ASIO
 AX_BOOST_SYSTEM

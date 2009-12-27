@@ -1,7 +1,7 @@
 /*****************************************************************
  * Unreal Internet Relay Chat Daemon, Version 4
- * File         pthread.hpp
- * Description  Posix threads
+ * File         wthread.hpp
+ * Description  Windows(R) threads
  *
  * All parts of this program are Copyright(C) 2009 by their
  * respective authors and the UnrealIRCd development team.
@@ -22,51 +22,59 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#ifndef _UNREALIRCD_PTHREAD_HPP
-#define _UNREALIRCD_PTHREAD_HPP
+#ifndef _UNREALIRCD_WTHREAD_HPP
+#define _UNREALIRCD_WTHREAD_HPP
 
+#include "platform.hpp"
 #include "string.hpp"
 #include <memory>
 #include <pthread.h>
 
-extern "C" void* unreal_posix_thread_function(void* arg);
+extern "C" void* unreal_windows_thread_function(void* arg);
 
 /**
- * Posix mutal exclusions.
+ * Windows mutal exclusions, critical sections
  */
-class UnrealPosixMutex
+class UnrealWinMutex
 {
 public:
-	UnrealPosixMutex();
-	~UnrealPosixMutex();
+	UnrealWinMutex();
+	~UnrealWinMutex();
 	void lock();
 	void unlock();
 
 private:
-	::pthread_mutex_t mutex_;
+	/** mutex handle */
+	HANDLE mutex_;
 };
 
 /**
- * Posix threads.
+ * Windows(R) threads.
  */
-class UnrealPosixThread
+class UnrealWinThread
 {
 public:
-	template<typename FnType> UnrealPosixThread(FnType fn)
-		: joined_(false)
+	template<typename FnType> UnrealWinThread(FnType fn)
+		: closed_(false)
 	{
 		std::auto_ptr<FuncBase> fu(new Func<FnType>(fn));
 
 		// Thread creation
-		if (::pthread_create(
-				&native_,						//< pthread object
-				NULL,							//< thread attributes
-				unreal_posix_thread_function,	//< function to call
-				fu.get())						//< callback function pointer
-				!= 0)
+		native_ = CreateThread(
+				0,								//< security attributes
+				0,								//< initial size of stack
+				unreal_windows_thread_function,	//< function call
+				fu.get(),						//< callback function pointer
+				0,								//< initial thread state
+				&thread_id_);					//< thread id storage
+
+		if (native_ == NULL)
 		{
-			throw new UnrealThreadException("UnrealPosixThread: "
-					"pthread_create() failed",
+			String msg;
+			msg.sprintf("UnrealWinThread: CreateThread() failed: %s",
+					strerror_w(GetLastError()));
+
+			throw new UnrealThreadException(msg,
 					UnrealThreadException::Error::CreationFailed);
 		}
 
@@ -74,12 +82,12 @@ public:
 		fu.release();
 	}
 
-	~UnrealPosixThread();
+	~UnrealWinThread();
 	void join();
 	static String type();
 
 public:
-	friend void* unreal_posix_thread_function(void* arg);
+	friend void* unreal_windows_thread_function(void* arg);
 
 	class FuncBase
 	{
@@ -98,31 +106,34 @@ public:
 	};
 
 private:
-	/** native pthread object */
-	::pthread_t native_;
+	/** native thread handle */
+	HANDLE native_;
 
-	/** something to check if we joined the thread already */
-	bool joined_;
+	/** thread ID */
+	DWORD thread_id_;
+
+	/** already closed? */
+	bool closed_;
 };
 
 /**
- * Call function for pthread_create().
+ * Call function for ResumeThread().
  *
  * @param arg Generic pointer for the callback function
- * @return 0
+ * @return NULL
  */
-inline void* unreal_posix_thread_function(void* arg)
+inline void* unreal_windows_thread_function(void* arg)
 {
-	std::auto_ptr<UnrealPosixThread::FuncBase> fu(
-	    static_cast<UnrealPosixThread::FuncBase*>(arg));
+	std::auto_ptr<UnrealWinThread::FuncBase> fu(
+	    static_cast<UnrealWinThread::FuncBase*>(arg));
 
 	fu->exec();
 
-	return 0;
+	return NULL;
 }
 
 /** global typedef */
-typedef UnrealPosixMutex UnrealMutex;
-typedef UnrealPosixThread UnrealThread;
+typedef UnrealWinMutex UnrealMutex;
+typedef UnrealWinThread UnrealThread;
 
-#endif /* _UNREALIRCD_PTHREAD_HPP */
+#endif /* _UNREALIRCD_WTHREAD_HPP */

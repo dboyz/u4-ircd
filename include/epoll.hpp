@@ -29,6 +29,7 @@
 #include "map.hpp"
 #include "platform.hpp"
 #include "reactor.hpp"
+#include "timer.hpp"
 
 /**
  * epoll() reactor for asyncronous events
@@ -48,11 +49,13 @@ public:
 	UnrealEpollReactor();
 	~UnrealEpollReactor();
 	void dispatch();
-	bool observe(int fd, CallbackType cbptr, 
+	bool observe(int fd, CallbackType cb, 
 	    uint32_t events = EventError | EventIn);
+	bool observe(const UnrealTimer& timer);
 	void run();
 	void stop();
 	bool stop(int fd);
+	bool stop(const UnrealTimer& timer);
 	uint32_t translateEvents(TranslationFlag ot, uint32_t ev);
 	static String type();
 
@@ -69,8 +72,11 @@ private:
 	/** specified for an infinite loop break */
 	bool active_;
 
-	/** callback vector */
+	/** callback map */
 	Map<int, CallbackType> callbacks_;
+
+	/** timer map */
+	List<UnrealTimer> timers_;
 };
 
 /* typedef the reactor */

@@ -1,7 +1,7 @@
 /*****************************************************************
  * Unreal Internet Relay Chat Daemon, Version 4
- * File         pthread.cpp
- * Description  Posix threads
+ * File         wthread.cpp
+ * Description  Windows(R) threads
  *
  * All parts of this program are Copyright(C) 2009 by their
  * respective authors and the UnrealIRCd development team.
@@ -22,18 +22,23 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#include "pthread.hpp"
+#include "wthread.hpp"
 
 /**
- * Initialize the mutex.
+ * Mutex initialization.
  */
-UnrealPosixMutex::UnrealPosixMutex()
+UnrealWinMutex::UnrealWinMutex()
 {
-	if (::pthread_mutex_init(&mutex_, 0) != 0)
+	mutex_ = CreateMutex(
+			NULL,
+			FALSE,
+			0);
+
+	if (mutex_ == NULL)
 	{
 		String msg;
-		msg.sprintf("UnrealPosixMutex: Initialization failed: %s",
-				strerror(errno));
+		msg.sprintf("UnrealWinMutex: Initialization failed: %s",
+				strerror_w(GetLastError()));
 
 		throw new UnrealMutexException(msg,
 				UnrealMutexException::Error::InitFailed);
@@ -43,29 +48,29 @@ UnrealPosixMutex::UnrealPosixMutex()
 /**
  * Mutex destruction.
  */
-UnrealPosixMutex::~UnrealPosixMutex()
+UnrealWinMutex::~UnrealWinMutex()
 {
-	if (::pthread_mutex_destroy(&mutex_) != 0)
+	if (!CloseHandle(mutex_))
 	{
 		String msg;
-		msg.sprintf("UnrealPosixMutex: Destruction of mutex failed: %s",
-				strerror(errno));
+		msg.sprintf("UnrealWinMutex: Destruction failed: %s",
+				strerror_w(GetLastError()));
 
 		throw new UnrealMutexException(msg,
-				UnrealMutexException::Error::DestroyFailed);
+				UnrealMutexException::Error::DestructFailed);
 	}
 }
 
 /**
- * Lock the mutex.
+ * Tries to gain exclusive ownership for the mutex.
  */
-void UnrealPosixMutex::lock()
+void UnrealWinMutex::lock()
 {
-	if (::pthread_mutex_lock(&mutex_) != 0)
+	if (WaitForSingleObject(&mutex_, INFINITE) == WAIT_FAILED)
 	{
 		String msg;
-		msg.sprintf("UnrealPosixMutex: Lock failed: %s",
-				strerror(errno));
+		msg.sprintf("UnrealWinMutex: Lock failed: %s",
+				strerror_w(GetLastError()));
 
 		throw new UnrealMutexException(msg,
 				UnrealMutexException::Error::LockFailed);
@@ -73,15 +78,15 @@ void UnrealPosixMutex::lock()
 }
 
 /**
- * Unlock the mutex.
+ * Release mutex ownership.
  */
-void UnrealPosixMutex::unlock()
+void UnrealWinMutex::unlock()
 {
-	if (::pthread_mutex_unlock(&mutex_) != 0)
+	if (!ReleaseMutex(&mutex_))
 	{
 		String msg;
-		msg.sprintf("UnrealPosixMutex: Unlock failed: %s",
-				strerror(errno));
+		msg.sprintf("UnrealWinMutex: Unlock failed: %s",
+				strerror_w(GetLastError()));
 
 		throw new UnrealMutexException(msg,
 				UnrealMutexException::Error::UnlockFailed);
@@ -89,49 +94,41 @@ void UnrealPosixMutex::unlock()
 }
 
 /**
- * UnrealPosixThread destructor.
+ * Thread initialization.
  */
-UnrealPosixThread::~UnrealPosixThread()
+UnrealWinThread::~UnrealWinThread()
 {
-	if (!joined_)
+	if (!closed_ && !CloseHandle(native_))
 	{
-		if (::pthread_detach(&native_) != 0)
-		{
-			String msg;
-			msg.sprintf("UnrealPosixThread: Detaching failed: %s",
-					strerror(errno));
+		String msg;
+		msg.sprintf("UnrealWinThread: Destruction of thread failed: "
+				"%s", strerror_w(GetLastError()));
 
-			throw new UnrealThreadException(msg,
-					UnrealThreadException::Error::DestructFailed);
-		}
+		throw new UnrealThreadException(msg,
+				UnrealThreadException::Error::DestructFailed);
 	}
 }
 
 /**
  * Wait for thread termination.
  */
-void UnrealPosixThread::join()
+void UnrealWinThread::join()
 {
-	if (!joined_)
+	if (WaitForSingleObject(native_, INFINITE) == WAIT_FAILED)
 	{
-		if (::pthread_join(&native_, 0) != 0)
-		{
-			String msg;
-			msg.sprintf("UnrealPosixThread: Waiting for thread to finish "
-					"failed: %s", strerror(errno));
+		String msg;
+		msg.sprintf("UnrealWinThread: Waiting for thread termination failed: "
+				"%s", strerror_w(GetLastError()));
 
-			throw new UnrealThreadException(msg,
-					UnrealThreadException::Error::WaitFailed);
-		}
-		else
-			joined_ = true;
+		throw new UnrealThreadException(msg,
+				UnrealThreadException::Error::WaitFailed);
 	}
 }
 
 /**
  * Returns the name of threading library.
  */
-String UnrealPosixThread::type()
+String UnrealWinThread::type()
 {
-	return "pthreads";
+	return "windows";
 }

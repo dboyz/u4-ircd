@@ -54,6 +54,7 @@ pkginclude_HEADERS = \
 	include/command.hpp \
 	include/config.hpp \
 	include/epoll.hpp \
+	include/exception.hpp \
 	include/isupport.hpp \
 	include/list.hpp \
 	include/listener.hpp \
@@ -69,6 +70,7 @@ pkginclude_HEADERS = \
 	include/reactorpool.hpp \
 	include/resolver.hpp \
 	include/server.hpp \
+	include/signal.hpp \
 	include/socket.hpp \
 	include/stats.hpp \
 	include/string.hpp \
@@ -77,7 +79,9 @@ pkginclude_HEADERS = \
 	include/time.hpp \
 	include/timer.hpp \
 	include/user.hpp \
-	include/version.hpp
+	include/version.hpp \
+	include/windows.hpp \
+	include/wthread.hpp
 
 unrealircd_SOURCES = \
 	src/base.cpp \
@@ -99,6 +103,7 @@ unrealircd_SOURCES = \
 	src/timer.cpp \
 	src/unreal.cpp \
 	src/user.cpp \
+	src/wthread.cpp \
 	$(pkginclude_HEADERS)
 
 # we need to _not_ have AM_LDFLAGS added to the binary because it has libtool

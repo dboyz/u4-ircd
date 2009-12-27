@@ -1,7 +1,7 @@
 /*****************************************************************
  * Unreal Internet Relay Chat Daemon, Version 4
- * File         time.hpp
- * Description  Object for time storage and math
+ * File         windows.hpp
+ * Description  Windows(R) specific helper functions
  *
  * All parts of this program are Copyright(C) 2009 by their
  * respective authors and the UnrealIRCd development team.
@@ -22,38 +22,43 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#ifndef _UNREALIRCD_TIME_HPP
-#define _UNREALIRCD_TIME_HPP
-
-#include "string.hpp"
-#include <ctime>
+#ifndef _UNREALIRCD_WINDOWS_HPP
+#define _UNREALIRCD_WINDOWS_HPP
 
 /**
- * UnrealTime class.
+ * POSIX strerror() emulation for Windows.
+ *
+ * @param Error code as returned by GetLastError()
+ * @return Pointer to error message buffer
  */
-class UnrealTime
+const char* strerror_w(DWORD ec)
 {
-public:
-	UnrealTime(const std::time_t& ts = 0);
+	LPVOID msgbuf;
+	DWORD ret;
 
-	UnrealTime& addSeconds(const std::time_t& sec);
-	static UnrealTime now();
-	void setTS(const std::time_t& ts);
-	void sync();
-	std::time_t toTS();
-	String toString(const String& fmt);
+	ret = FormatMessage(
+			FORMAT_MESSAGE_ALLOCATE_BUFFER |
+			FORMAT_MESSAGE_FROM_SYSTEM |
+			FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL,
+			ec,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+			(LPTSTR)&msgbuf,
+			0,
+			NULL);
 
-	inline bool operator<(UnrealTime& other)
-	{ return timestamp_ < other.toTS(); }
+	if (ret == 0)
+		return NULL;
+	else
+	{
+		static String message;
+		message.sprintf("%s (errcode: %d)", (char*)msgbuf, ec);
 
-	inline bool operator>(UnrealTime& other)
-	{ return timestamp_ > other.toTS(); }
+		// Free some memory
+		LocalFree(msgbuf);
 
-	inline bool operator==(UnrealTime& other)
-	{ return timestamp_ == other.toTS(); }
+		return message.c_str();
+	}
+}
 
-private:
-	std::time_t timestamp_;
-};
-
-#endif /* _UNREALIRCD_TIME_HPP */
+#endif /* WINDOWS_HPP_ */

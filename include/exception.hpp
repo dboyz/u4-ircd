@@ -1,7 +1,7 @@
 /*****************************************************************
  * Unreal Internet Relay Chat Daemon, Version 4
- * File         time.hpp
- * Description  Object for time storage and math
+ * File         exception.hpp
+ * Description  Generic exception interface
  *
  * All parts of this program are Copyright(C) 2009 by their
  * respective authors and the UnrealIRCd development team.
@@ -22,38 +22,50 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#ifndef _UNREALIRCD_TIME_HPP
-#define _UNREALIRCD_TIME_HPP
+#ifndef _UNREALIRCD_EXCEPTION_HPP
+#define _UNREALIRCD_EXCEPTION_HPP
 
+#include <exception>
 #include "string.hpp"
-#include <ctime>
 
 /**
- * UnrealTime class.
+ * Generic exception class.
  */
-class UnrealTime
+template<typename ErrorCodeType>
+class UnrealException
+	: public std::exception
 {
 public:
-	UnrealTime(const std::time_t& ts = 0);
+	UnrealException(const String& msg, ErrorCodeType c = OK)
+		: message_(msg), code_(c)
+	{}
 
-	UnrealTime& addSeconds(const std::time_t& sec);
-	static UnrealTime now();
-	void setTS(const std::time_t& ts);
-	void sync();
-	std::time_t toTS();
-	String toString(const String& fmt);
+	/**
+	 * Returns the error code.
+	 *
+	 * @return Error code
+	 */
+	ErrorCodeType code()
+	{
+		return code_;
+	}
 
-	inline bool operator<(UnrealTime& other)
-	{ return timestamp_ < other.toTS(); }
-
-	inline bool operator>(UnrealTime& other)
-	{ return timestamp_ > other.toTS(); }
-
-	inline bool operator==(UnrealTime& other)
-	{ return timestamp_ == other.toTS(); }
+	/**
+	 * Returns the actual exception message.
+	 *
+	 * @return Exception message
+	 */
+	const char* what() const throw()
+	{
+		return message_.c_str();
+	}
 
 private:
-	std::time_t timestamp_;
+	/** actual error message */
+	String message_;
+
+	/** error code number */
+	ErrorCodeType code_;
 };
 
-#endif /* _UNREALIRCD_TIME_HPP */
+#endif /* _UNREALIRCD_EXCEPTION_HPP */

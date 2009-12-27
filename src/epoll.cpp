@@ -66,9 +66,14 @@ UnrealEpollReactor::~UnrealEpollReactor()
  */
 void UnrealEpollReactor::dispatch()
 {
+	static UnrealTime currentTime;
 	struct epoll_event* ev;
 	int num_events;
 
+	/* sync time */
+	currentTime.sync();
+
+	/* wait for events */
 	num_events = epoll_wait(epoll_fd_, events_, max_evpl_, -1);
 
 	for (int i = 0; i < num_events; i++)
@@ -76,20 +81,45 @@ void UnrealEpollReactor::dispatch()
 		ev = &events_[i];
 
 		/* notify callback */
-		//(*callbacks_[ev->data.fd])(1, 12);
 		callbacks_[ev->data.fd](ev->data.fd, ev->events);
 	}
+
+	/* look for expired timers */
+	for (List<UnrealTimer>::Iterator ti = timers_.begin();
+			ti != timers_.end(); ++ti)
+	{
+		UnrealTimer& timer = *ti;
+
+		if (timer.expiretime() <= currentTime)
+		{
+			timer.exec();
+
+			if (timer.interval() == -1)
+			{
+				timer.erase(ti);
+
+				ti = timers_.begin();
+				continue;
+			}
+			else
+			{
+				UnrealTime ts = timer.expiretime();
+				ts.addSeconds(static_cast<std::time_t>(timer.interval()));
+				timer.setExpireTime(ts);
+			}
+		}
+	}   
 }
 
 /**
  * Observe the specified file descriptor for events.
  *
  * @param fd File descriptor to observe
- * @param cbptr Callback pointer
+ * @param cbptr Callback
  * @param events Generic event mask with flags to check for
  * @return True if the event has been registered successfully, otherwise false
  */
-bool UnrealEpollReactor::observe(int fd, CallbackType cbptr, uint32_t events)
+bool UnrealEpollReactor::observe(int fd, CallbackType cb, uint32_t events)
 {
 	struct epoll_event evs;
 	int ep_result;
@@ -99,9 +129,24 @@ bool UnrealEpollReactor::observe(int fd, CallbackType cbptr, uint32_t events)
 	ep_result = epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, fd, &evs);
 
 	if (ep_result == 0)
-		callbacks_.add(fd, cbptr);
+		callbacks_.add(fd, cb);
 
 	return (ep_result == 0);
+}
+
+/**
+ * Observe an timer to be observed and triggered once the specified time has
+ * arrived.
+ *
+ * @param timer Timer to be added
+ * @return Always true
+ */
+bool UnrealEpollReactor::observe(const UnrealTimer& timer)
+{
+	UnrealTimer t = timer;
+	timers_ << t;
+
+	return true;
 }
 
 /**
@@ -135,6 +180,22 @@ bool UnrealEpollReactor::stop(int fd)
 	callbacks_.remove(fd);
 
 	return (ep_result == 0);
+}
+
+/**
+ * Stop monitoring the specified timer.
+ *
+ * @param timer Timer being observed
+ * @param Boolean value if the timer has been removed
+ */
+bool UnrealEpollReactor::stop(const UnrealTimer& timer)
+{
+	bool result = timers_.contains(timer);
+
+	if (result)
+		timers_.remove(timer);
+
+	return result;
 }
 
 /**

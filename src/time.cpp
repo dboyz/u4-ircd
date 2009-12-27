@@ -69,6 +69,14 @@ void UnrealTime::setTS(const std::time_t& ts)
 }
 
 /**
+ * Synronize time object to the current time.
+ */
+void UnrealTime::sync()
+{
+	setTS(std::time(0));
+}
+
+/**
  * Return a formatted time string.
  * The format for `fmt' is described in the manpage for strftime().
  *

@@ -32,6 +32,7 @@
 // OS related
 #if defined(_WIN32)
 #include <windows.h>
+#include "windows.hpp"
 #define OS_WINDOWS
 #if defined(_WIN64)
 #define OS_WIN64

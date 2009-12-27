@@ -30,6 +30,7 @@
 #include "platform.hpp"
 #include "reactor.hpp"
 #include "resolver.hpp"
+#include "signal.hpp"
 #include "string.hpp"
 
 /**
@@ -51,16 +52,22 @@ struct UnrealSocketTrafficType
 class UnrealSocket
 {
 public:
-	UnrealSocket(UnrealReactor& reactor);
+	UnrealSocket();
 	~UnrealSocket();
-	bool closeSafe();
+	bool close();
 	void connect(const String& hostname, const uint16_t& portnum);
-	void destroyResolverQuery();
 	UnrealSocketTrafficType traffic();
 	void waitForLine();
 	void write(const String& data);
 
+public:
+	UnrealSignal1<UnrealSocket, UnrealSocket*> onConnected;
+	UnrealSignal1<UnrealSocket, UnrealSocket*> onDisconnected;
+
 private:
+	/** native file descriptor */
+	int native_;
+
 	/** traffic on the socket */
 	UnrealSocketTrafficType traffic_;
 };

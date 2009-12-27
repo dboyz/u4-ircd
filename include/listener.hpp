@@ -27,23 +27,16 @@
 
 #include "list.hpp"
 #include "reactor.hpp"
+#include "signal.hpp"
 #include "socket.hpp"
 #include "string.hpp"
 #include "stringlist.hpp"
-#include <boost/asio.hpp>
-#include <boost/signals2.hpp>
-
-using namespace boost::asio::ip;
 
 class UnrealListener
-	: public tcp::acceptor
 {
 public:
 	/** Listener type */
 	enum ListenerType { LClient, LServer };
-
-	/** alias error code class */
-	typedef boost::system::error_code ErrorCode;
 
 public:
 	UnrealListener(UnrealReactor& reactor, const String& address,
@@ -71,17 +64,11 @@ public:
 	List<UnrealSocket*> connections;
 
 public:
-	/** emitted when an error occured */
-	boost::signals2::signal<void(UnrealListener*, const ErrorCode&)> onError;
-
-	/** emitted when the listener got a new connection */
-	boost::signals2::signal<void(UnrealListener*, const UnrealSocket*)>
-		onNewConnection;
+	/** signal which is triggered on a new connection ready */
+	UnrealSignal0<UnrealListener> onNewConnection;
 
 private:
-	void handleAccept(UnrealSocket* sptr, const ErrorCode& ec);
-	void handleDataResponse(UnrealSocket* sptr, String& data);
-	void handleError(UnrealSocket* sptr, const ErrorCode& ec);
+	void handleNewConnection();
 
 private:
 	/** listener type */
@@ -98,6 +85,9 @@ private:
 
 	/** max amount of connections allowed for this listener */
 	uint32_t max_connections_;
+
+	/** native file descriptor */
+	int native_;
 };
 
 #endif /* _UNREALIRCD_LISTENER_HPP */

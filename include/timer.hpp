@@ -26,11 +26,55 @@
 #define _UNREALIRCD_TIMER_HPP
 
 #include "reactor.hpp"
+#include "time.hpp"
 
+/**
+ * UnrealTimer class.
+ *
+ * Timers are observed from event reactors. If no interval has been set, the
+ * timer is being removed (it's interpreted to have single-shot only).
+ */
 class UnrealTimer
 {
 public:
-	UnrealTimer(UnrealReactor& reactor);
+	template<typename FnType>
+	UnrealTimer(const UnrealTime& ts, FnType cb, const uint32_t ival = -1)
+		: expiretime_(ts), interval_(ival),
+		callback_(static_cast<void*>(new Func<FnType>(cb)))
+	{ }
+
+	void exec();
+	const UnrealTime& expiretime();
+	uint32_t interval();
+	void setInterval(const uint32_t& ival);
+	void setExpireTime(const UnrealTime& ts);
+
+private:
+	class FuncBase
+	{
+	public:
+		virtual ~FuncBase() {}
+		virtual void exec() = 0;
+	};
+
+	template<typename FnType> class Func : public FuncBase
+	{
+	public:
+		Func(FnType fn) : fn_(fn) {}
+		void exec() { fn_(); }
+	private:
+		FnType fn_;
+	};
+
+private:
+	/** expire time */
+	UnrealTime expiretime_;
+
+	/** interval */
+	uint32_t interval_;
+
+	/** callback function, sure not the cleanest way */
+	void* callback_;
 };
 
 #endif /* _UNREALIRCD_TIMER_HPP */

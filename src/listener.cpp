@@ -29,6 +29,8 @@
 #include "numeric.hpp"
 #include "user.hpp"
 #include <iostream>
+#include <sys/socket.h>
+#include <sys/types.h>
 
 /**
  * UnrealListener constructor.
@@ -36,11 +38,9 @@
  * @param address Address used for binding
  * @param port Port number used for binding
  */
-UnrealListener::UnrealListener(UnrealReactor& reactor, const String& address,
-		const uint16_t& port)
-	: tcp::acceptor(ios), type_(LClient),
-	address_(address), port_(port), ping_freq_(0), max_connections_(0),
-	strand_(ios)
+UnrealListener::UnrealListener(const String& address, const uint16_t& port)
+	: type_(LClient), address_(address), port_(port), ping_freq_(0),
+	max_connections_(0), native_(-1)
 { }
 
 /**
@@ -71,12 +71,14 @@ void UnrealListener::addConnection(UnrealSocket* sptr)
 		return;
 	}
 
+/*
 	sptr->onDisconnected.connect(boost::bind(&UnrealListener::removeConnection,
 		this, _1));
 	sptr->onError.connect(boost::bind(&UnrealListener::handleError,
 		this, _1, _2));
 	sptr->onRead.connect(boost::bind(&UnrealListener::handleDataResponse,
 		this, _1, _2));
+*/
 
 	/* add to the connection list */
 	connections << sptr;
@@ -147,24 +149,6 @@ uint16_t UnrealListener::bindPort()
  */
 void UnrealListener::handleAccept(UnrealSocket* sptr, const ErrorCode& ec)
 {
-	if (ec)
-	{
-		ErrorCode edupl = ec;
-		String errmsg = edupl.message();
-
-		unreal->log.write(UnrealLog::Normal, "UnrealListener::handleAccept(): "
-				"Error encountered: %s", errmsg.c_str());
-
-		onError(this, ec);
-	}
-	else
-	{
-		addConnection(sptr);
-		onNewConnection(this, sptr);
-
-		/* wait for the next connection */
-		waitForAccept();
-	}
 }
 
 /**
@@ -241,15 +225,6 @@ void UnrealListener::handleDataResponse(UnrealSocket* sptr, String& data)
  */
 void UnrealListener::handleError(UnrealSocket* sptr, const ErrorCode& ec)
 {
-	ErrorCode edupl = ec;
-
-	unreal->log.write(UnrealLog::Debug, "UnrealListener::handleError(): "
-			"fd %d, errno %d, errstr (%s)",
-			sptr->native(),
-			edupl.value(),
-			edupl.message().c_str());
-
-	onError(this, ec);
 }
 
 /**
@@ -309,42 +284,39 @@ void UnrealListener::removeConnection(UnrealSocket* sptr)
  */
 void UnrealListener::run()
 {
-	ErrorCode ec;
+	int v = 1; // reuse address
+	struct sockaddr_in saddr;
 	UnrealResolver resolv((UnrealIOService&)get_io_service());
 	UnrealResolver::Query query(address_, String(port_));
 	UnrealResolver::Endpoint endpoint = *resolv.resolve(query, ec);
 
-	if (ec)
-	{
-		unreal->log.write(UnrealLog::Normal, "UnrealListener::listen(): "
-				"Can't resolve endpoint for %s:%d", address_.c_str(), port_);
+	/* setting up address details */
+	saddr.sin_family = endpoint.protocol();
+	saddr.sin_port = htons(port_);
 
-		unreal->exit(1);
+	if ((native_ = ::socket(endpoint.protocol(), SOCK_STREAM, SOCK_NONBLOCK))
+	    == -1)
+	{
+		unreal->log.write(UnrealLog::Fatal, "UnrealListener: Socket creation "
+			"failed: %s", strerror(errno));
+	}
+	else if (::setsockopt(native_, SO_SOCKET, SO_REUSEADDR, &v, sizeof(v))
+		== -1)
+	{
+		unreal->log.write(UnrealLog::Fatal, "UnrealListener: Setting reuse-flag"
+		    " on listener fd failed: %s", strerror(errno));
+	}
+	else if (::bind(native_, (struct sockaddr*)&saddr, sizeof(saddr)) == -1)
+	{
+		unreal->log.write(UnrealLog::Fatal, "UnrealListener: Bind failed: %s",
+			strerror(errno));
+	}
+	else if (::listen(native_, 5) == -1)
+	{
+		unreal->log.write(UnrealLog::Fatal, "UnrealListener: Listen failed: %s",
+			strerror(errno));
 	}
 
-	try
-	{
-		/* the endpoint should automatically obtain the inet address type */
-		open(endpoint.protocol());
-
-		/* reuse address if it's in use */
-		set_option(tcp::acceptor::reuse_address(true), ec);
-
-		/* bind acceptor to specified endpoint */
-		bind(endpoint, ec);
-
-		/* listen for connections */
-		listen(socket_base::max_connections, ec);
-	}
-	catch (...)
-	{
-		String what = ec.message();
-
-		unreal->log.write(UnrealLog::Normal, "UnrealListener::listen(): "
-				"Caught exception: %s", what.c_str());
-
-		return;
-	}
 	/* wait for connections to be accepted */
 	waitForAccept();
 }

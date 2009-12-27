@@ -25,6 +25,61 @@
 #ifndef _UNREALIRCD_THREAD_HPP
 #define _UNREALIRCD_THREAD_HPP
 
+#include "exception.hpp"
+#include "platform.hpp"
+#include "string.hpp"
+
+#if defined(OS_WINDOWS)
+#include "wthread.hpp"
+#else
 #include "pthread.hpp"
+#endif
+
+namespace ErrorCode {
+
+/**
+ * Thread-related error codes.
+ */
+enum Thread
+{
+	OK,                 //!< no error specified
+	CreationFailed,     //!< thread creation failed
+	DestructFailed,     //!< thread destruction failed
+	WaitFailed,         //!< waiting for thread to destruct failed
+};
+
+/**
+ * Mutex-related error codes.
+ */
+enum Mutex
+{
+	OK,					//!< no error specified
+	InitFailed,			//!< mutex initialization failed
+	DestroyFailed,		//!< mutex destruction failed
+	LockFailed,			//!< mutex lock failed
+	UnlockFailed		//!< mutex unlock failed
+};
+
+} // namespace ErrorCode
+
+/**
+ * Thread exception class.
+ */
+class UnrealThreadException
+	: public UnrealException<ErrorCode::Thread>
+{
+public:
+	typedef ErrorCode::Thread Error;
+};
+
+/**
+ * Mutex exception class.
+ */
+class UnrealMutexException
+	: public UnrealException<ErrorCode::Mutex>
+{
+public:
+	typedef ErrorCode::Mutex Error;
+};
 
 #endif /* _UNREALIRCD_THREAD_HPP */

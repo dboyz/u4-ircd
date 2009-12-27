@@ -1,6 +1,6 @@
 /*****************************************************************
  * Unreal Internet Relay Chat Daemon, Version 4
- * File         timer.hpp
+ * File         timer.cpp
  * Description  Asyncronous timing events
  *
  * All parts of this program are Copyright(C) 2009 by their
@@ -25,10 +25,52 @@
 #include "timer.hpp"
 
 /**
- * UnrealTimer constructor.
- *
- * @param ios IO Service
+ * Execute callback function.
  */
-UnrealTimer::UnrealTimer(UnrealIOService& ios)
-	: boost::asio::deadline_timer(ios), strand(ios)
-{ }
+void UnrealTimer::exec()
+{
+	static_cast<FuncBase*>(callback_)->exec();
+}
+
+/**
+ * Returns the expire time.
+ *
+ * @return Expire time
+ */
+const UnrealTime& UnrealTimer::expiretime()
+{
+	return expiretime_;
+}
+
+/**
+ * Return the interval.
+ *
+ * Note: If the interval is -1 (UINT_MAX), timed events should be removed
+ * after they've been triggered.
+ *
+ * @return Timer interval
+ */
+uint32_t UnrealTimer::interval()
+{
+	return interval_;
+}
+
+/**
+ * Update the timer interval.
+ *
+ * @param ival New interval
+ */
+void UnrealTimer::setInterval(const uint32_t& ival)
+{
+	interval_ = ival;
+}
+
+/**
+ * Update expire time.
+ *
+ * @param ts New expiry time
+ */
+void UnrealTimer::setExpireTime(const UnrealTime& ts)
+{
+	expiretime_ = ts;
+}

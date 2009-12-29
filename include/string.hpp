@@ -31,6 +31,9 @@
 /** define the String::sprintf() buffer size */
 #define SPRINTF_BUFFER_SIZE		4096
 
+#define foreach_str(x, y) \
+	foreach(String::Iterator, x, y)
+
 class StringList;
 
 /**

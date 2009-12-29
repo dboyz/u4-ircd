@@ -36,7 +36,7 @@ UnrealPosixMutex::UnrealPosixMutex()
 				strerror(errno));
 
 		throw new UnrealMutexException(msg,
-				UnrealMutexException::Error::InitFailed);
+				ErrorCode::Mutex::InitFailed);
 	}
 }
 
@@ -52,7 +52,7 @@ UnrealPosixMutex::~UnrealPosixMutex()
 				strerror(errno));
 
 		throw new UnrealMutexException(msg,
-				UnrealMutexException::Error::DestroyFailed);
+				ErrorCode::Mutex::DestroyFailed);
 	}
 }
 
@@ -68,7 +68,7 @@ void UnrealPosixMutex::lock()
 				strerror(errno));
 
 		throw new UnrealMutexException(msg,
-				UnrealMutexException::Error::LockFailed);
+				ErrorCode::Mutex::LockFailed);
 	}
 }
 
@@ -84,7 +84,7 @@ void UnrealPosixMutex::unlock()
 				strerror(errno));
 
 		throw new UnrealMutexException(msg,
-				UnrealMutexException::Error::UnlockFailed);
+				ErrorCode::Mutex::UnlockFailed);
 	}
 }
 
@@ -102,7 +102,7 @@ UnrealPosixThread::~UnrealPosixThread()
 					strerror(errno));
 
 			throw new UnrealThreadException(msg,
-					UnrealThreadException::Error::DestructFailed);
+					ErrorCode::Thread::DestructFailed);
 		}
 	}
 }
@@ -121,7 +121,7 @@ void UnrealPosixThread::join()
 					"failed: %s", strerror(errno));
 
 			throw new UnrealThreadException(msg,
-					UnrealThreadException::Error::WaitFailed);
+					ErrorCode::Thread::WaitFailed);
 		}
 		else
 			joined_ = true;

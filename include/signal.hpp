@@ -34,6 +34,10 @@ template<typename ConnectionFnType>
 class UnrealSignal0
 {
 public:
+	typedef List<ConnectionFnType> ConnectionList;
+	typedef typename List<ConnectionFnType>::Iterator ConnectionIterator;
+
+public:
 	~UnrealSignal0()
 	{
 		disconnectAllSlots();
@@ -61,7 +65,7 @@ public:
 
 	void operator()()
 	{
-		for (List<ConnectionFnType>::Iterator ci = connections_.begin();
+		for (ConnectionIterator ci = connections_.begin();
 		    	ci != connections_.end(); ++ci)
 		{
 			(*ci)();
@@ -69,7 +73,7 @@ public:
 	}
 	
 private:
-	List<ConnectionFnType> connections_;
+	ConnectionList connections_;
 };
 
 /**
@@ -77,17 +81,49 @@ private:
  */
 template<typename ConnectionFnType, typename Arg1Type>
 class UnrealSignal1
-	: public UnrealSignal0
+	: public UnrealSignal0<ConnectionFnType>
 {
 public:
+	typedef List<ConnectionFnType> ConnectionList;
+	typedef typename List<ConnectionFnType>::Iterator ConnectionIterator;
+
+public:
+	~UnrealSignal1()
+	{
+		disconnectAllSlots();
+	}
+
+	void connect(ConnectionFnType fn)
+	{
+		connections_ << fn;
+	}
+
+	size_t connectionCount()
+	{
+		return connections_.size();
+	}
+
+	void disconnect(ConnectionFnType fn)
+	{
+		connections_.remove(fn);
+	}
+
+	void disconnectAllSlots()
+	{
+		connections_.clear();
+	}
+
 	void operator()(Arg1Type arg1)
 	{
-		for (List<ConnectionFnType>::Iterator ci = connections_.begin();
+		for (ConnectionIterator ci = connections_.begin();
 		    	ci != connections_.end(); ++ci)
 		{
 			(*ci)(arg1);
 		}
 	}
+
+private:
+	ConnectionList connections_;
 };
 
 /**
@@ -95,17 +131,49 @@ public:
  */
 template<typename ConnectionFnType, typename Arg1Type, typename Arg2Type>
 class UnrealSignal2
-	: public UnrealSignal0
+	: public UnrealSignal0<ConnectionFnType>
 {
 public:
+	typedef List<ConnectionFnType> ConnectionList;
+	typedef typename List<ConnectionFnType>::Iterator ConnectionIterator;
+
+public:
+	~UnrealSignal2()
+	{
+		disconnectAllSlots();
+	}
+
+	void connect(ConnectionFnType fn)
+	{
+		connections_ << fn;
+	}
+
+	size_t connectionCount()
+	{
+		return connections_.size();
+	}
+
+	void disconnect(ConnectionFnType fn)
+	{
+		connections_.remove(fn);
+	}
+
+	void disconnectAllSlots()
+	{
+		connections_.clear();
+	}
+
 	void operator()(Arg1Type arg1, Arg2Type arg2)
 	{
-		for (List<ConnectionFnType>::Iterator ci = connections_.begin();
+		for (ConnectionIterator ci = connections_.begin();
 		    	ci != connections_.end(); ++ci)
 		{
 			(*ci)(arg1, arg2);
 		}
 	}
+
+private:
+	ConnectionList connections_;
 };
 
 /**
@@ -114,17 +182,49 @@ public:
 template<typename ConnectionFnType, typename Arg1Type, typename Arg2Type,
 	typename Arg3Type>
 class UnrealSignal3
-	: public UnrealSignal0
+	: public UnrealSignal0<ConnectionFnType>
 {
 public:
+	typedef List<ConnectionFnType> ConnectionList;
+	typedef typename List<ConnectionFnType>::Iterator ConnectionIterator;
+
+public:
+	~UnrealSignal3()
+	{
+		disconnectAllSlots();
+	}
+
+	void connect(ConnectionFnType fn)
+	{
+		connections_ << fn;
+	}
+
+	size_t connectionCount()
+	{
+		return connections_.size();
+	}
+
+	void disconnect(ConnectionFnType fn)
+	{
+		connections_.remove(fn);
+	}
+
+	void disconnectAllSlots()
+	{
+		connections_.clear();
+	}
+
 	void operator()(Arg1Type arg1, Arg2Type arg2, Arg3Type arg3)
 	{
-		for (List<ConnectionFnType>::Iterator ci = connections_.begin();
+		for (ConnectionIterator ci = connections_.begin();
 		    	ci != connections_.end(); ++ci)
 		{
 			(*ci)(arg1, arg2, arg3);
 		}
 	}
+
+private:
+	ConnectionList connections_;
 };
 
 #endif /* _UNREALIRCD_SIGNAL_HPP */

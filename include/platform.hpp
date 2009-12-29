@@ -36,22 +36,26 @@
 #define OS_WINDOWS
 #if defined(_WIN64)
 #define OS_WIN64
+#define OS_NAME "Win64"
 #else
 #define OS_WIN32
+#define OS_NAME "Win32"
 #endif
 
 #elif defined(__linux__) || defined(__linux)
 #define OS_LINUX
-// TODO: include epoll/poll/select reactor
+#define OS_NAME "Linux"
 #elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #if defined(__FreeBSD__)
 #define OS_FREEBSD
+#define OS_NAME "FreeBSD"
 #elif defined(__NetBSD__)
 #define OS_NETBSD
+#define OS_NAME "NetBSD"
 #elif defined(__OpenBSD__)
 #define OS_OPENBSD
+#define OS_NAME "OpenBSD"
 #endif
-// TODO: include kqueue reactor
 #endif
 
 // compiler

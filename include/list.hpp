@@ -64,7 +64,19 @@ public:
 	}
 
 	/**
+	 * Returns whether the list is empty.
+	 * @return true when the list is empty, otherwise false
+	 */
+	bool empty()
+	{
+		return (this->size() == 0);
+	}
+
+	/**
 	 * Remove an element from the list and free the memory allocated to it.
+	 * Be *careful* with this function, as it definly crashes the server when
+	 * using this on lists with non-allocated elements.
+	 * Use it for allocated pointer elements only.
 	 *
 	 * @param el Element to be removed
 	 */

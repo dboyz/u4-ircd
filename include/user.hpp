@@ -75,8 +75,8 @@ public:
 	Bitmask<uint8_t>& authflags();
 	const String& awayMessage();
 	UnrealTime connectionTime();
-	void exit(const UnrealSocket::ErrorCode& ec);
-	void exitClient(const String& message);
+	void exit(ErrorCode::Socket::Type ec);
+	void exit(const String& message);
 	static UnrealUser* find(UnrealSocket* sptr);
 	static UnrealUser* find(const String& nickname);
 	const String& hostname();
@@ -176,9 +176,6 @@ private:
 
 	/** away message */
 	String away_message_;
-
-	/** timeout timer */
-	UnrealTimer timer_;
 };
 
 namespace UnrealUserProperties

@@ -32,6 +32,69 @@
 #include "resolver.hpp"
 #include "signal.hpp"
 #include "string.hpp"
+#include <errno.h>
+
+/**
+ * Error code definitions for networking.
+ */
+namespace ErrorCode {
+
+namespace Socket {
+
+enum Type
+{
+	// bad file descriptor
+	BadFd = EBADFD,
+
+	// protocol not supported
+	ProtocolNotSupported = EPROTONOSUPPORT,
+
+	// address is already in use
+	AddressInUse = EADDRINUSE,
+
+	// network is down
+	NetworkDown = ENETDOWN,
+
+	// network is unreachable
+	NetworkUnreachable = ENETUNREACH,
+
+	// network dropped connection because of reset
+	NetworkReset = ENETRESET,
+
+	// software caused connection abort
+	ConnectionAborted = ECONNABORTED,
+
+	// connection reset by peer
+	ConnectionReset = ECONNRESET,
+
+	// endpoint is already connected
+	AlreadyConnected = EISCONN,
+
+	// endpoint is not connected
+	NotConnected = ENOTCONN,
+
+	// connection timed out
+	TimedOut = ETIMEDOUT,
+
+	// connection refused
+	ConnectionRefused = ECONNREFUSED,
+
+	// host is down
+	HostIsDown = EHOSTDOWN,
+
+	// no route to host
+	HostUnreachable = EHOSTUNREACH,
+
+	// operation already in progress
+	AlreadyInProgress = EALREADY,
+
+	// operation now in progress
+	InProgress = EINPROGRESS,
+};
+
+} // namespace Socket
+
+} // namespace ErrorCode
 
 /**
  * Define a traffic type, that is used to measure how many data

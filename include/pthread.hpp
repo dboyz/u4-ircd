@@ -26,6 +26,7 @@
 #define _UNREALIRCD_PTHREAD_HPP
 
 #include "string.hpp"
+#include "thread.hpp"
 #include <memory>
 #include <pthread.h>
 
@@ -67,7 +68,7 @@ public:
 		{
 			throw new UnrealThreadException("UnrealPosixThread: "
 					"pthread_create() failed",
-					UnrealThreadException::Error::CreationFailed);
+					ErrorCode::Thread::CreationFailed);
 		}
 
 		// Release memory

@@ -86,7 +86,7 @@ UnrealChannel::UnrealChannel(const String& name)
  */
 UnrealChannel::~UnrealChannel()
 {
-	for (MemberIterator cmi = members.begin(); cmi != members.end(); cmi++)
+	foreach(MemberIterator, cmi, members)
 	{
 		/* free all member entries */
 		Member* cmptr = cmi->second;
@@ -225,7 +225,7 @@ UnrealChannel* UnrealChannel::find(const String& chname)
  */
 UnrealChannel::Ban* UnrealChannel::findBan(const String& mask)
 {
-	for (BanIterator cbi = banlist.begin(); cbi != banlist.end(); cbi++)
+	foreach (BanIterator, cbi, banlist)
 	{
 		Ban* cbptr = *cbi;
 
@@ -434,8 +434,7 @@ void UnrealChannel::modebufSend(UnrealUser* uptr, List<ModeBuf>& mblist)
 	ModeBuf::StateType last_state = ModeBuf::None;
 	size_t count = 0;
 
-	for (List<ModeBuf>::Iterator mbi = mblist.begin(); mbi != mblist.end();
-			mbi++)
+	foreach (List<ModeBuf>::Iterator, mbi, mblist)
 	{
 		mbuf = *mbi;
 
@@ -502,13 +501,12 @@ Bitmask<uint32_t>& UnrealChannel::modes()
  */
 String UnrealChannel::modestr()
 {
-	UnrealChannelModeTable::Iterator cmi;
 	String result;
 
 	/* channel mode table */
 	UnrealChannelModeTable& modetab = UnrealChannelProperties::ModeTable;
 
-	for (cmi = modetab.begin(); cmi != modetab.end(); cmi++)
+	foreach (UnrealChannelModeTable::Iterator, cmi, modetab)
 	{
 		UnrealChannelMode mo = cmi->first;
 
@@ -552,7 +550,7 @@ void UnrealChannel::parseModeChange(UnrealUser* uptr, StringList* argv)
 	/* mode table */
 	UnrealChannelModeTable& modetab = UnrealChannelProperties::ModeTable;
 
-	for (String::Iterator ch = flagset.begin(); ch != flagset.end(); ch++)
+	foreach_str(ch, flagset)
 	{
 		if (*ch == '+' || *ch == '-')
 			state = (*ch == '+') ? ModeBuf::Add : ModeBuf::Remove;
@@ -854,7 +852,7 @@ void UnrealChannel::sendlocalreply(UnrealUser* uptr, const String& cmd,
 		data.c_str());
 
 	/* send the message to all users on the channel */
-	for (MemberIterator cmi = members.begin(); cmi != members.end(); cmi++)
+	foreach (MemberIterator, cmi, members)
 	{
 		UnrealUser* tuptr = cmi->first;
 

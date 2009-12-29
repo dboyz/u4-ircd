@@ -36,8 +36,11 @@ class UnrealException
 	: public std::exception
 {
 public:
-	UnrealException(const String& msg, ErrorCodeType c = OK)
+	UnrealException(const String& msg, ErrorCodeType c = static_cast<ErrorCodeType>(0))
 		: message_(msg), code_(c)
+	{}
+
+	~UnrealException() throw()
 	{}
 
 	/**

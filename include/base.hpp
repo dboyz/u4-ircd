@@ -43,6 +43,10 @@
 #include "user.hpp"
 #include "version.hpp"
 
+/** generic foreach */
+#define foreach(x, y, z) \
+	for (x y=z.begin(); y!=z.end();++y)
+
 /**
  * UnrealBase acts as the global ircd instance.
  */

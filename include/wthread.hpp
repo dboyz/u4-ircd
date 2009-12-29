@@ -75,7 +75,7 @@ public:
 					strerror_w(GetLastError()));
 
 			throw new UnrealThreadException(msg,
-					UnrealThreadException::Error::CreationFailed);
+					ErrorCode::Thread::CreationFailed);
 		}
 
 		// Release memory

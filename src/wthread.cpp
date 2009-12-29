@@ -41,7 +41,7 @@ UnrealWinMutex::UnrealWinMutex()
 				strerror_w(GetLastError()));
 
 		throw new UnrealMutexException(msg,
-				UnrealMutexException::Error::InitFailed);
+				ErrorCode::Mutex::InitFailed);
 	}
 }
 
@@ -57,7 +57,7 @@ UnrealWinMutex::~UnrealWinMutex()
 				strerror_w(GetLastError()));
 
 		throw new UnrealMutexException(msg,
-				UnrealMutexException::Error::DestructFailed);
+				ErrorCode::Mutex::DestructFailed);
 	}
 }
 
@@ -73,7 +73,7 @@ void UnrealWinMutex::lock()
 				strerror_w(GetLastError()));
 
 		throw new UnrealMutexException(msg,
-				UnrealMutexException::Error::LockFailed);
+				ErrorCode::Mutex::LockFailed);
 	}
 }
 
@@ -89,7 +89,7 @@ void UnrealWinMutex::unlock()
 				strerror_w(GetLastError()));
 
 		throw new UnrealMutexException(msg,
-				UnrealMutexException::Error::UnlockFailed);
+				ErrorCode::Mutex::UnlockFailed);
 	}
 }
 
@@ -105,7 +105,7 @@ UnrealWinThread::~UnrealWinThread()
 				"%s", strerror_w(GetLastError()));
 
 		throw new UnrealThreadException(msg,
-				UnrealThreadException::Error::DestructFailed);
+				ErrorCode::Thread::DestructFailed);
 	}
 }
 
@@ -121,7 +121,7 @@ void UnrealWinThread::join()
 				"%s", strerror_w(GetLastError()));
 
 		throw new UnrealThreadException(msg,
-				UnrealThreadException::Error::WaitFailed);
+				ErrorCode::Thread::WaitFailed);
 	}
 }
 

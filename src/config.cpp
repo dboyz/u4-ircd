@@ -23,13 +23,14 @@
  ******************************************************************/
 
 #include "config.hpp"
+#include "platform.hpp"
 #include <fstream>
 #include <iostream>
 #include <cstdlib>
 
 /**
  * Full documentation of the configuration system can be found at
- * http://wiki.commx.ws/wiki/Neonbox/Config
+ * http://wiki.commx.ws/wiki/Unreal4/Config
  */
 
 /**
@@ -174,6 +175,21 @@ String UnrealConfig::getVarContent(const String& key, const String& category)
 		return entries_[key];
 	else
 		return String();
+}
+
+/**
+ * Initialize default contents for the configuration.
+ */
+void UnrealConfig::initDefaults()
+{
+	/* prepare default sequences */
+	sequences_ << String("Listener")
+			   << String("Operator");
+
+	/* prepare default variable contents */
+	entries_.add("Modules/Suffix", PLATFORM_MODSUFFIX);
+	entries_.add("OS/Name", OS_NAME);
+	entries_.add("Version", PACKAGE_VERSION);
 }
 
 /**

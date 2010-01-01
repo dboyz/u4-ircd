@@ -3,8 +3,9 @@
  * File         base.cpp
  * Description  An object representing the unreal IRCd server
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -63,17 +64,15 @@ UnrealBase::UnrealBase(int cnt, char** vec)
 	initModes();
 
 	/* setup reactor pool */
-	size_t reactor_pool_size = config.get("Me/ReactorPoolSize", "1").toSize();
-	size_t reactor_threads = config.get("Me/Threads", "0").toSize();
+	size_t reactor_pool_size = config.get("Me::ReactorPoolSize", "1").toSize();
+	size_t reactor_threads = config.get("Me::Threads", "0").toSize();
+	rpool = new UnrealReactorPool(reactor_threads, reactor_pool_size);
 
 	if (reactor_pool_size == 0)
 	{
 		log.write(UnrealLog::Fatal, "Me::ReactorPoolSize is set to 0, exiting. "
 		    "Please increase that value in your server configuration file");
 	}
-	else if (rpool.size() != reactor_pool_size
-			|| rpool.threads() != reactor_threads)
-		rpool.resize(reactor_threads, reactor_pool_size);
 
 	/* fix resource limits */
 	setupRlimit();
@@ -430,7 +429,7 @@ void UnrealBase::printVersion()
  */
 void UnrealBase::run()
 {
-	rpool.run();
+	rpool->run();
 }
 
 /**
@@ -511,8 +510,7 @@ void UnrealBase::setupListener()
 			"1024").toUInt();
 
 		/* Setup the Listener */
-		UnrealListener* lptr = new UnrealListener(rpool.getReactor(),
-				addr, port.toUInt16());
+		UnrealListener* lptr = new UnrealListener(addr, port.toUInt16());
 		UnrealListener::ListenerType ltype;
 
 		if (type.toLower() == "server")
@@ -592,7 +590,7 @@ void UnrealBase::setupRlimit()
  */
 void UnrealBase::setupServer()
 {
-	me.setName(config.get("Me/ServerName"));
+	me.setName(config.get("Me::ServerName"));
 
 	if (me.name().empty())
 	{
@@ -600,7 +598,7 @@ void UnrealBase::setupServer()
 		exit(1);
 	}
 
-	me.setNumeric(config.get("Me/Numeric", "0").toUInt());
+	me.setNumeric(config.get("Me::Numeric", "0").toUInt());
 
 	if (me.numeric() == 0)
 	{
@@ -613,4 +611,18 @@ void UnrealBase::setupServer()
 
 	/* add into the server list */
 	servers.add(me.numeric(), &me);
+
+	/* setup default name servers, if not specified by config */
+	if (config.sequenceCount("DNS::Server") == 0)
+	{
+		if (config.get("DNS::System", "true").toBool())
+		{
+			// TODO: fetch DNS servers from system' configuration
+		}
+		else
+		{
+			config.set("DNS::System::Server_#SEQ-1#::Address", "8.8.8.8");
+			config.set("DNS::System::Server_#SEQ-2#::Address", "8.8.4.4");
+		}
+	}
 }

@@ -3,8 +3,9 @@
  * File         client.hpp
  * Description  User representation
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -123,16 +124,14 @@ public:
 	List<UnrealChannel*> channels;
 
 private:
-	void checkAuthTimeout(const UnrealSocket::ErrorCode& ec);
-	void checkPingTimeout(const UnrealSocket::ErrorCode& ec);
+	void checkAuthTimeout();
+	void checkPingTimeout();
 	void checkRemoteIdent();
 	void destroyIdentRequest();
 	void handleIdentCheckConnected(UnrealSocket* sptr);
-	void handleIdentCheckError(UnrealSocket* sptr,
-			const UnrealSocket::ErrorCode& ec);
+	//void handleIdentCheckError(UnrealSocket* sptr,
+	//		const UnrealSocket::Error& ec);
 	void handleIdentCheckRead(UnrealSocket* sptr, String& data);
-	void handleResolveResponse(const UnrealResolver::ErrorCode& ec,
-			UnrealResolver::Iterator response);
 	void resolveHostname();
 	void scheduleAuthTimeout();
 	void schedulePingTimeout();

@@ -3,8 +3,9 @@
  * File         names.cpp
  * Description  NAMES command handler
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -72,7 +73,7 @@ void uc_names(UnrealUser* uptr, StringList* argv)
 			chlist << argv->at(1);
 
 		for (StringList::Iterator chan = chlist.begin(); chan != chlist.end();
-				chan++)
+				++chan)
 		{
 			UnrealChannel* chptr = UnrealChannel::find(argv->at(1));
 
@@ -89,7 +90,7 @@ void uc_names(UnrealUser* uptr, StringList* argv)
 					prefix = '=';
 
 				for (UnrealChannel::MemberIterator cm = chptr->members.begin();
-						cm != chptr->members.end(); cm++)
+						cm != chptr->members.end(); ++cm)
 				{
 					UnrealChannel::Member* cmptr = cm->second;
 

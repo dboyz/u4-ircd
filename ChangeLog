@@ -2,6 +2,12 @@
   UnrealIRCd 4 ChangeLog
 -------------------------------------------------------------------------------
 
+  2010-01-01 21:51 +0100  Christian Jurk <commx@commx.ws>
+    >> Updated copyright notice in every file
+    >> Added conditions to the configuration system
+    >> Added Throw keyword to the configuration system
+    >> Got the code into some acceptable state
+
   2009-12-14 20:00 +0100  Christian Jurk <commx@commx.ws>
     >> UnrealUser: Added exit() function to exit an
        client based on an error code

@@ -3,8 +3,9 @@
  * File         time.hpp
  * Description  Object for time storage and math
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -43,14 +44,23 @@ public:
 	std::time_t toTS();
 	String toString(const String& fmt);
 
-	inline bool operator<(UnrealTime& other)
-	{ return timestamp_ < other.toTS(); }
+	inline bool operator<(const UnrealTime& other)
+	{ return timestamp_ < const_cast<UnrealTime&>(other).toTS(); }
 
-	inline bool operator>(UnrealTime& other)
-	{ return timestamp_ > other.toTS(); }
+	inline bool operator>(const UnrealTime& other)
+	{ return timestamp_ > const_cast<UnrealTime&>(other).toTS(); }
 
-	inline bool operator==(UnrealTime& other)
-	{ return timestamp_ == other.toTS(); }
+	inline bool operator==(const UnrealTime& other)
+	{ return timestamp_ == const_cast<UnrealTime&>(other).toTS(); }
+
+	inline bool operator!=(const UnrealTime& other)
+	{ return timestamp_ != const_cast<UnrealTime&>(other).toTS(); }
+
+	inline bool operator<=(const UnrealTime& other)
+	{ return timestamp_ <= const_cast<UnrealTime&>(other).toTS(); }
+
+	inline bool operator>=(const UnrealTime& other)
+	{ return timestamp_ >= const_cast<UnrealTime&>(other).toTS(); }
 
 private:
 	std::time_t timestamp_;

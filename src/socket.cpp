@@ -3,8 +3,9 @@
  * File         socket.cpp
  * Description  Socket wrapper class
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -43,7 +44,6 @@ UnrealSocket::UnrealSocket()
  */
 UnrealSocket::~UnrealSocket()
 {
-	destroyResolverQuery();
 }
 
 /**
@@ -56,7 +56,8 @@ bool UnrealSocket::close()
 	if (native_ != -1)
 		::close(native_);
 
-	onDisconnected(this);
+	onDisconnected.exec(this);
+	return true;
 }
 
 /**
@@ -72,19 +73,6 @@ void UnrealSocket::connect(const String& hostname, const uint16_t& portnum)
 }
 
 /**
- * Asyncronous connect callback.
- * This tries to connect to requested host and starts asyncronous reading.
- * Once connect failed, it tries the next endpoint returned from the resolver.
- *
- * @param ec boost error code
- * @param ep_iter Resolver endpoint iterator
- */
-void UnrealSocket::handleConnect(const ErrorCode& ec,
-	UnrealResolver::Iterator ep_iter)
-{
-}
-
-/**
  * Callback for asyncronous reading on the socket.
  * It's called when a new line has arrived for reading or the particular socket
  * throws an error.
@@ -92,10 +80,12 @@ void UnrealSocket::handleConnect(const ErrorCode& ec,
  * @param ec boost error_code
  * @param bytes_read Number of bytes read from the socket
  */
-void UnrealSocket::handleRead(const ErrorCode& ec, size_t bytes_read)
+/*
+void UnrealSocket::handleRead(const Error& ec, size_t bytes_read)
 {
 	traffic_.in += static_cast<uint64_t>(bytes_read);
 }
+*/
 
 /**
  * Callback for asyncronous writing to the socket.
@@ -103,10 +93,22 @@ void UnrealSocket::handleRead(const ErrorCode& ec, size_t bytes_read)
  * @param ec boost error_code
  * @param bytes_written Number of bytes written to the socket
  */
-void UnrealSocket::handleWrite(const ErrorCode& ec, size_t bytes_written)
+/*
+void UnrealSocket::handleWrite(const Error& ec, size_t bytes_written)
 {
-	/* add actual amount of data that has been written on the socket */
+	// add actual amount of data that has been written on the socket
 	traffic_.out += static_cast<uint64_t>(bytes_written);
+}
+*/
+
+/**
+ * Returns the native file descriptor assigned with this socket.
+ *
+ * @return File descriptor
+ */
+int UnrealSocket::native()
+{
+	return native_;
 }
 
 /**

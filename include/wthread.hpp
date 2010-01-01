@@ -3,8 +3,9 @@
  * File         wthread.hpp
  * Description  Windows(R) threads
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -28,7 +29,8 @@
 #include "platform.hpp"
 #include "string.hpp"
 #include <memory>
-#include <pthread.h>
+
+#ifdef OS_WINDOWS
 
 extern "C" void* unreal_windows_thread_function(void* arg);
 
@@ -136,4 +138,5 @@ inline void* unreal_windows_thread_function(void* arg)
 typedef UnrealWinMutex UnrealMutex;
 typedef UnrealWinThread UnrealThread;
 
+#endif /* OS_WINDOWS */
 #endif /* _UNREALIRCD_WTHREAD_HPP */

@@ -3,8 +3,9 @@
  * File         info.cpp
  * Description  INFO command handler
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -86,13 +87,13 @@ void uc_info(UnrealUser* uptr, StringList* argv)
 		StringList output = readInfoFile();
 
 		output << String("") << String("");
-		output << String::format("Revision: %s", _U4_VER_REVISION_);
+		output << String::format("Revision: %s", PACKAGE_CHANGESET);
 		output << String::format("Birth date: %s %s", __DATE__, __TIME__);
 		output << String::format("On-line since %s",
 			unreal->me.bootTime().toString("%Y-%M-%dT%H:%M:%S %Z").c_str());
 
 		/* now send it */
-		for (StringList::Iterator i = output.begin(); i != output.end(); i++)
+		for (StringList::Iterator i = output.begin(); i != output.end(); ++i)
 			uptr->sendreply(RPL_INFO, (*i).c_str());
 
 		uptr->sendreply(RPL_ENDOFINFO, MSG_ENDOFINFO);

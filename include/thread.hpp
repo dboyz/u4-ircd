@@ -3,8 +3,9 @@
  * File         thread.hpp
  * Description  Thread wrapper implementation
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -29,36 +30,37 @@
 #include "platform.hpp"
 #include "string.hpp"
 
-namespace ErrorCode {
-
-/**
- * Thread-related error codes.
- */
-namespace Thread {
-enum Type
+namespace ErrorCode
 {
-	OK = 0,             //!< no error specified
-	CreationFailed,     //!< thread creation failed
-	DestructFailed,     //!< thread destruction failed
-	WaitFailed,         //!< waiting for thread to destruct failed
-};
-} // namespace Thread
+	/**
+	 * Thread-related error codes.
+	 */
+	namespace Thread
+	{
+		enum Type
+		{
+			OK = 0,             //!< no error specified
+			CreationFailed,     //!< thread creation failed
+			DestructFailed,     //!< thread destruction failed
+			WaitFailed,         //!< waiting for thread to destruct failed
+		};
+	}
 
-/**
- * Mutex-related error codes.
- */
-namespace Mutex {
-enum Type
-{
-	OK = 0,				//!< no error specified
-	InitFailed,			//!< mutex initialization failed
-	DestroyFailed,		//!< mutex destruction failed
-	LockFailed,			//!< mutex lock failed
-	UnlockFailed		//!< mutex unlock failed
-};
-} // namespace Mutex
-
-} // namespace ErrorCode
+	/**
+	 * Mutex-related error codes.
+	 */
+	namespace Mutex
+	{
+		enum Type
+		{
+			OK = 0,             //!< no error specified
+			InitFailed,         //!< mutex initialization failed
+			DestroyFailed,      //!< mutex destruction failed
+			LockFailed,         //!< mutex lock failed
+			UnlockFailed        //!< mutex unlock failed
+		};
+	}
+}
 
 /**
  * Thread exception class.

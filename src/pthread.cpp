@@ -3,8 +3,9 @@
  * File         pthread.cpp
  * Description  Posix threads
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -23,6 +24,8 @@
  ******************************************************************/
 
 #include "pthread.hpp"
+#include <errno.h>
+#include <string.h>
 
 /**
  * Initialize the mutex.
@@ -33,7 +36,7 @@ UnrealPosixMutex::UnrealPosixMutex()
 	{
 		String msg;
 		msg.sprintf("UnrealPosixMutex: Initialization failed: %s",
-				strerror(errno));
+				::strerror(errno));
 
 		throw new UnrealMutexException(msg,
 				ErrorCode::Mutex::InitFailed);
@@ -49,7 +52,7 @@ UnrealPosixMutex::~UnrealPosixMutex()
 	{
 		String msg;
 		msg.sprintf("UnrealPosixMutex: Destruction of mutex failed: %s",
-				strerror(errno));
+				::strerror(errno));
 
 		throw new UnrealMutexException(msg,
 				ErrorCode::Mutex::DestroyFailed);
@@ -65,7 +68,7 @@ void UnrealPosixMutex::lock()
 	{
 		String msg;
 		msg.sprintf("UnrealPosixMutex: Lock failed: %s",
-				strerror(errno));
+				::strerror(errno));
 
 		throw new UnrealMutexException(msg,
 				ErrorCode::Mutex::LockFailed);
@@ -81,7 +84,7 @@ void UnrealPosixMutex::unlock()
 	{
 		String msg;
 		msg.sprintf("UnrealPosixMutex: Unlock failed: %s",
-				strerror(errno));
+				::strerror(errno));
 
 		throw new UnrealMutexException(msg,
 				ErrorCode::Mutex::UnlockFailed);
@@ -95,11 +98,11 @@ UnrealPosixThread::~UnrealPosixThread()
 {
 	if (!joined_)
 	{
-		if (::pthread_detach(&native_) != 0)
+		if (::pthread_detach(native_) != 0)
 		{
 			String msg;
 			msg.sprintf("UnrealPosixThread: Detaching failed: %s",
-					strerror(errno));
+					::strerror(errno));
 
 			throw new UnrealThreadException(msg,
 					ErrorCode::Thread::DestructFailed);
@@ -114,11 +117,11 @@ void UnrealPosixThread::join()
 {
 	if (!joined_)
 	{
-		if (::pthread_join(&native_, 0) != 0)
+		if (::pthread_join(native_, 0) != 0)
 		{
 			String msg;
 			msg.sprintf("UnrealPosixThread: Waiting for thread to finish "
-					"failed: %s", strerror(errno));
+					"failed: %s", ::strerror(errno));
 
 			throw new UnrealThreadException(msg,
 					ErrorCode::Thread::WaitFailed);

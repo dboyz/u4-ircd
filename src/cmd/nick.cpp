@@ -3,8 +3,9 @@
  * File         nick.cpp
  * Description  NICK command handler
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -59,7 +60,7 @@ bool is_valid_nick(const String& str)
 	String trstr = str;
 	trstr = trstr.trimmed();
 
-	if (trstr.length() > _U4_NICKLEN_)
+	if (trstr.length() > U4_NICKLEN)
 		return false;
 
 	for (size_t i = 0; i < trstr.length(); i++)

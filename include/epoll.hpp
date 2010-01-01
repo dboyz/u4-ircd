@@ -3,8 +3,9 @@
  * File         epoll.hpp
  * Description  epoll() event reactor
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -31,6 +32,8 @@
 #include "reactor.hpp"
 #include "timer.hpp"
 
+class UnrealTimer;
+
 /**
  * epoll() reactor for asyncronous events
  */
@@ -51,11 +54,11 @@ public:
 	void dispatch();
 	bool observe(int fd, CallbackType cb, 
 	    uint32_t events = EventError | EventIn);
-	bool observe(const UnrealTimer& timer);
+	bool observe(UnrealTimer* timer);
 	void run();
 	void stop();
 	bool stop(int fd);
-	bool stop(const UnrealTimer& timer);
+	bool stop(UnrealTimer* timer);
 	uint32_t translateEvents(TranslationFlag ot, uint32_t ev);
 	static String type();
 
@@ -76,7 +79,7 @@ private:
 	Map<int, CallbackType> callbacks_;
 
 	/** timer map */
-	List<UnrealTimer> timers_;
+	List<UnrealTimer*> timers_;
 };
 
 /* typedef the reactor */

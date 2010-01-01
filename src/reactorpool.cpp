@@ -3,8 +3,9 @@
  * File         reactorpool.cpp
  * Description  An object representing a set of worker threads
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -40,10 +41,10 @@
 UnrealReactorPool::UnrealReactorPool(size_t nthreads, size_t nr)
 	: threads_size_(nthreads), next_reactor_(0)
 {
-	assert(nios > 0);
+	assert(nr > 0);
 
-	/* allocate the IO services */
-	for (size_t i = 0; i < nios; i++)
+	/* allocate the reactors */
+	for (size_t i = 0; i < nr; ++i)
 	{
 		UnrealReactor react;
 		reactors_ << react;
@@ -61,7 +62,7 @@ UnrealReactor& UnrealReactorPool::getReactor()
 	UnrealReactor& react = reactors_[next_reactor_];
 
 	/* increment counter */
-	next_reactor_++;
+	++next_reactor_;
 
 	if (next_reactor_ >= reactors_.size())
 		next_reactor_ = 0;
@@ -80,11 +81,11 @@ UnrealReactor& UnrealReactorPool::getReactor()
  */
 void UnrealReactorPool::resize(size_t nthreads, size_t nr)
 {
-    if (nios > reactors_.size())
+    if (nr > reactors_.size())
     {
         size_t diff = nr - reactors_.size();
 
-        for (size_t i = 0; i < diff; i++)
+        for (size_t i = 0; i < diff; ++i)
         {
 			UnrealReactor react;
 			reactors_ << react;
@@ -95,7 +96,7 @@ void UnrealReactorPool::resize(size_t nthreads, size_t nr)
         size_t diff = reactors_.size() - nr;
 
         /* remove the difference amount of reactors */
-        for (size_t i = 0; i < diff; i++)
+        for (size_t i = 0; i < diff; ++i)
         {
             reactors_.removeFirst();
         }
@@ -110,13 +111,14 @@ void UnrealReactorPool::resize(size_t nthreads, size_t nr)
  */
 void UnrealReactorPool::run()
 {
-	List<ThreadPtr> threads;
+	List<UnrealThread*> threads;
 	size_t reactor_pos = 0;
 
-	for (size_t i = 0; i < threads_size_; i++)
+	for (size_t i = 0; i < threads_size_; ++i)
 	{
-		ThreadPtr thread(new UnrealThread(
-		    UnrealBinder0(&UnrealReactor::run, &reactors_[reactor_pos])));
+		UnrealThread* thread = new UnrealThread(
+		    UnrealBinder0<UnrealReactor>(&UnrealReactor::run,
+		    	&reactors_[reactor_pos]));
 
 		/* add to thread list */
 		threads << thread;
@@ -130,6 +132,10 @@ void UnrealReactorPool::run()
 
 	if (threads_size_ == 0)
 		reactors_[0].run();
+
+	for (List<UnrealThread*>::Iterator it = threads.begin();
+			it != threads.end(); ++it)
+		delete *it;
 }
 
 /**

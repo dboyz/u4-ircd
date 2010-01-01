@@ -3,8 +3,9 @@
  * File         part.cpp
  * Description  PART command handler
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -79,7 +80,7 @@ void uc_part(UnrealUser* uptr, StringList* argv)
 		else
 			cl << argv->at(1);
 
-		for (StringList::Iterator chan = cl.begin(); chan != cl.end(); chan++)
+		for (StringList::Iterator chan = cl.begin(); chan != cl.end(); ++chan)
 		{
 			String tmp_chan = *chan;
 

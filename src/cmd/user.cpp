@@ -3,8 +3,9 @@
  * File         user.cpp
  * Description  USER command handler
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -76,10 +77,10 @@ void uc_user(UnrealUser* uptr, StringList* argv)
 		}
 
 		/* trim the ident if it's too long */
-		if (uptr->ident().length() > _U4_USERLEN_)
+		if (uptr->ident().length() > U4_USERLEN)
 		{
 			String tmp = uptr->ident();
-			uptr->setIdent(tmp.left(_U4_USERLEN_));
+			uptr->setIdent(tmp.left(U4_USERLEN));
 		}
 
 		uptr->setRealname(argv->at(argv->size() - 1));

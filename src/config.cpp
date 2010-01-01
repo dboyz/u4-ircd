@@ -3,8 +3,9 @@
  * File         config.cpp
  * Description  An object for configuration storage and loading
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -22,7 +23,9 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
+#include "base.hpp"
 #include "config.hpp"
+#include "config.h"
 #include "platform.hpp"
 #include <fstream>
 #include <iostream>
@@ -38,7 +41,9 @@
  */
 UnrealConfig::UnrealConfig()
 	: filename_(CONFIG_DEFAULT_FILE), warnings_(0)
-{ }
+{
+	initDefaults();
+}
 
 /**
  * Returns the initial configuration file name.
@@ -153,7 +158,9 @@ bool UnrealConfig::getQuotedContent(String& inp, String& val)
 String UnrealConfig::getSeqVal(const String& key, int index, const String& name,
 	const String& def)
 {
-	String vr = key + "_#SEQ-" + String(index) + "#/" + name;
+	String vr;
+	vr.sprintf("%s_#SEQ-%d#%s%s", key.c_str(), index, CONFIG_ITEM_SEPARATOR,
+			name.c_str());
 	return get(vr, def);
 }
 
@@ -183,12 +190,13 @@ String UnrealConfig::getVarContent(const String& key, const String& category)
 void UnrealConfig::initDefaults()
 {
 	/* prepare default sequences */
-	sequences_ << String("Listener")
+	sequences_ << String("DNS/Server")
+			   << String("Listener")
 			   << String("Operator");
 
 	/* prepare default variable contents */
-	entries_.add("Modules/Suffix", PLATFORM_MODSUFFIX);
-	entries_.add("OS/Name", OS_NAME);
+	entries_.add("DLLSuffix", OS_DLLSUFFIX);
+	entries_.add("OSName", OS_NAME);
 	entries_.add("Version", PACKAGE_VERSION);
 }
 
@@ -224,6 +232,7 @@ bool UnrealConfig::read(const String& file)
 	std::ifstream fst(file.c_str(), std::ifstream::in);
 	size_t pos, lineno = 0, cpos = String::npos, cpos2 = String::npos;
 	String category;
+	bool permit = true, if_ac = false;
 
 	if (!fst)
 		return false;
@@ -276,10 +285,13 @@ bool UnrealConfig::read(const String& file)
 
 			/* check if we have a nested block */
 			if (!category.empty())
-				category << "/" << line.mid(0, pos).trimmed();
+			{
+				tmp_cat.prepend(category + CONFIG_ITEM_SEPARATOR);
+				category << CONFIG_ITEM_SEPARATOR << line.mid(0, pos).trimmed();
+			}
 
 			/* or an sequenced block */
-			else if (line.size() > 2 && (line.mid(pos - 2, 2) == "++"
+			if (line.size() > 2 && (line.mid(pos - 2, 2) == "++"
 					|| sequences_.contains(tmp_cat)))
 			{
 				if (line.mid(pos - 2, 2) == "++")
@@ -301,11 +313,11 @@ bool UnrealConfig::read(const String& file)
 		while (line.left(2) == "};") //< end of block
 		{
 			/* on nested blocks, remove the last category item */
-			if (category.contains("/"))
+			if (category.contains(CONFIG_ITEM_SEPARATOR))
 			{
-				StringList sl = category.split("/");
+				StringList sl = category.split(CONFIG_ITEM_SEPARATOR);
 				sl.removeLast();
-				category = sl.join("/");
+				category = sl.join(CONFIG_ITEM_SEPARATOR);
 			}
 			else
 				category.clear();
@@ -313,7 +325,102 @@ bool UnrealConfig::read(const String& file)
 			line = line.mid(2);
 		}
 
-		if (line.left(8) == "Include ") //< Include directive
+		if (line.left(3) == "If ") //< If directive
+		{
+			StringList par = line.mid(3).split(" ");
+			String r, s;
+
+			if (par.size() < 3)
+			{
+				std::cout << "Warning: "
+						  << file
+						  << ":"
+						  << lineno
+						  << " -- "
+						  << "If syntax: If A operator B {"
+						  << std::endl;
+				warnings_++;
+				continue;
+			}
+
+			replaceVars(par[0], r, "");
+			if (!getQuotedContent(par[0], r))
+			{
+				std::cout << "Warning: "
+						  << file
+						  << ":"
+						  << lineno
+						  << " --"
+						  << " Left value is missing closing quote"
+						  << std::endl;
+				warnings_++;
+
+				continue;
+			}
+			else
+				par[0] = r;
+
+			r.clear();
+			replaceVars(par[2], r, "");
+			if (!getQuotedContent(par[2], r))
+			{
+				std::cout << "Warning: "
+						  << file
+						  << ":"
+						  << lineno
+						  << " --"
+						  << " Right value is missing closing quote"
+						  << std::endl;
+				warnings_++;
+
+				continue;
+			}
+			else
+				par[2] = r;
+
+			std::cout << String::format("Compare (%s) %s (%s)\n",
+					par[0].c_str(),
+					par[1].c_str(),
+					par[2].c_str());
+
+			if (par[1] == "==")
+				permit = (par[0] == par[2]);
+			else if (par[1] == "!=")
+				permit = (par[0] != par[2]);
+			else if (par[1] == "<=")
+				permit = (par[0].compare(par[2]) <= 0);
+			else if (par[1] == ">=")
+				permit = (par[0].compare(par[2]) >= 0);
+			else if (par[1] == ">")
+				permit = (par[0].compare(par[2]) > 0);
+			else if (par[1] == "<")
+				permit = (par[0].compare(par[2]) < 0);
+			else
+			{
+				std::cout << "Warning: "
+						  << file
+						  << ":"
+						  << lineno
+						  << " -- "
+						  << "Invalid comparisation operator: "
+						  << par[1]
+						  << std::endl;
+				warnings_++;
+				continue;
+			}
+
+			if_ac = true;
+		}
+		else if (line.left(5) == "Endif")
+		{
+			if_ac = false;
+			permit = true;
+		}
+		else if (!permit)
+		{
+			continue;
+		}
+		else if (line.left(8) == "Include ") //< Include directive
 		{
 			String r;
 			String s = line.mid(8);
@@ -366,6 +473,9 @@ bool UnrealConfig::read(const String& file)
 			String r;
 			String s = line.mid(9);
 
+			if (!category.empty())
+				s.prepend(category);
+
 			replaceVars(s, r, "");
 
 			r.clear();
@@ -385,6 +495,34 @@ bool UnrealConfig::read(const String& file)
 
 			sequences_ << r;
 		}
+		else if (line.left(6) == "Throw ") //< Throw directive
+		{
+			String r, s = line.mid(6);
+			replaceVars(s, r, "");
+
+			r.clear();
+			if (!getQuotedContent(s, r))
+			{
+				std::cout << "Warning: "
+						  << file
+						  << ":"
+						  << lineno
+						  << " --"
+						  << " Value is missing closing quote"
+						  << std::endl;
+				warnings_++;
+
+				continue;
+			}
+
+			std::cout << file
+					  << ":"
+					  << lineno
+					  << " -- Throw: "
+					  << r
+					  << std::endl;
+			unreal->exit(2);
+		}
 		else
 		{
 			while (line.contains(";"))
@@ -399,7 +537,7 @@ bool UnrealConfig::read(const String& file)
 
 				// get the key
 				String val = line.left(fi).trimmed();
-				String key = category + "/" + val;
+				String key = category + CONFIG_ITEM_SEPARATOR + val;
 
 				// content
 				String tmp = line.mid(fi + 1, sc);
@@ -445,11 +583,11 @@ bool UnrealConfig::read(const String& file)
 				while (line.left(2) == "};")
 				{
 					/* on nested blocks, remove the last category item */
-					if (category.contains("/"))
+					if (category.contains(CONFIG_ITEM_SEPARATOR))
 					{
-						StringList sl = category.split("/");
+						StringList sl = category.split(CONFIG_ITEM_SEPARATOR);
 						sl.removeLast();
-						category = sl.join("/");
+						category = sl.join(CONFIG_ITEM_SEPARATOR);
 					}
 					else
 						category.clear();
@@ -533,7 +671,7 @@ bool UnrealConfig::replaceVars(String& str, String& ret, const String& category)
 		/* ignore escaped vars */
 		if (pos > 0 && str[pos - 1] == '\\')
 		{
-			pos += 3;
+			lastpos += 2;
 			continue;
 		}
 		else if (std::sscanf(str.c_str() + pos, "$(%[^)])", var_name) > 0)
@@ -568,7 +706,7 @@ size_t UnrealConfig::sequenceCount(const String& blk)
 	String blknam = blk + "_#SEQ-";
 
 	for (Map<String, String>::Iterator siter = entries_.begin();
-			siter != entries_.end(); siter++)
+			siter != entries_.end(); ++siter)
 	{
 		String key = siter->first;
 
@@ -595,6 +733,20 @@ size_t UnrealConfig::sequenceCount(const String& blk)
 	}
 
 	return highest;
+}
+
+/**
+ * Set configuration item.
+ *
+ * @param key Key
+ * @param value Value
+ */
+void UnrealConfig::set(const String& key, const String& value)
+{
+	if (entries_.contains(key))
+		entries_.remove(key);
+
+	entries_.add(key, value);
 }
 
 /**

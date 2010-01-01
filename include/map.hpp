@@ -3,8 +3,9 @@
  * File         map.hpp
  * Description  An object mapping object onto eachother
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -76,7 +77,7 @@ public:
 	 */
 	bool containsElement(const _ElementType& el)
 	{
-		for (Iterator i = this->begin(); i != this->end(); i++)
+		for (Iterator i = this->begin(); i != this->end(); ++i)
 		{
 			if (i->second == el)
 			{
@@ -113,7 +114,7 @@ public:
 	 */
 	_KeyType key(const _ElementType& el)
 	{
-		for (Iterator i = this->begin(); i != this->end(); i++)
+		for (Iterator i = this->begin(); i != this->end(); ++i)
 		{
 			if (i->second == el)
 			{
@@ -133,7 +134,7 @@ public:
 	{
 		List<_KeyType> kl;
 
-		for (Iterator i = this->begin(); i != this->end(); i++)
+		for (Iterator i = this->begin(); i != this->end(); ++i)
 			kl << i->first;
 
 		return kl;
@@ -177,7 +178,7 @@ public:
 	{
 		List<_ElementType> el;
 
-		for (Iterator i = this->begin(); i != this->end(); i++)
+		for (Iterator i = this->begin(); i != this->end(); ++i)
 			el << i->second;
 
 		return el;

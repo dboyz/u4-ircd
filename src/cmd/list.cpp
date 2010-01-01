@@ -3,8 +3,9 @@
  * File         list.cpp
  * Description  LIST command handler
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -79,7 +80,7 @@ void uc_list(UnrealUser* uptr, StringList* argv)
 	uptr->sendreply(RPL_LISTSTART, MSG_LISTSTART);
 
 	for (Map<String, UnrealChannel*>::Iterator ci = unreal->channels.begin();
-			ci != unreal->channels.end(); ci++)
+			ci != unreal->channels.end(); ++ci)
 	{
 		UnrealChannel* chptr = ci->second;
 

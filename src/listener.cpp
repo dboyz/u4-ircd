@@ -3,8 +3,9 @@
  * File         listener.cpp
  * Description  Connection listener
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -142,16 +143,6 @@ uint16_t UnrealListener::bindPort()
 }
 
 /**
- * Acceptor notification callback.
- *
- * @param sptr Shared UnrealSocket pointer of new connection
- * @param ec ErrorCode
- */
-void UnrealListener::handleAccept(UnrealSocket* sptr, const ErrorCode& ec)
-{
-}
-
-/**
  * Socket notification callback for new data available.
  *
  * @param sptr Shared UnrealSocket pointer
@@ -218,16 +209,6 @@ void UnrealListener::handleDataResponse(UnrealSocket* sptr, String& data)
 }
 
 /**
- * Socket error notification callback.
- *
- * @param sptr Shared UnrealSocket pointer
- * @param ec ErrorCode
- */
-void UnrealListener::handleError(UnrealSocket* sptr, const ErrorCode& ec)
-{
-}
-
-/**
  * Returns the maximum amount of connections permitted for this listener.
  *
  * @return Connection limit
@@ -286,21 +267,21 @@ void UnrealListener::run()
 {
 	int v = 1; // reuse address
 	struct sockaddr_in saddr;
-	UnrealResolver resolv((UnrealIOService&)get_io_service());
-	UnrealResolver::Query query(address_, String(port_));
-	UnrealResolver::Endpoint endpoint = *resolv.resolve(query, ec);
+	//UnrealResolver resolv((UnrealIOService&)get_io_service());
+	//UnrealResolver::Query query(address_, String(port_));
+	//UnrealResolver::Endpoint endpoint = *resolv.resolve(query, ec);
 
 	/* setting up address details */
-	saddr.sin_family = endpoint.protocol();
+	//saddr.sin_family = endpoint.protocol();
 	saddr.sin_port = htons(port_);
 
-	if ((native_ = ::socket(endpoint.protocol(), SOCK_STREAM, SOCK_NONBLOCK))
+	if ((native_ = ::socket(/*endpoint.protocol()*/AF_INET, SOCK_STREAM, SOCK_NONBLOCK))
 	    == -1)
 	{
 		unreal->log.write(UnrealLog::Fatal, "UnrealListener: Socket creation "
 			"failed: %s", strerror(errno));
 	}
-	else if (::setsockopt(native_, SO_SOCKET, SO_REUSEADDR, &v, sizeof(v))
+	else if (::setsockopt(native_, SOL_SOCKET, SO_REUSEADDR, &v, sizeof(v))
 		== -1)
 	{
 		unreal->log.write(UnrealLog::Fatal, "UnrealListener: Setting reuse-flag"
@@ -422,9 +403,11 @@ UnrealListener::ListenerType UnrealListener::type()
  */
 void UnrealListener::waitForAccept()
 {
+	/*
 	UnrealSocket* sptr = new UnrealSocket(unreal->ios_pool.getIOService());
 
 	async_accept(*sptr,
 		strand_.wrap(boost::bind(&UnrealListener::handleAccept,
 			this, sptr, boost::asio::placeholders::error)));
+			*/
 }

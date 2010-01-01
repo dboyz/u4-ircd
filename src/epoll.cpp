@@ -3,8 +3,9 @@
  * File         epoll.hpp
  * Description  epoll() event reactor
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -85,27 +86,27 @@ void UnrealEpollReactor::dispatch()
 	}
 
 	/* look for expired timers */
-	for (List<UnrealTimer>::Iterator ti = timers_.begin();
+	for (List<UnrealTimer*>::Iterator ti = timers_.begin();
 			ti != timers_.end(); ++ti)
 	{
-		UnrealTimer& timer = *ti;
+		UnrealTimer* timer = *ti;
 
-		if (timer.expiretime() <= currentTime)
+		if (currentTime >= timer->expiretime())
 		{
-			timer.exec();
+			timer->exec();
 
-			if (timer.interval() == -1)
+			if (timer->interval() == -1U)
 			{
-				timer.erase(ti);
+				timers_.erase(ti);
 
 				ti = timers_.begin();
 				continue;
 			}
 			else
 			{
-				UnrealTime ts = timer.expiretime();
-				ts.addSeconds(static_cast<std::time_t>(timer.interval()));
-				timer.setExpireTime(ts);
+				UnrealTime ts = timer->expiretime();
+				ts.addSeconds(static_cast<std::time_t>(timer->interval()));
+				timer->setExpireTime(ts);
 			}
 		}
 	}   
@@ -141,11 +142,9 @@ bool UnrealEpollReactor::observe(int fd, CallbackType cb, uint32_t events)
  * @param timer Timer to be added
  * @return Always true
  */
-bool UnrealEpollReactor::observe(const UnrealTimer& timer)
+bool UnrealEpollReactor::observe(UnrealTimer* timer)
 {
-	UnrealTimer t = timer;
-	timers_ << t;
-
+	timers_ << timer;
 	return true;
 }
 
@@ -188,7 +187,7 @@ bool UnrealEpollReactor::stop(int fd)
  * @param timer Timer being observed
  * @param Boolean value if the timer has been removed
  */
-bool UnrealEpollReactor::stop(const UnrealTimer& timer)
+bool UnrealEpollReactor::stop(UnrealTimer* timer)
 {
 	bool result = timers_.contains(timer);
 

@@ -3,8 +3,9 @@
  * File         signal.hpp
  * Description  A type-independent way to transmit signals
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -81,11 +82,10 @@ private:
  */
 template<typename ConnectionFnType, typename Arg1Type>
 class UnrealSignal1
-	: public UnrealSignal0<ConnectionFnType>
 {
 public:
-	typedef List<ConnectionFnType> ConnectionList;
-	typedef typename List<ConnectionFnType>::Iterator ConnectionIterator;
+	typedef List<ConnectionFnType*> ConnectionList;
+	typedef typename List<ConnectionFnType*>::Iterator ConnectionIterator;
 
 public:
 	~UnrealSignal1()
@@ -93,7 +93,7 @@ public:
 		disconnectAllSlots();
 	}
 
-	void connect(ConnectionFnType fn)
+	void connect(ConnectionFnType* fn)
 	{
 		connections_ << fn;
 	}
@@ -103,7 +103,7 @@ public:
 		return connections_.size();
 	}
 
-	void disconnect(ConnectionFnType fn)
+	void disconnect(ConnectionFnType* fn)
 	{
 		connections_.remove(fn);
 	}
@@ -113,13 +113,18 @@ public:
 		connections_.clear();
 	}
 
-	void operator()(Arg1Type arg1)
+	void exec(Arg1Type arg1)
 	{
 		for (ConnectionIterator ci = connections_.begin();
 		    	ci != connections_.end(); ++ci)
 		{
 			(*ci)(arg1);
 		}
+	}
+
+	void operator()(Arg1Type arg1)
+	{
+		exec(arg1);
 	}
 
 private:

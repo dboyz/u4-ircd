@@ -3,8 +3,9 @@
  * File         resolver.cpp
  * Description  Asyncronous DNS resolver
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -28,43 +29,13 @@
 /**
  * UnrealResolver constructor.
  */
-UnrealResolver::UnrealResolver(UnrealIOService& ios)
-	: tcp::resolver(ios), strand_(ios)
+UnrealResolver::UnrealResolver()
 { }
-
-/**
- * Callback for asyncronous resolver query.
- *
- * @param err boost error_code
- * @param ep Resolver query iterator
- */
-void UnrealResolver::handleResult(const ErrorCode& ec, Iterator ep_iter)
-{
-	onResolve(ec, ep_iter);
-}
-
-/**
- * Initiate an DNS query using an endpoint specification
- */
-void UnrealResolver::query(Endpoint& endpoint)
-{
-	async_resolve(endpoint,
-		strand_.wrap(boost::bind(&UnrealResolver::handleResult,
-			this,
-			boost::asio::placeholders::error,
-			boost::asio::placeholders::iterator)));
-}
 
 /**
  * Initiate an DNS query w/ host/port.
  */
 void UnrealResolver::query(const String& hostname, const uint16_t& port)
 {
-	Query query(hostname, String(port));
 
-	async_resolve(query,
-		strand_.wrap(boost::bind(&UnrealResolver::handleResult,
-			this,
-			boost::asio::placeholders::error,
-			boost::asio::placeholders::iterator)));
 }

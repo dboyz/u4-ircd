@@ -3,8 +3,9 @@
  * File         binder.hpp
  * Description  Object function binders
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -26,49 +27,30 @@
 #define _UNREALIRCD_BINDER_HPP
 
 /**
- * This is a simple object function binder implementation for UnrealIRCd.
- * The idea behind all it is to provide a way to provide object-based callback
- * methods.
- *
- * Example:
- * You have a class with a basic method to call.
- *
- *   class MyClass {
- *       public: void test(int av);
- *   } cl;
- *
- * And you've got a global function to call.
- *
- *   void testfunc(int av);
- *
- * Let's assume you have some kind of function that triggers an
- * callback function.
- *
- *    registerCallback(testfunc);  // works just fine
- *    registerCallback(cl.test);   // doesn't work
- *
- * Now, we can use a binder object to make it possible to register an object
- * callback:
- *
- *    UnrealBinder1<MyClass, int, void> cb(&MyClass::test, &cl);
- *    registerCallback(cb);
- *
- */
-
-/**
  * Object binder w/o arguments.
  */
 template<class ClassType, typename ReturnType = void>
 class UnrealBinder0
 {
 public:
-	UnrealBinder0(ReturnType (ClassType::*mf)(), ClassType* cl)
+	UnrealBinder0(ReturnType (ClassType::*mf)() = 0, ClassType* cl = 0)
 			: member_(mf), cl_(cl)
 	{ }
 
-	ReturnType operator()()
+	void bind(ReturnType (ClassType::*mf)(), ClassType* cl)
 	{
-		(cl_->*member_)();
+		member_ = mf;
+		cl_ = cl;
+	}
+
+	inline ReturnType emit()
+	{
+		return (cl_->*member_)();
+	}
+
+	inline ReturnType operator()()
+	{
+		return emit();
 	}
 
 private:
@@ -83,13 +65,24 @@ template<class ClassType, typename Arg1Type, typename ReturnType = void>
 class UnrealBinder1
 {
 public:
-	UnrealBinder1(ReturnType (ClassType::*mf)(Arg1Type), ClassType* cl)
+	UnrealBinder1(ReturnType (ClassType::*mf)(Arg1Type) = 0, ClassType* cl = 0)
 			: member_(mf), cl_(cl)
 	{ }
 
-	ReturnType operator()(Arg1Type arg1)
+	void bind(ReturnType (ClassType::*mf)(Arg1Type), ClassType* cl)
 	{
-		(cl_->*member_)(arg1);
+		member_ = mf;
+		cl_ = cl;
+	}
+
+	inline ReturnType emit(Arg1Type arg1)
+	{
+		return (cl_->*member_)(arg1);
+	}
+
+	inline ReturnType operator()(Arg1Type arg1)
+	{
+		return emit(arg1);
 	}
 
 private:
@@ -105,8 +98,8 @@ template<class ClassType, typename Arg1Type, typename Arg2Type,
 class UnrealBinder2
 {
 public:
-	UnrealBinder2(ReturnType (ClassType::*mf)(Arg1Type, Arg2Type) = NULL,
-	    ClassType* cl = NULL)
+	UnrealBinder2(ReturnType (ClassType::*mf)(Arg1Type, Arg2Type) = 0,
+	    ClassType* cl = 0)
 			: member_(mf), cl_(cl)
 	{ }
 

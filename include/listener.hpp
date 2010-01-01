@@ -3,8 +3,9 @@
  * File         listener.hpp
  * Description  Connection listener
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -32,15 +33,26 @@
 #include "string.hpp"
 #include "stringlist.hpp"
 
+namespace ErrorCode
+{
+	namespace Listener
+	{
+		enum Type
+		{
+			OK = 0
+		};
+	}
+}
+
 class UnrealListener
 {
 public:
 	/** Listener type */
 	enum ListenerType { LClient, LServer };
+	typedef ErrorCode::Listener::Type Error;
 
 public:
-	UnrealListener(UnrealReactor& reactor, const String& address,
-			const uint16_t& port);
+	UnrealListener(const String& address, const uint16_t& port);
 	~UnrealListener();
 
 	void addConnection(UnrealSocket* sptr);
@@ -68,6 +80,7 @@ public:
 	UnrealSignal0<UnrealListener> onNewConnection;
 
 private:
+	void handleDataResponse(UnrealSocket* sptr, String& data);
 	void handleNewConnection();
 
 private:

@@ -3,8 +3,9 @@
  * File         socket.hpp
  * Description  Socket wrapper class definition
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -37,64 +38,62 @@
 /**
  * Error code definitions for networking.
  */
-namespace ErrorCode {
-
-namespace Socket {
-
-enum Type
+namespace ErrorCode
 {
-	// bad file descriptor
-	BadFd = EBADFD,
+	namespace Socket
+	{
+		enum Type
+		{
+			// bad file descriptor
+			BadFd = EBADFD,
 
-	// protocol not supported
-	ProtocolNotSupported = EPROTONOSUPPORT,
+			// protocol not supported
+			ProtocolNotSupported = EPROTONOSUPPORT,
 
-	// address is already in use
-	AddressInUse = EADDRINUSE,
+			// address is already in use
+			AddressInUse = EADDRINUSE,
 
-	// network is down
-	NetworkDown = ENETDOWN,
+			// network is down
+			NetworkDown = ENETDOWN,
 
-	// network is unreachable
-	NetworkUnreachable = ENETUNREACH,
+			// network is unreachable
+			NetworkUnreachable = ENETUNREACH,
 
-	// network dropped connection because of reset
-	NetworkReset = ENETRESET,
+			// network dropped connection because of reset
+			NetworkReset = ENETRESET,
 
-	// software caused connection abort
-	ConnectionAborted = ECONNABORTED,
+			// software caused connection abort
+			ConnectionAborted = ECONNABORTED,
 
-	// connection reset by peer
-	ConnectionReset = ECONNRESET,
+			// connection reset by peer
+			ConnectionReset = ECONNRESET,
 
-	// endpoint is already connected
-	AlreadyConnected = EISCONN,
+			// endpoint is already connected
+			AlreadyConnected = EISCONN,
 
-	// endpoint is not connected
-	NotConnected = ENOTCONN,
+			// endpoint is not connected
+			NotConnected = ENOTCONN,
 
-	// connection timed out
-	TimedOut = ETIMEDOUT,
+			// connection timed out
+			TimedOut = ETIMEDOUT,
 
-	// connection refused
-	ConnectionRefused = ECONNREFUSED,
+			// connection refused
+			ConnectionRefused = ECONNREFUSED,
 
-	// host is down
-	HostIsDown = EHOSTDOWN,
+			// host is down
+			HostIsDown = EHOSTDOWN,
 
-	// no route to host
-	HostUnreachable = EHOSTUNREACH,
+			// no route to host
+			HostUnreachable = EHOSTUNREACH,
 
-	// operation already in progress
-	AlreadyInProgress = EALREADY,
+			// operation already in progress
+			AlreadyInProgress = EALREADY,
 
-	// operation now in progress
-	InProgress = EINPROGRESS,
-};
-
-} // namespace Socket
-
-} // namespace ErrorCode
+			// operation now in progress
+			InProgress = EINPROGRESS,
+		};
+	}
+}
 
 /**
  * Define a traffic type, that is used to measure how many data
@@ -115,17 +114,21 @@ struct UnrealSocketTrafficType
 class UnrealSocket
 {
 public:
+	typedef ErrorCode::Socket::Type Error;
+
+public:
 	UnrealSocket();
 	~UnrealSocket();
 	bool close();
 	void connect(const String& hostname, const uint16_t& portnum);
+	int native();
 	UnrealSocketTrafficType traffic();
 	void waitForLine();
 	void write(const String& data);
 
 public:
-	UnrealSignal1<UnrealSocket, UnrealSocket*> onConnected;
-	UnrealSignal1<UnrealSocket, UnrealSocket*> onDisconnected;
+	UnrealSignal1<void(UnrealSocket*), UnrealSocket*> onConnected;
+	UnrealSignal1<void(UnrealSocket*), UnrealSocket*> onDisconnected;
 
 private:
 	/** native file descriptor */

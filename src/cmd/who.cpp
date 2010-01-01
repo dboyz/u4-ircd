@@ -3,8 +3,9 @@
  * File         who.cpp
  * Description  WHO command handler
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -77,7 +78,7 @@ void uc_who(UnrealUser* uptr, StringList* argv)
 			bool can_recv_inv = (chptr->findMember(uptr) || uptr->isOper());
 
 			for (UnrealChannel::MemberIterator i = chptr->members.begin();
-					i != chptr->members.end(); i++)
+					i != chptr->members.end(); ++i)
 			{
 				UnrealUser* tuptr = i->first;
 

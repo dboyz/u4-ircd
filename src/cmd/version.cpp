@@ -3,8 +3,9 @@
  * File         version.cpp
  * Description  VERSION command handler
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -67,10 +68,10 @@ void uc_version(UnrealUser* uptr, StringList* argv)
 	{
 		uptr->sendreply(RPL_VERSION,
 			String::format(MSG_VERSION,
-				_U4_VERSTR_,
-				_U4_PATCHLEVEL_,
+				PACKAGE_VERSTR,
+				PACKAGE_PATCHLEVEL,
 				unreal->config.get("Me/ServerName").c_str(),
-				_U4_VER_REVISION_));
+				PACKAGE_CHANGESET));
 	}
 }
 

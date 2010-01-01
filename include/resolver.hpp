@@ -3,8 +3,9 @@
  * File         resolver.hpp
  * Description  Asyncronous DNS resolver
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -29,10 +30,25 @@
 #include "reactor.hpp"
 #include "string.hpp"
 
+namespace ErrorCode
+{
+	namespace Resolver
+	{
+		enum Type
+		{
+			// anything OK
+			OK = 0
+		};
+	}
+}
+
 class UnrealResolver
 {
 public:
-	UnrealResolver(UnrealReactor& reactor);
+	typedef ErrorCode::Resolver::Type Error;
+
+public:
+	UnrealResolver();
 	void query(const String& hostname, const uint16_t& port);
 
 private:

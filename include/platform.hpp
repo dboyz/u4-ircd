@@ -3,8 +3,9 @@
  * File         platform.hpp
  * Description  Abstractions around system-specific code
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -31,31 +32,39 @@
 
 // OS related
 #if defined(_WIN32)
-#include <windows.h>
-#include "windows.hpp"
-#define OS_WINDOWS
-#if defined(_WIN64)
-#define OS_WIN64
-#define OS_NAME "Win64"
-#else
-#define OS_WIN32
-#define OS_NAME "Win32"
-#endif
-
+#  include <windows.h>
+#  include "windows.hpp"
+#  define OS_WINDOWS
+#  define OS_DLLSUFFIX "dll"
+#  if defined(_WIN64)
+#    define OS_WIN64
+#    define OS_NAME "Win64"
+#  else
+#    define OS_WIN32
+#    define OS_NAME "Win32"
+#  endif
 #elif defined(__linux__) || defined(__linux)
-#define OS_LINUX
-#define OS_NAME "Linux"
+#  define OS_LINUX
+#  define OS_NAME "Linux"
+#  define OS_DLLSUFFIX "so"
 #elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
-#if defined(__FreeBSD__)
-#define OS_FREEBSD
-#define OS_NAME "FreeBSD"
-#elif defined(__NetBSD__)
-#define OS_NETBSD
-#define OS_NAME "NetBSD"
-#elif defined(__OpenBSD__)
-#define OS_OPENBSD
-#define OS_NAME "OpenBSD"
-#endif
+#  define OS_DLLSUFFIX "so"
+#  if defined(__FreeBSD__)
+#    define OS_FREEBSD
+#    define OS_NAME "FreeBSD"
+#  elif defined(__NetBSD__)
+#    define OS_NETBSD
+#    define OS_NAME "NetBSD"
+#  elif defined(__OpenBSD__)
+#    define OS_OPENBSD
+#    define OS_NAME "OpenBSD"
+#  endif
+#elif defined(__Darwin__)
+#  define OS_DARWIN
+#  define OS_NAME "Darwin"
+#  define OS_DLLSUFFIX "dylib"
+#else
+#  error Unsupported operating system.
 #endif
 
 // compiler

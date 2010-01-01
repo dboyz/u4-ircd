@@ -3,8 +3,9 @@
  * File         limits.hpp
  * Description  Default limitations for various things
  *
- * All parts of this program are Copyright(C) 2009 by their
- * respective authors and the UnrealIRCd development team.
+ * Copyright(C) 2009, 2010
+ * The UnrealIRCd development team and contributors
+ * http://www.unrealircd.com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -27,25 +28,25 @@
 
 #include "base.hpp"
 
-/** maximum buffer size for IRC contents, as defined by RFC 1459 */
-#define _U4_BUFSIZE_	512
+/** maximum line size for IRC contents, as defined by RFC 1459 */
+#define U4_BUFSIZE		512
 
 /** nick length limit */
-#define _U4_NICKLEN_	unreal->config.get("limits/nicklen", 18).toUInt()
+#define U4_NICKLEN		unreal->config.get("limits/nicklen", 18).toUInt()
 
 /** user (ident) length limit */
-#define _U4_USERLEN_	unreal->config.get("limits/userlen", 10).toUInt()
+#define U4_USERLEN		unreal->config.get("limits/userlen", 10).toUInt()
 
 /** topic length limit */
-#define _U4_TOPICLEN_	unreal->config.get("limits/topiclen", 250).toUInt()
+#define U4_TOPICLEN		unreal->config.get("limits/topiclen", 250).toUInt()
 
 /** away message length limit */
-#define _U4_AWAYLEN_	unreal->config.get("limits/awaylen", 250).toUInt()
+#define U4_AWAYLEN		unreal->config.get("limits/awaylen", 250).toUInt()
 
 /** kick message length limit */
-#define _U4_KICKLEN_	unreal->config.get("limits/kicklen", 250).toUInt()
+#define U4_KICKLEN		unreal->config.get("limits/kicklen", 250).toUInt()
 
 /** channel name length limit */
-#define _U4_CHANNELLEN_ unreal->config.get("limits/channellen", 200).toUInt()
+#define U4_CHANNELLEN 	unreal->config.get("limits/channellen", 200).toUInt()
 
 #endif /* _UNREALIRCD_LIMITS_HPP */

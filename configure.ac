@@ -52,7 +52,7 @@ AC_PROG_LIBTOOL
 # 
 # copied from http://flameeyes.eu/autotools-mythbuster/libtool/#libtool.plugins.ltdl
 AC_CHECK_HEADER([ltdl.h],
-  [AC_CHECK_LIB([ltdl], [lt_dladdsearchdir],
+  [AC_CHECK_LIB([ltdl], [lt_dladvise_init],
     [LIBLTDL=-lltdl], [LIBLTDL=])],
   [LIBLTDL=])
 AC_SUBST([LTDL_LIBS], [${LIBLTDL}])

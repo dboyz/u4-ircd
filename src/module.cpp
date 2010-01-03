@@ -47,6 +47,37 @@ UnrealModule::~UnrealModule()
 }
 
 /**
+   Deinitializes dynamic linker.
+
+   Must be called once as the program is exiting after all
+   dynamically loaded objects are unloaded.
+*/
+int UnrealModule::deinit()
+{
+	int myerr;
+
+	myerr = 0;
+	if(!lt_dlexit())
+	{
+		std::cerr << "Unable to deinitialize ltdl: " << lt_dlerror() << std::endl;
+		myerr ++;
+	}
+
+	/** see UnrealModule::init()
+	    -- don't try to destroy a NULL dlflags_
+	 */	
+	if(!dlflags_)
+		return myerr;
+
+	if(!lt_dladvice_destroy(&dlflags_))
+	{
+		std::cerr << "Unable to deinitialize ltdl's advice: " << lt_dlerror() << std::endl;
+		myerr ++;
+	}
+	return myerr;
+}
+
+/**
  * Returns the error string, if any.
  *
  * @return Error message, or empty string if no errors were encountered
@@ -87,9 +118,36 @@ UnrealModule* UnrealModule::find(const String& fname)
 /**
  * Returns the library handle.
  */
-void* UnrealModule::handle()
+lt_dlhandle UnrealModule::handle()
 {
 	return handle_;
+}
+
+/**
+   Must be called before the UnrealModule class
+   may be used. But must only be called once.
+*/
+int UnrealModule::init()
+{
+	if(!lt_dlinit())
+	{
+		std::cerr << "Unable to initialize ltdl: " << lt_dlerror() << std::endl;
+		return 1;
+	}
+	if(!lt_dladvice_init(&dlflags_))
+	{
+		std::cerr << "Unable to deinitialize ltdl's advice: " << lt_dlerror() << std::endl;
+		dlflags_ = (lt_dladvise)NULL;
+		return 1 + deinit();
+	}
+	/** Aim at the equivlients for dlopen()'s RTLD_NOW | RTLD_GLOBAL */
+	if(!lt_dladvice_global(&dlflags_))
+	{
+		std::cerr << "Error setting RTDL_GLOBAL in lt_dladvise(): " << lt_dlerror() << std::endl;
+		return 1 + deinit();
+	}
+
+	return 0;
 }
 
 /**
@@ -122,9 +180,9 @@ bool UnrealModule::load()
 		error_str_ = "Module already loaded";
 		state_ = SError;
 	}
-	else if (!(handle_ = dlopen(filename_.c_str(), RTLD_NOW | RTLD_GLOBAL)))
+	else if ( !(handle_ = lt_dlopen(filename_.c_str(), dlflags_)) )
 	{
-		error_str_ = dlerror();
+		error_str_ = lt_dlerror();
 		state_ = SError;
 	}
 	else
@@ -138,7 +196,7 @@ bool UnrealModule::load()
 			error_str_.sprintf("Entry symbol \"%s\" not found", MODULE_INIT_FN);
 			state_ = SError;
 
-			dlclose(handle_);
+			lt_dlclose(handle_);
 			handle_ = 0;
 		}
 		else
@@ -148,7 +206,7 @@ bool UnrealModule::load()
 				error_str_.sprintf("Init function did not succeed");
 				state_ = SError;
 
-				dlclose(handle_);
+				lt_dlclose(handle_);
 				handle_ = 0;
 			}
 		}
@@ -170,10 +228,10 @@ void* UnrealModule::resolve(const String& name)
 		return 0;
 	else
 	{
-		void* sym = dlsym(handle_, name.c_str());
+		void* sym = lt_dlsym(handle_, name.c_str());
 
 		if (!sym)
-			error_str_ = dlerror();
+			error_str_ = lt_dlerror();
 
 		return sym;
 	}
@@ -222,7 +280,7 @@ void UnrealModule::unload()
 			}
 		}
 
-		dlclose(handle_);
+		lt_dlclose(handle_);
 		handle_ = 0;
 		state_ = SNone;
 	}

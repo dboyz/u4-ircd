@@ -28,7 +28,8 @@
 
 #include "platform.hpp"
 #include "string.hpp"
-#include <dlfcn.h>
+
+#include <ltdl.h>
 
 #define UNREAL_DLL extern "C"
 
@@ -69,13 +70,6 @@ public:
 	/** alias the Inf class */
 	typedef UnrealModuleInf Info;
 
-	/** generic handle type */
-#ifdef WIN32
-	typedef HMODULE Handle;
-#else
-	typedef void Handle;
-#endif
-
 	/** module initialization symbol type */
 	typedef Result (InitFunc)(UnrealModule&);
 
@@ -87,13 +81,15 @@ public:
 	~UnrealModule();
 
 	const String& errorString();
+	static int deinit();
 	const String& fileName();
 	static UnrealModule* find(const String& fname);
-	Handle* handle();
+	lt_dlhandle handle();
+	static int init();
 	bool isError();
 	bool isLoaded();
 	bool load();
-	Handle* resolve(const String& name);
+	lt_dlhandle resolve(const String& name);
 	void setFileName(const String& fname);
 	ModuleState state();
 	void unload();
@@ -102,6 +98,9 @@ public:
 	Info info;
 
 private:
+	/** ltdl module loading ``advice'' */
+	lt_dladvise dlflags_;
+
 	/** error string */
 	String error_str_;
 
@@ -109,7 +108,7 @@ private:
 	String filename_;
 
 	/** library handle */
-	Handle* handle_;
+	lt_dlhandle handle_;
 
 	/** module state */
 	ModuleState state_;

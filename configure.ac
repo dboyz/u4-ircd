@@ -96,9 +96,6 @@ AC_MSG_RESULT([$reactor])
 AX_BOOST_BASE([1.39])
 AX_BOOST_ASIO
 AX_BOOST_SYSTEM
-AX_BOOST_THREAD
-
-# Checks for header files.
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL

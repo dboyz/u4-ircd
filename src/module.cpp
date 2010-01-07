@@ -27,6 +27,11 @@
 #include "module.hpp"
 
 /**
+ * lt_dladvise
+ */
+lt_dladvise UnrealModule::dlflags_;
+
+/**
  * UnrealModule constructor.
  *
  * @param fname Filename of module to load
@@ -59,7 +64,7 @@ int UnrealModule::deinit()
 	myerr = 0;
 	if(!lt_dlexit())
 	{
-		std::cerr << "Unable to deinitialize ltdl: " << lt_dlerror() << std::endl;
+		unreal->log.write(UnrealLog::Error, ( String("Unable to deinitialize ltdl: ") + lt_dlerror() ).c_str() );
 		myerr ++;
 	}
 
@@ -69,9 +74,9 @@ int UnrealModule::deinit()
 	if(!dlflags_)
 		return myerr;
 
-	if(!lt_dladvice_destroy(&dlflags_))
+	if(!lt_dladvise_destroy(&dlflags_))
 	{
-		std::cerr << "Unable to deinitialize ltdl's advice: " << lt_dlerror() << std::endl;
+		unreal->log.write(UnrealLog::Error, ( String("Unable to deinitialize ltdl's advice: ") + lt_dlerror() ).c_str() );
 		myerr ++;
 	}
 	return myerr;
@@ -130,20 +135,17 @@ lt_dlhandle UnrealModule::handle()
 int UnrealModule::init()
 {
 	if(!lt_dlinit())
+		unreal->log.write(UnrealLog::Fatal, ( String("Unable to initialize ltdl: ") + lt_dlerror() ).c_str() );
+	if(!lt_dladvise_init(&dlflags_))
 	{
-		std::cerr << "Unable to initialize ltdl: " << lt_dlerror() << std::endl;
-		return 1;
-	}
-	if(!lt_dladvice_init(&dlflags_))
-	{
-		std::cerr << "Unable to deinitialize ltdl's advice: " << lt_dlerror() << std::endl;
 		dlflags_ = (lt_dladvise)NULL;
-		return 1 + deinit();
+		unreal->log.write(UnrealLog::Fatal, ( String("Unable to initialize ltdl's advice: ") + lt_dlerror() ).c_str() );
 	}
 	/** Aim at the equivlients for dlopen()'s RTLD_NOW | RTLD_GLOBAL */
-	if(!lt_dladvice_global(&dlflags_))
+	if(!lt_dladvise_global(&dlflags_))
 	{
-		std::cerr << "Error setting RTDL_GLOBAL in lt_dladvise(): " << lt_dlerror() << std::endl;
+		/** There's a chance we can work without this */
+		unreal->log.write(UnrealLog::Error, ( String("Error setting RTDL_GLOBAL in lt_dladvise(): ") + lt_dlerror() ).c_str() );
 		return 1 + deinit();
 	}
 
@@ -180,7 +182,7 @@ bool UnrealModule::load()
 		error_str_ = "Module already loaded";
 		state_ = SError;
 	}
-	else if ( !(handle_ = lt_dlopen(filename_.c_str(), dlflags_)) )
+	else if ( !(handle_ = lt_dlopenadvise(filename_.c_str(), dlflags_)) )
 	{
 		error_str_ = lt_dlerror();
 		state_ = SError;
@@ -222,7 +224,7 @@ bool UnrealModule::load()
  * @return Address of the symbol, or 0 if the symbol cannot be located or the
  * module isn't loaded
  */
-void* UnrealModule::resolve(const String& name)
+void *UnrealModule::resolve(const String& name)
 {
 	if (!isLoaded())
 		return 0;

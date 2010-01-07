@@ -89,7 +89,7 @@ public:
 	bool isError();
 	bool isLoaded();
 	bool load();
-	lt_dlhandle resolve(const String& name);
+	void *resolve(const String& name);
 	void setFileName(const String& fname);
 	ModuleState state();
 	void unload();
@@ -99,7 +99,7 @@ public:
 
 private:
 	/** ltdl module loading ``advice'' */
-	lt_dladvise dlflags_;
+	static lt_dladvise dlflags_;
 
 	/** error string */
 	String error_str_;

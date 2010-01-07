@@ -34,9 +34,7 @@ AM_CPPFLAGS = @BOOST_CPPFLAGS@
 AM_CXXFLAGS = @PTHREAD_CFLAGS@ -Wall
 #AM_CXXFLAGS = -std=c++0x -Wall
 
-# http://www.flameeyes.eu/autotools-mythbuster/libtool/index.html#libtool.plugins.dlopen
-#AM_LDFLAGS = @BOOST_LDFLAGS@ -module -avoid-version -shared
-LIBS = @LTDL_LIBS@ @PTHREAD_LIBS@ @BOOST_ASIO_LIB@ @BOOST_SYSTEM_LIB@ @BOOST_THREAD_LIB@
+LIBS = @LTDL_LIBS@ @PTHREAD_LIBS@ @BOOST_ASIO_LIB@ @BOOST_SYSTEM_LIB@
 
 #
 # Binaries:
@@ -111,8 +109,10 @@ unrealircd_SOURCES = \
 # _overrides_ AM_LDFLAGS. It's a good thing that this doesn't just supplement
 # them  ;-)
 #
-# supposedly we need --export-dynamic so that modules can link to the IRCd when loaded...?
-unrealircd_LDFLAGS = @BOOST_LDFLAGS@ -Wl,--export-dynamic
+# supposedly we need -export-dynamic (eaten by libtool)
+# so that modules can link to the IRCd's module object
+#  when loaded
+unrealircd_LDFLAGS = -export-dynamic
 
 #
 # include/hgrev.hpp:

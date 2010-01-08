@@ -225,7 +225,7 @@ void UnrealUser::destroyIdentRequest()
 	    unreal->config.get("Me/ServerName").c_str());
 }
 
-void UnrealUser::exit(ErrorCode::Socket::Type ec)
+void UnrealUser::exit(UnrealSocket::ErrorCode& ec)
 {
 	String message;
 

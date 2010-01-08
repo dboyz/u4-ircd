@@ -432,13 +432,21 @@ void UnrealBase::printVersion()
 }
 
 /**
+ * Returns the event reactor reference.
+ */
+UnrealReactor& UnrealBase::reactor()
+{
+	return reactor_;
+}
+
+/**
  * Run the main loop.
  * The reactor usually blocks until all attached I/O operations are done.
  * It usually never leaves this function unless all listeners are destroyed.
  */
 void UnrealBase::run()
 {
-	reactor.run();
+	reactor_.run();
 }
 
 /**

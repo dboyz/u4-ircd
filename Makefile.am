@@ -35,7 +35,8 @@ AM_CXXFLAGS = @PTHREAD_CFLAGS@ -Wall
 #AM_CXXFLAGS = -std=c++0x -Wall
 AM_LDFLAGS = @BOOST_LDFLAGS@
 
-LIBS = @LTDL_LIBS@ @PTHREAD_LIBS@ @BOOST_ASIO_LIB@ @BOOST_SYSTEM_LIB@
+LIBS = @LTDL_LIBS@ @PTHREAD_LIBS@ @BOOST_ASIO_LIB@ @BOOST_SYSTEM_LIB@ \
+	@BOOST_SIGNALS_LIB@
 
 #
 # Binaries:
@@ -90,7 +91,6 @@ unrealircd_SOURCES = \
 	src/string.cpp \
 	src/stringlist.cpp \
 	src/time.cpp \
-	src/timer.cpp \
 	src/unreal.cpp \
 	src/user.cpp \
 	$(pkginclude_HEADERS)

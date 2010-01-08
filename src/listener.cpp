@@ -30,8 +30,7 @@
 #include "numeric.hpp"
 #include "user.hpp"
 #include <iostream>
-#include <sys/socket.h>
-#include <sys/types.h>
+#include <boost/bind.hpp>
 
 /**
  * UnrealListener constructor.
@@ -40,8 +39,8 @@
  * @param port Port number used for binding
  */
 UnrealListener::UnrealListener(const String& address, const uint16_t& port)
-	: type_(LClient), address_(address), port_(port), ping_freq_(0),
-	max_connections_(0), native_(-1)
+	: tcp::acceptor(unreal->reactor()), type_(LClient), address_(address),
+	port_(port), ping_freq_(0), max_connections_(0)
 { }
 
 /**
@@ -72,14 +71,16 @@ void UnrealListener::addConnection(UnrealSocket* sptr)
 		return;
 	}
 
-/*
-	sptr->onDisconnected.connect(boost::bind(&UnrealListener::removeConnection,
-		this, _1));
-	sptr->onError.connect(boost::bind(&UnrealListener::handleError,
-		this, _1, _2));
-	sptr->onRead.connect(boost::bind(&UnrealListener::handleDataResponse,
-		this, _1, _2));
-*/
+	sptr->onDisconnected.connect(
+		boost::bind(&UnrealListener::removeConnection,
+			this,
+			_1));
+
+	sptr->onRead.connect(
+		boost::bind(&UnrealListener::handleDataResponse,
+			this,
+			_1,
+			_2));
 
 	/* add to the connection list */
 	connections << sptr;
@@ -143,6 +144,31 @@ uint16_t UnrealListener::bindPort()
 }
 
 /**
+ * Acceptor callback.
+ *
+ * @param ec Error code
+ * @param sptr Socket pointer
+ */
+void UnrealListener::handleAccept(const ErrorCode& ec, UnrealSocket* sptr)
+{
+	if (ec)
+	{
+		ErrorCode edupl = ec;
+		
+		unreal->log.write(UnrealLog::Error, "UnrealListener handleAccept(): %s",
+			edupl.message().c_str());
+	}
+	else
+	{
+		addConnection(sptr);
+		onNewConnection(this, sptr);
+		
+		/* wait for the next client */
+		waitForAccept();
+	}
+}
+
+/**
  * Socket notification callback for new data available.
  *
  * @param sptr Shared UnrealSocket pointer
@@ -153,9 +179,6 @@ void UnrealListener::handleDataResponse(UnrealSocket* sptr, String& data)
 	StringList tokens = splitLine(data);
 	size_t shift = 0;
 
-	/* data has to be trimmed, in case to remove whitespaces;
-	 * mIRC seem to send lines with LF only
-	 */
 	unreal->log.write(UnrealLog::Debug, ">> %s", data.c_str());
 
 	// check prefix
@@ -265,37 +288,34 @@ void UnrealListener::removeConnection(UnrealSocket* sptr)
  */
 void UnrealListener::run()
 {
-	int v = 1; // reuse address
-	struct sockaddr_in saddr;
-	//UnrealResolver resolv((UnrealIOService&)get_io_service());
-	//UnrealResolver::Query query(address_, String(port_));
-	//UnrealResolver::Endpoint endpoint = *resolv.resolve(query, ec);
-
-	/* setting up address details */
-	//saddr.sin_family = endpoint.protocol();
-	saddr.sin_port = htons(port_);
-
-	if ((native_ = ::socket(/*endpoint.protocol()*/AF_INET, SOCK_STREAM, SOCK_NONBLOCK))
-	    == -1)
+	UnrealResolver resolv;
+	UnrealResolver::ErrorCode ec;
+	UnrealResolver::Query query(address_, String(port_));
+	UnrealResolver::Endpoint endpoint = *resolv.resolve(query, ec);
+	
+	if (ec)
 	{
-		unreal->log.write(UnrealLog::Fatal, "UnrealListener: Socket creation "
-			"failed: %s", strerror(errno));
+		unreal->log.write(UnrealLog::Fatal, "Can't resolve endpoint for %s:%d",
+			address_.c_str(), port_);
 	}
-	else if (::setsockopt(native_, SOL_SOCKET, SO_REUSEADDR, &v, sizeof(v))
-		== -1)
+	
+	try
 	{
-		unreal->log.write(UnrealLog::Fatal, "UnrealListener: Setting reuse-flag"
-		    " on listener fd failed: %s", strerror(errno));
+		/* open listener socket */
+		open(endpoint.protocol());
+		
+		/* reuse address if it's anready in use */
+		set_option(reuse_address(true));
+		
+		/* bind acceptor to endpoint */
+		bind(endpoint);
+		
+		/* listen for connections */
+		listen(socket_base::max_connections);
 	}
-	else if (::bind(native_, (struct sockaddr*)&saddr, sizeof(saddr)) == -1)
+	catch (...)
 	{
-		unreal->log.write(UnrealLog::Fatal, "UnrealListener: Bind failed: %s",
-			strerror(errno));
-	}
-	else if (::listen(native_, 5) == -1)
-	{
-		unreal->log.write(UnrealLog::Fatal, "UnrealListener: Listen failed: %s",
-			strerror(errno));
+		unreal->log.write(UnrealLog::Fatal, "UnrealListener exception");
 	}
 
 	/* wait for connections to be accepted */
@@ -403,11 +423,11 @@ UnrealListener::ListenerType UnrealListener::type()
  */
 void UnrealListener::waitForAccept()
 {
-	/*
-	UnrealSocket* sptr = new UnrealSocket(unreal->ios_pool.getIOService());
+	UnrealSocket* sptr = new UnrealSocket();
 
 	async_accept(*sptr,
-		strand_.wrap(boost::bind(&UnrealListener::handleAccept,
-			this, sptr, boost::asio::placeholders::error)));
-			*/
+		boost::bind(&UnrealListener::handleAccept,
+			this,
+			boost::asio::placeholders::error,
+			sptr));
 }

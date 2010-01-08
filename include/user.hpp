@@ -76,7 +76,7 @@ public:
 	Bitmask<uint8_t>& authflags();
 	const String& awayMessage();
 	UnrealTime connectionTime();
-	void exit(ErrorCode::Socket::Type ec);
+	void exit(UnrealSocket::ErrorCode& ec);
 	void exit(const String& message);
 	static UnrealUser* find(UnrealSocket* sptr);
 	static UnrealUser* find(const String& nickname);

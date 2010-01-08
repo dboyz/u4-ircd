@@ -33,23 +33,23 @@
 #include "string.hpp"
 #include "stringlist.hpp"
 
-namespace ErrorCode
-{
-	namespace Listener
-	{
-		enum Type
-		{
-			OK = 0
-		};
-	}
-}
+#include <boost/asio.hpp>
+#include <boost/signal.hpp>
 
+using namespace boost::asio::ip;
+
+/**
+ * Listener class.
+ */
 class UnrealListener
+	: public tcp::acceptor
 {
 public:
 	/** Listener type */
 	enum ListenerType { LClient, LServer };
-	typedef ErrorCode::Listener::Type Error;
+	
+	/** error code */
+	typedef boost::system::error_code ErrorCode;
 
 public:
 	UnrealListener(const String& address, const uint16_t& port);
@@ -77,9 +77,10 @@ public:
 
 public:
 	/** signal which is triggered on a new connection ready */
-	UnrealSignal0<UnrealListener> onNewConnection;
+	boost::signal<void(UnrealListener*, UnrealSocket*)> onNewConnection;
 
 private:
+	void handleAccept(const ErrorCode& ec, UnrealSocket* sptr);
 	void handleDataResponse(UnrealSocket* sptr, String& data);
 	void handleNewConnection();
 
@@ -98,9 +99,6 @@ private:
 
 	/** max amount of connections allowed for this listener */
 	uint32_t max_connections_;
-
-	/** native file descriptor */
-	int native_;
 };
 
 #endif /* _UNREALIRCD_LISTENER_HPP */

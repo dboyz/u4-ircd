@@ -33,67 +33,11 @@
 #include "resolver.hpp"
 #include "signal.hpp"
 #include "string.hpp"
-#include <errno.h>
 
-/**
- * Error code definitions for networking.
- */
-namespace ErrorCode
-{
-	namespace Socket
-	{
-		enum Type
-		{
-			// bad file descriptor
-			BadFd = EBADFD,
+#include <boost/asio.hpp>
+#include <boost/signal.hpp>
 
-			// protocol not supported
-			ProtocolNotSupported = EPROTONOSUPPORT,
-
-			// address is already in use
-			AddressInUse = EADDRINUSE,
-
-			// network is down
-			NetworkDown = ENETDOWN,
-
-			// network is unreachable
-			NetworkUnreachable = ENETUNREACH,
-
-			// network dropped connection because of reset
-			NetworkReset = ENETRESET,
-
-			// software caused connection abort
-			ConnectionAborted = ECONNABORTED,
-
-			// connection reset by peer
-			ConnectionReset = ECONNRESET,
-
-			// endpoint is already connected
-			AlreadyConnected = EISCONN,
-
-			// endpoint is not connected
-			NotConnected = ENOTCONN,
-
-			// connection timed out
-			TimedOut = ETIMEDOUT,
-
-			// connection refused
-			ConnectionRefused = ECONNREFUSED,
-
-			// host is down
-			HostIsDown = EHOSTDOWN,
-
-			// no route to host
-			HostUnreachable = EHOSTUNREACH,
-
-			// operation already in progress
-			AlreadyInProgress = EALREADY,
-
-			// operation now in progress
-			InProgress = EINPROGRESS,
-		};
-	}
-}
+using namespace boost::asio::ip;
 
 /**
  * Define a traffic type, that is used to measure how many data
@@ -112,27 +56,38 @@ struct UnrealSocketTrafficType
 };
 
 class UnrealSocket
+	: public tcp::socket
 {
 public:
-	typedef ErrorCode::Socket::Type Error;
+	typedef boost::system::error_code ErrorCode;
 
 public:
 	UnrealSocket();
 	~UnrealSocket();
-	bool close();
-	void connect(const String& hostname, const uint16_t& portnum);
-	int native();
+	void connectTo(UnrealResolver::Endpoint& ep);
+	void connectTo(const String& hostname, const uint16_t& portnum);
 	UnrealSocketTrafficType traffic();
 	void waitForLine();
 	void write(const String& data);
 
 public:
-	UnrealSignal1<void(UnrealSocket*), UnrealSocket*> onConnected;
-	UnrealSignal1<void(UnrealSocket*), UnrealSocket*> onDisconnected;
+	boost::signal<void(UnrealSocket*)> onConnected;
+	boost::signal<void(UnrealSocket*)> onDisconnected;
+	boost::signal<void(UnrealSocket*, const ErrorCode&)> onError;
+	boost::signal<void(UnrealSocket*, String&)> onRead;
 
 private:
-	/** native file descriptor */
-	int native_;
+	void destroyResolverQuery();
+	void handleConnect(const ErrorCode& ec,
+		UnrealResolver::Iterator ep_iter);
+	void handleRead(const ErrorCode& ec, size_t bytes_read);
+	void handleResolveResponse(const ErrorCode& ec,
+		UnrealResolver::Iterator ep_iter);
+	void handleWrite(const ErrorCode& ec, size_t bytes_written);
+
+private:
+	/** stream buffer */
+	boost::asio::streambuf streambuf_;
 
 	/** traffic on the socket */
 	UnrealSocketTrafficType traffic_;

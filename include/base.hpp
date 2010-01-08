@@ -67,6 +67,7 @@ public:
 
 	void exit(int code = 0);
 	FState fstate();
+	UnrealReactor& reactor();
 	void run();
 
 public:
@@ -81,9 +82,6 @@ public:
 
 	/** list with modules */
 	List<UnrealModule*> modules;
-
-	/** Reactor */
-	UnrealReactor reactor;
 
 	/** list with listeners */
 	List<UnrealListener*> listeners;
@@ -131,6 +129,9 @@ private:
 private:
 	/** fork() state */
 	FState fork_state_;
+
+	/** Reactor */
+	UnrealReactor reactor_;
 };
 
 extern UnrealBase* unreal;

@@ -28,7 +28,7 @@ AM_CXXFLAGS = @PTHREAD_CFLAGS@ -Wall
 #AM_CXXFLAGS = -std=c++0x -Wall
 
 # http://www.flameeyes.eu/autotools-mythbuster/libtool/index.html#libtool.plugins.dlopen
-AM_LDFLAGS = -module -avoid-version -shared
+AM_LDFLAGS = -module -avoid-version -shared @BOOST_LDFLAGS@
 LIBS = @LTDL_LIBS@ @BOOST_ASIO_LIB@ @BOOST_SYSTEM_LIB@
 INCLUDES = -I$(top_srcdir)/include
 

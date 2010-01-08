@@ -2,6 +2,10 @@
   UnrealIRCd 4 ChangeLog
 -------------------------------------------------------------------------------
 
+  2010-01-08 01:50 +0100  Christian Jurk <commx@commx.ws>
+    >> Removed bunch of selfmade networking stuff
+    >> Removed multithreading code for now
+
   2010-01-01 21:51 +0100  Christian Jurk <commx@commx.ws>
     >> Updated copyright notice in every file
     >> Added conditions to the configuration system

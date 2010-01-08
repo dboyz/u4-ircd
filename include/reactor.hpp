@@ -30,52 +30,10 @@
 #include "platform.hpp"
 #include "string.hpp"
 
-/**
- * Generic reactor interface.
- */
-class UnrealGenericReactor
-{
-public:
-	/**
-	 * Generic flags to be used for event administration
-	 */
-	enum GenericFlagType
-	{
-		EventError	= 0x01,	// is set when an error occured
-		EventHup	= 0x02, // is set when a FD got hung up
-		EventIn		= 0x04, // is set when there is data available for reading
-		EventOut	= 0x08  // is set when we can send data
-	};
+#include <boost/asio.hpp>
 
-	/**
-	 * Translation flags for translateEvents()
-	 */
-	enum TranslationFlag
-	{
-		Generic, // output type: generic flags
-		Native   // output type: native flags
-	};
-
-public:
-	virtual bool observe(int fd, uint32_t events)
-	{ return false; }
-	virtual bool stop(int fd)
-	{ return false; }
-	virtual uint32_t translateEvents(TranslationFlag ot, uint32_t ev)
-	{ return -1; }
-	static String type()
-	{ return "(generic)"; }
-};
-
-/**
- * Include platform-specific event reactor.
- */
-#include "config.h"
-
-#if defined(EVREACT_EPOLL)
-#include "epoll.hpp"
-#else
-#error No suitable event reactor found
-#endif
+class UnrealReactor
+	: public boost::asio::io_service
+{ };
 
 #endif /* _UNREALIRCD_REACTOR_HPP */

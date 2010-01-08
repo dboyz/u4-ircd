@@ -63,17 +63,6 @@ UnrealBase::UnrealBase(int cnt, char** vec)
 	/* initialize mode tables */
 	initModes();
 
-	/* setup reactor pool */
-	size_t reactor_pool_size = config.get("Me::ReactorPoolSize", "1").toSize();
-	size_t reactor_threads = config.get("Me::Threads", "0").toSize();
-	rpool = new UnrealReactorPool(reactor_threads, reactor_pool_size);
-
-	if (reactor_pool_size == 0)
-	{
-		log.write(UnrealLog::Fatal, "Me::ReactorPoolSize is set to 0, exiting. "
-		    "Please increase that value in your server configuration file");
-	}
-
 	/* fix resource limits */
 	setupRlimit();
 	
@@ -267,7 +256,7 @@ void UnrealBase::initModules()
 {
 	StringList ml = config.moduleList();
 
-	for (StringList::Iterator miter = ml.begin(); miter != ml.end(); miter++)
+	for (StringList::Iterator miter = ml.begin(); miter != ml.end(); ++miter)
 	{
 		UnrealModule* mptr = new UnrealModule(*miter);
 
@@ -302,7 +291,7 @@ void UnrealBase::parseArgv()
 	if (sli != argv.end())
 		sli++; // skip the first entry here
 
-	for (; sli != argv.end(); sli++)
+	for (; sli != argv.end(); ++sli)
 	{
 		if (*sli == "-c" || *sli == "--config-file")
 		{
@@ -388,7 +377,7 @@ void UnrealBase::printConfig()
 	Map<String, String> cmap = config.map();
 	Map<String, String>::Iterator ci = cmap.begin();
 
-	for (; ci != cmap.end(); ci++)
+	for (; ci != cmap.end(); ++ci)
 	{
 		std::cout << ci->first << "\n  => String("
 		    << ci->second.length() << ") \"" << ci->second << "\"\n";
@@ -410,14 +399,17 @@ void UnrealBase::printVersion()
 			  << " "
 			  << __TIME__
 			  << std::endl;
-	std::cout << "Using event reactor: "
-			  << UnrealReactor::type()
+	std::cout << "Copyright (c) 2009, 2010"
 			  << std::endl;
-	std::cout << "Copyright (c) 2009 The UnrealIRCd Project" << std::endl;
-	std::cout << "http://www.unrealircd.com" << std::endl << std::endl;
+	std::cout << "The UnrealIRCd team and contributors"
+			  << std::endl;
+	std::cout << "http://www.unrealircd.com"
+			  << std::endl
+			  << std::endl;
 
 	std::cout << "This is free software: you are free to change and "
-			  << "redistribute it." << std::endl
+			  << "redistribute it."
+			  << std::endl
 			  << "There is NO WARRANTY, to the extent permitted by law."
 			  << std::endl;
 
@@ -426,10 +418,12 @@ void UnrealBase::printVersion()
 
 /**
  * Run the main loop.
+ * The reactor usually blocks until all attached I/O operations are done.
+ * It usually never leaves this function unless all listeners are destroyed.
  */
 void UnrealBase::run()
 {
-	rpool->run();
+	reactor.run();
 }
 
 /**
@@ -611,18 +605,4 @@ void UnrealBase::setupServer()
 
 	/* add into the server list */
 	servers.add(me.numeric(), &me);
-
-	/* setup default name servers, if not specified by config */
-	if (config.sequenceCount("DNS::Server") == 0)
-	{
-		if (config.get("DNS::System", "true").toBool())
-		{
-			// TODO: fetch DNS servers from system' configuration
-		}
-		else
-		{
-			config.set("DNS::System::Server_#SEQ-1#::Address", "8.8.8.8");
-			config.set("DNS::System::Server_#SEQ-2#::Address", "8.8.4.4");
-		}
-	}
 }

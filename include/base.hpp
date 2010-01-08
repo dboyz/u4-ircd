@@ -35,7 +35,7 @@
 #include "log.hpp"
 #include "map.hpp"
 #include "module.hpp"
-#include "reactorpool.hpp"
+#include "reactor.hpp"
 #include "server.hpp"
 #include "stats.hpp"
 #include "string.hpp"
@@ -82,8 +82,8 @@ public:
 	/** list with modules */
 	List<UnrealModule*> modules;
 
-	/** Reactor pool */
-	UnrealReactorPool* rpool;
+	/** Reactor */
+	UnrealReactor reactor;
 
 	/** list with listeners */
 	List<UnrealListener*> listeners;

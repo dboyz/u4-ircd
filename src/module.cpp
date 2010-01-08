@@ -25,6 +25,7 @@
 
 #include "base.hpp"
 #include "module.hpp"
+#include <assert.h>
 
 /**
  * lt_dladvise
@@ -64,7 +65,8 @@ int UnrealModule::deinit()
 	myerr = 0;
 	if(!lt_dlexit())
 	{
-		unreal->log.write(UnrealLog::Error, ( String("Unable to deinitialize ltdl: ") + lt_dlerror() ).c_str() );
+		unreal->log.write(UnrealLog::Error, "Unable to deinitialize ltdl: %s",
+			lt_dlerror());
 		myerr ++;
 	}
 
@@ -76,7 +78,8 @@ int UnrealModule::deinit()
 
 	if(!lt_dladvise_destroy(&dlflags_))
 	{
-		unreal->log.write(UnrealLog::Error, ( String("Unable to deinitialize ltdl's advice: ") + lt_dlerror() ).c_str() );
+		unreal->log.write(UnrealLog::Error, "Unable to deinitialize ltdl's "
+			"advice: %s", lt_dlerror());
 		myerr ++;
 	}
 	return myerr;
@@ -111,7 +114,7 @@ const String& UnrealModule::fileName()
 UnrealModule* UnrealModule::find(const String& fname)
 {
 	for (List<UnrealModule*>::Iterator i = unreal->modules.begin();
-			i != unreal->modules.end(); i++)
+			i != unreal->modules.end(); ++i)
 	{
 		if ((*i)->fileName() == fname)
 			return *i;
@@ -135,17 +138,25 @@ lt_dlhandle UnrealModule::handle()
 int UnrealModule::init()
 {
 	if(!lt_dlinit())
-		unreal->log.write(UnrealLog::Fatal, ( String("Unable to initialize ltdl: ") + lt_dlerror() ).c_str() );
+	{
+		/* TODO: binki: lt_dlerror() seems to return NULL, which leads to an
+		   crash here.
+		*/
+		unreal->log.write(UnrealLog::Fatal, "Unable to initialize ltdl: %s",
+			lt_dlerror());
+	}
 	if(!lt_dladvise_init(&dlflags_))
 	{
 		dlflags_ = (lt_dladvise)NULL;
-		unreal->log.write(UnrealLog::Fatal, ( String("Unable to initialize ltdl's advice: ") + lt_dlerror() ).c_str() );
+		unreal->log.write(UnrealLog::Fatal, "Unable to initialize ltdl's "
+			"advice: %s", lt_dlerror());
 	}
 	/** Aim at the equivlients for dlopen()'s RTLD_NOW | RTLD_GLOBAL */
 	if(!lt_dladvise_global(&dlflags_))
 	{
 		/** There's a chance we can work without this */
-		unreal->log.write(UnrealLog::Error, ( String("Error setting RTDL_GLOBAL in lt_dladvise(): ") + lt_dlerror() ).c_str() );
+		unreal->log.write(UnrealLog::Error, "Error setting RTDL_GLOBAL in "
+			"lt_dladvise(): %s", lt_dlerror());
 		return 1 + deinit();
 	}
 

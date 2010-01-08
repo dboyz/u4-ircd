@@ -27,13 +27,7 @@
 
 int main(int argc, char** argv)
 {
-	/** global initializations */
-	if(UnrealModule::init())
-		return 1;
-
 	UnrealBase unreal(argc, argv);
 
 	unreal.run();
-
-	return UnrealModule::deinit();
 }

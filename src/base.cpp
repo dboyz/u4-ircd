@@ -49,6 +49,9 @@ UnrealBase::UnrealBase(int cnt, char** vec)
 	for (int i = 0; i < cnt; i++)
 		argv << String(vec[i]);
 
+	/* library initializations */
+	UnrealModule::init();
+	
 	/* check the command line arguments */
 	parseArgv();
 
@@ -104,6 +107,12 @@ UnrealBase::UnrealBase(int cnt, char** vec)
 UnrealBase::~UnrealBase()
 {
 	finish();
+
+	/* library deinitialization
+	   (should only be done if modules are properly unloaded
+	   first)
+	 */
+	UnrealModule::deinit();
 }
 
 /**

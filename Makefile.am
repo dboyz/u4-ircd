@@ -33,6 +33,7 @@ AM_DEFAULT_SOURCE_EXT = .cpp
 AM_CPPFLAGS = @BOOST_CPPFLAGS@
 AM_CXXFLAGS = @PTHREAD_CFLAGS@ -Wall
 #AM_CXXFLAGS = -std=c++0x -Wall
+AM_LDFLAGS = @BOOST_LDFLAGS@
 
 LIBS = @LTDL_LIBS@ @PTHREAD_LIBS@ @BOOST_ASIO_LIB@ @BOOST_SYSTEM_LIB@
 
@@ -102,7 +103,7 @@ unrealircd_SOURCES = \
 # supposedly we need -export-dynamic (eaten by libtool)
 # so that modules can link to the IRCd's module object
 #  when loaded
-unrealircd_LDFLAGS = -export-dynamic
+unrealircd_LDFLAGS = $(AM_LDFLAGS) -export-dynamic
 
 #
 # include/hgrev.hpp:

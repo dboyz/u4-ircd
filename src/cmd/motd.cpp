@@ -64,7 +64,7 @@ void uc_motd(UnrealUser* uptr, StringList* argv)
 	if (argv && argv->size() >= 2)
 		target = argv->at(1);
 
-	String motd_file = unreal->config.get("Me/MOTD");
+	String motd_file = unreal->config.get("Me::MOTD");
 	String tmp;
 
 	if (!motd_file.empty())
@@ -75,7 +75,7 @@ void uc_motd(UnrealUser* uptr, StringList* argv)
 		{
 			uptr->sendreply(RPL_MOTDSTART,
 				String::format(MSG_MOTDSTART,
-					unreal->config.get("Me/ServerName").c_str()));
+					unreal->me.name().c_str()));
 
 			while (is.good())
 			{

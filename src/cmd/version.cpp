@@ -59,18 +59,18 @@ UnrealUserCommand* uc = 0;
  */
 void uc_version(UnrealUser* uptr, StringList* argv)
 {
-	String target = unreal->config.get("Me/ServerName");
+	String target = unreal->me.name();
 
 	if (argv->size() >= 2)
 		target = argv->at(1);
 
-	if (target == unreal->config.get("Me/ServerName"))
+	if (target == unreal->me.name())
 	{
 		uptr->sendreply(RPL_VERSION,
 			String::format(MSG_VERSION,
 				PACKAGE_VERSTR,
 				PACKAGE_PATCHLEVEL,
-				unreal->config.get("Me/ServerName").c_str(),
+				unreal->me.name().c_str(),
 				PACKAGE_CHANGESET));
 	}
 }

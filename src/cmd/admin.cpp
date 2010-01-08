@@ -63,22 +63,22 @@ void uc_admin(UnrealUser* uptr, StringList* argv)
 	{
 		//TODO: specify server name
 	}
-	else if (unreal->config.get("Admin/Location", "").empty())
+	else if (unreal->config.get("Admin::Location", "").empty())
 	{
 		uptr->sendreply(ERR_NOADMININFO,
 			String::format(MSG_NOADMININFO,
-				unreal->config.get("Me/ServerName").c_str()));
+				unreal->me.name().c_str()));
 	}
 	else
 	{
 		uptr->sendreply(RPL_ADMINME, String::format(MSG_ADMINME,
-			unreal->config.get("Me/ServerName", "not.configured").c_str()));
+			unreal->me.name().c_str()));
 		uptr->sendreply(RPL_ADMINLOC1,
-			unreal->config.get("Admin/Location").c_str());
+			unreal->config.get("Admin::Location").c_str());
 		uptr->sendreply(RPL_ADMINLOC2,
-			unreal->config.get("Admin/Description").c_str());
+			unreal->config.get("Admin::Description").c_str());
 		uptr->sendreply(RPL_ADMINEMAIL,
-			unreal->config.get("Admin/Contact").c_str());
+			unreal->config.get("Admin::Contact").c_str());
 	}
 }
 

@@ -91,6 +91,7 @@ unrealircd_SOURCES = \
 	src/string.cpp \
 	src/stringlist.cpp \
 	src/time.cpp \
+	src/timer.cpp \
 	src/unreal.cpp \
 	src/user.cpp \
 	$(pkginclude_HEADERS)

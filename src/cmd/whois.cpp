@@ -147,9 +147,8 @@ void uc_whois(UnrealUser* uptr, StringList* argv)
 				uptr->sendreply(RPL_WHOIS_SERVER,
 					String::format(MSG_WHOIS_SERVER,
 						tuptr->nick().c_str(),
-						unreal->config.get("Me/ServerName",
-							"not.configured").c_str(),
-						unreal->config.get("Me/Description",
+						unreal->me.name().c_str(),
+						unreal->config.get("Me::Description",
 							"Example IRC Server").c_str()));
 
 				if (tuptr->isOper())

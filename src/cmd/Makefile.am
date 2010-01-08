@@ -49,6 +49,7 @@ pkglib_LTLIBRARIES = \
 	names.la \
 	nick.la \
 	notice.la \
+	oper.la \
 	part.la \
 	ping.la \
 	pong.la \
@@ -59,4 +60,5 @@ pkglib_LTLIBRARIES = \
 	user.la \
 	userhost.la \
 	version.la \
+	who.la \
 	whois.la

@@ -60,13 +60,16 @@ UnrealModule::~UnrealModule()
 */
 int UnrealModule::deinit()
 {
+	String msg;
 	int myerr;
 
 	myerr = 0;
-	if(!lt_dlexit())
+	if(lt_dlexit() != 0)
 	{
-		unreal->log.write(UnrealLog::Error, "Unable to deinitialize ltdl: %s",
-			lt_dlerror());
+		msg.sprintf("Unable to deinitialize ltdl: %s", lt_dlerror());
+
+		throw new UnrealModuleException(msg, LTDL_DEINIT_FAIL);
+
 		myerr ++;
 	}
 
@@ -76,10 +79,12 @@ int UnrealModule::deinit()
 	if(!dlflags_)
 		return myerr;
 
-	if(!lt_dladvise_destroy(&dlflags_))
+	if(lt_dladvise_destroy(&dlflags_) != 0)
 	{
-		unreal->log.write(UnrealLog::Error, "Unable to deinitialize ltdl's "
-			"advice: %s", lt_dlerror());
+		msg.sprintf("Unable to deinitialize ltdl's advice: %s", lt_dlerror());
+
+		throw new UnrealModuleException(msg, LTDL_DEINIT_ADVISE_FAIL);
+
 		myerr ++;
 	}
 	return myerr;
@@ -137,26 +142,30 @@ lt_dlhandle UnrealModule::handle()
 */
 int UnrealModule::init()
 {
-	if(!lt_dlinit())
+	String msg;
+
+	if(lt_dlinit() != 0)
 	{
-		/* TODO: binki: lt_dlerror() seems to return NULL, which leads to an
-		   crash here.
-		*/
-		unreal->log.write(UnrealLog::Fatal, "Unable to initialize ltdl: %s",
-			lt_dlerror());
+		msg.sprintf("Unable to initialize ltdl: %s", lt_dlerror());
+
+		throw new UnrealModuleException(msg, LTDL_INIT_FAIL);
 	}
-	if(!lt_dladvise_init(&dlflags_))
+	if(lt_dladvise_init(&dlflags_) != 0)
 	{
 		dlflags_ = (lt_dladvise)NULL;
-		unreal->log.write(UnrealLog::Fatal, "Unable to initialize ltdl's "
-			"advice: %s", lt_dlerror());
+		msg.sprintf("Unable to initialize ltdl's advice: %s", lt_dlerror());
+
+		throw new UnrealModuleException(msg, LTDL_INIT_ADVISE_FAIL);
 	}
 	/** Aim at the equivlients for dlopen()'s RTLD_NOW | RTLD_GLOBAL */
-	if(!lt_dladvise_global(&dlflags_))
+	if(lt_dladvise_global(&dlflags_) != 0)
 	{
 		/** There's a chance we can work without this */
-		unreal->log.write(UnrealLog::Error, "Error setting RTDL_GLOBAL in "
-			"lt_dladvise(): %s", lt_dlerror());
+		msg.sprintf("Error settings RTDL_GLOBAL in ld_dladvise(): %s",
+			lt_dlerror());
+
+		throw new UnrealModuleException(msg, LTDL_ADVISE_GLOBAL_FAIL);
+
 		return 1 + deinit();
 	}
 

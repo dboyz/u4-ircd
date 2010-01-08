@@ -28,6 +28,7 @@
 #include "reactor.hpp"
 #include <cstdlib>
 #include <iostream>
+#include <boost/version.hpp>
 #include <sys/resource.h>
 
 /** global UnrealBase object */
@@ -398,6 +399,11 @@ void UnrealBase::printVersion()
 			  << __DATE__
 			  << " "
 			  << __TIME__
+			  << std::endl;
+	std::cout << String::format("Using boost v%d.%d.%d",
+					BOOST_VERSION / 100000,
+					BOOST_VERSION / 100 % 1000,
+					BOOST_VERSION % 100)
 			  << std::endl;
 	std::cout << "Copyright (c) 2009, 2010"
 			  << std::endl;

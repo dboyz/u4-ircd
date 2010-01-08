@@ -59,12 +59,12 @@ UnrealUserCommand* uc = 0;
  */
 void uc_help(UnrealUser* uptr, StringList* argv)
 {
-	String target = unreal->config.get("Me/ServerName");
+	String target = unreal->me.name();
 
 	if (argv->size() >= 2)
 		target = argv->at(1);
 
-	if (target == unreal->config.get("Me/ServerName"))
+	if (target == unreal->me.name())
 	{
 		/* print all commands available on this server */
 		Map<String, UnrealUserCommand*>::Iterator cmd_iter;

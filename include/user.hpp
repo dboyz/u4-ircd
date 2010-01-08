@@ -124,14 +124,16 @@ public:
 	List<UnrealChannel*> channels;
 
 private:
-	void checkAuthTimeout();
-	void checkPingTimeout();
+	void checkAuthTimeout(const UnrealTimer::ErrorCode& ec);
+	void checkPingTimeout(const UnrealTimer::ErrorCode& ec);
 	void checkRemoteIdent();
 	void destroyIdentRequest();
 	void handleIdentCheckConnected(UnrealSocket* sptr);
 	//void handleIdentCheckError(UnrealSocket* sptr,
 	//		const UnrealSocket::Error& ec);
 	void handleIdentCheckRead(UnrealSocket* sptr, String& data);
+	void handleResolveResponse(const UnrealResolver::ErrorCode& ec,
+		UnrealResolver::Iterator response);
 	void resolveHostname();
 	void scheduleAuthTimeout();
 	void schedulePingTimeout();
@@ -175,6 +177,9 @@ private:
 
 	/** away message */
 	String away_message_;
+
+	/** timer */
+	UnrealTimer timer_;
 };
 
 namespace UnrealUserProperties

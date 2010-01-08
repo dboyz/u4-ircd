@@ -23,22 +23,9 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#ifndef _UNREALIRCD_TIMER_HPP
-#define _UNREALIRCD_TIMER_HPP
-
-#include <boost/asio.hpp>
-
-/**
- * UnrealTimer class.
- */
-class UnrealTimer
-	: public boost::asio::deadline_timer
-{
-public:
-	typedef boost::system::error_code ErrorCode;
-
-public:
-	UnrealTimer();
-};
-
-#endif /* _UNREALIRCD_TIMER_HPP */
+#include "base.hpp" 
+#include "timer.hpp"
+ 
+UnrealTimer::UnrealTimer()
+	: boost::asio::deadline_timer(unreal->reactor())
+{ }

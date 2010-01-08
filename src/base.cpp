@@ -196,8 +196,8 @@ UnrealBase::FState UnrealBase::fstate()
  */
 void UnrealBase::initLog()
 {
-	String logfile = config.get("Log/File");
-	String loglevel = config.get("Log/Level", "Normal");
+	String logfile = config.get("Log::File");
+	String loglevel = config.get("Log::Level", "Normal");
 
 	if (!logfile.empty())
 	{
@@ -243,7 +243,7 @@ void UnrealBase::initModes()
 		ModeTable.registerMode(Ban);
 
 		/* half op can be disabled */
-		if (config.get("Features/EnableHalfOp", "false").toBool())
+		if (config.get("Features::EnableHalfOp", "false").toBool())
 			ModeTable.registerMode(HalfOp);
 
 		ModeTable.registerMode(InviteOnly);
@@ -475,7 +475,7 @@ void UnrealBase::setupISupport()
 	/* build PREFIX */
 	String prefix = "(ov)@+";
 
-	if (config.get("Features/EnableHalfOp", "false").toBool())
+	if (config.get("Features::EnableHalfOp", "false").toBool())
 		prefix = "(ohv)@%+";
 
 	isupport.add("PREFIX", prefix);
@@ -520,7 +520,7 @@ void UnrealBase::setupListener()
 
 		/* ping frequency */
 		uint32_t ping_freq = config.getSeqVal("Listener", i, "PingFreq",
-			config.get("Limits/PingFreq", "120")).toUInt();
+			config.get("Limits::PingFreq", "120")).toUInt();
 
 		/* max. connections allowed for this listener */
 		uint32_t max_conns = config.getSeqVal("Listener", i, "MaxConnections",
@@ -556,18 +556,14 @@ void UnrealBase::setupListener()
  */
 void UnrealBase::setupRlimit()
 {
-	struct rlimit rlcore, rlnfiles;
-
-	rlcore.rlim_cur = RLIM_INFINITY;
-	if (setrlimit(RLIMIT_CORE, &rlcore) == -1)
-		log.write(UnrealLog::Fatal, "Couldn't update core resource limit");
+	struct rlimit rlnfiles;
 
 	/* fetch the maximum number of permitted open files */
 	if (getrlimit(RLIMIT_NOFILE, &rlnfiles) == -1)
 		log.write(UnrealLog::Fatal, "Couldn't get file descriptor limit");
 	else
 	{
-		size_t max_connections = config.get("Me/MaxConnections", "0").toSize();
+		size_t max_connections = config.get("Me::MaxConnections", "0").toSize();
 
 		if (rlnfiles.rlim_max < max_connections)
 		{

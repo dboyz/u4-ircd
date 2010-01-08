@@ -97,7 +97,7 @@ void uc_who(UnrealUser* uptr, StringList* argv)
 						chptr->name().c_str(),
 						tuptr->ident().c_str(),
 						tuptr->hostname().c_str(),
-						unreal->config.get("Me/ServerName").c_str(),
+						unreal->me.name().c_str(),
 						tuptr->nick().c_str(),
 						status.c_str(),
 						0,

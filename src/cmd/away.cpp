@@ -67,7 +67,7 @@ void uc_away(UnrealUser* uptr, StringList* argv)
 	else if (argv->size() >= 2)
 	{
 		String awayMessage = argv->at(1);
-		size_t awaylen = unreal->config.get("Limits/Awaylen", "250")
+		size_t awaylen = unreal->config.get("Limits::Awaylen", "250")
 			.toUInt();
 
 		if (awayMessage.length() > awaylen)

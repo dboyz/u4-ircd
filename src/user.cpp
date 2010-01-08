@@ -30,6 +30,7 @@
 #include <cstdarg>
 #include <cstdio>
 #include <iostream>
+#include <boost/bind.hpp>
 
 /** ident check query map */
 Map<UnrealUser*, UnrealSocket*> icheck_queries;
@@ -87,7 +88,7 @@ void UnrealUser::auth()
 				<< AFDNS;
 
 	send(":%s NOTICE AUTH :*** Looking up your hostname",
-	    unreal->config.get("Me/ServerName").c_str());
+	    unreal->config.get("Me::ServerName").c_str());
 
 	/* resolve remote host */
 	resolveHostname();
@@ -96,7 +97,7 @@ void UnrealUser::auth()
 	scheduleAuthTimeout();
 
 	/* remote ident check, if enabled */
-	if (unreal->config.get("Features/EnableIdentCheck", "true").toBool())
+	if (unreal->config.get("Features::EnableIdentCheck", "true").toBool())
 		checkRemoteIdent();
 }
 
@@ -121,37 +122,43 @@ const String& UnrealUser::awayMessage()
 /**
  * Checks for authorization timeout.
  */
-void UnrealUser::checkAuthTimeout()
+void UnrealUser::checkAuthTimeout(const UnrealTimer::ErrorCode& ec)
 {
-	if (auth_flags_.isset(AFNick) || auth_flags_.isset(AFUser))
+	if (!ec)
 	{
-		/* haven't received USER and NICK within auth timeout */
-		exit("Authorization timeout");
-	}
-	else if (!auth_flags_.isset(AFNick) && !auth_flags_.isset(AFUser)
-			&& last_pong_time_.toTS() == 0)
-	{
-		/* got NICK and USER, but no valid PONG reply */
-		exit("Ping timeout");
+		if (auth_flags_.isset(AFNick) || auth_flags_.isset(AFUser))
+		{
+			/* haven't received USER and NICK within auth timeout */
+			exit("Authorization timeout");
+		}
+		else if (!auth_flags_.isset(AFNick) && !auth_flags_.isset(AFUser)
+				&& last_pong_time_.toTS() == 0)
+		{
+			/* got NICK and USER, but no valid PONG reply */
+			exit("Ping timeout");
+		}
 	}
 }
 
 /**
  * Checks for ping timeout.
  */
-void UnrealUser::checkPingTimeout()
+void UnrealUser::checkPingTimeout(const UnrealTimer::ErrorCode& ec)
 {
-	UnrealTime now = UnrealTime::now();
+	if (!ec)
+	{
+		UnrealTime now = UnrealTime::now();
 
-	if (last_pong_time_ < now.addSeconds(-120))
-	{
-		/* no PONG reply within two minutes */
-		exit("Ping timeout");
-	}
-	else
-	{
-		sendPing();
-		schedulePingTimeout();
+		if (last_pong_time_ < now.addSeconds(-120))
+		{
+			/* no PONG reply within two minutes */
+			exit("Ping timeout");
+		}
+		else
+		{
+			sendPing();
+			schedulePingTimeout();
+		}
 	}
 }
 
@@ -163,7 +170,7 @@ void UnrealUser::checkRemoteIdent()
 	UnrealSocket* sptr = new UnrealSocket();
 
 	send(":%s NOTICE AUTH :*** Checking Ident",
-	    unreal->config.get("Me/ServerName").c_str());
+		unreal->me.name().c_str());
 /*
 	sptr->onConnected
 		.connect(UnrealBinder1<UnrealUser, UnrealSocket*>(&UnrealUser::handleIdentCheckConnected,
@@ -202,7 +209,7 @@ void UnrealUser::destroyIdentRequest()
 	UnrealSocket* sptr = 0;
 
 	send(":%s NOTICE AUTH :Destroying Ident request...",
-	    unreal->config.get("Me/ServerName").c_str());
+	    unreal->me.name().c_str());
 
 	if (icheck_queries.contains(this))
 	{
@@ -222,7 +229,7 @@ void UnrealUser::destroyIdentRequest()
 		sendPing();
 
 	send(":%s NOTICE AUTH :Ident request destroyed.",
-	    unreal->config.get("Me/ServerName").c_str());
+	    unreal->me.name().c_str());
 }
 
 void UnrealUser::exit(UnrealSocket::ErrorCode& ec)
@@ -264,7 +271,7 @@ void UnrealUser::exit(const String& message)
 
 		reply.sprintf("ERROR :Closing link: %s by %s (%s)",
 			nickname_.empty() ? "*" : nickname_.c_str(),
-			unreal->config.get("Me/ServerName", "not.configured").c_str(),
+			unreal->me.name().c_str(),
 			message.c_str());
 
 		send(reply);
@@ -319,7 +326,7 @@ void UnrealUser::handleIdentCheckConnected(UnrealSocket* sptr)
 	String request_str;
 
 	send(":%s NOTICE AUTH :Connected to your ident server, requesting "
-	    "username...", unreal->config.get("Me/ServerName").c_str());
+	    "username...", unreal->me.name().c_str());
 
 	/*request_str.sprintf("%d, %d",
 		socket_->remote_endpoint().port(),
@@ -399,23 +406,21 @@ void UnrealUser::handleIdentCheckRead(UnrealSocket* sptr, String& data)
 
 	if (haveError)
 		send(":%s NOTICE AUTH :*** No valid ident response",
-		    unreal->config.get("Me/ServerName").c_str());
+		    unreal->me.name().c_str());
 	else
 		send(":%s NOTICE AUTH :*** Got ident response",
-		    unreal->config.get("Me/ServerName").c_str());
+		    unreal->me.name().c_str());
 
 	destroyIdentRequest();
 }
 
-
-/*
 void UnrealUser::handleResolveResponse(const UnrealResolver::ErrorCode& ec,
 	UnrealResolver::Iterator response)
 {
 	if (ec)
 	{
 		send(":%s NOTICE AUTH :Couldn't look up your hostname",
-		    unreal->config.get("Me/ServerName").c_str());
+		    unreal->me.name().c_str());
 	}
 	else
 	{
@@ -426,7 +431,7 @@ void UnrealUser::handleResolveResponse(const UnrealResolver::ErrorCode& ec,
 
 		// let the user know about the success
 		send(":%s NOTICE AUTH :*** Retrieved hostname (%s)",
-                unreal->config.get("Me/ServerName").c_str(),
+                unreal->me.name().c_str(),
 				hostname_.c_str());
 	}
 
@@ -439,7 +444,6 @@ void UnrealUser::handleResolveResponse(const UnrealResolver::ErrorCode& ec,
 	if (auth_flags_.value() == 0)
 		sendPing();
 }
-*/
 
 /**
  * Returns the visible hostname for this user.
@@ -877,11 +881,11 @@ void UnrealUser::registerUser()
 
 	sendreply(RPL_WELCOME,
 		String::format(MSG_WELCOME,
-			cfg.get("Me/Network", "ExampleNet").c_str(),
+			cfg.get("Me::Network", "ExampleNet").c_str(),
 			nickname_.c_str()));
 	sendreply(RPL_YOURHOST,
 		String::format(MSG_YOURHOST,
-			cfg.get("Me/ServerName").c_str(),
+			unreal->me.name().c_str(),
 			version.c_str()));
 	sendreply(RPL_CREATED,
 		String::format(MSG_CREATED,
@@ -889,7 +893,7 @@ void UnrealUser::registerUser()
 
 	sendreply(RPL_MYINFO,
 		String::format(MSG_MYINFO,
-			cfg.get("Me/ServerName").c_str(),
+			unreal->me.name().c_str(),
 			version.c_str(),
 			user_modes.c_str(),
 			chan_modes.c_str()));
@@ -940,7 +944,6 @@ void UnrealUser::registerUser()
  */
 void UnrealUser::resolveHostname()
 {
-	/*
 	tcp::endpoint endpoint;
 
 	try
@@ -951,17 +954,19 @@ void UnrealUser::resolveHostname()
 	{
 		std::cout<<"resolveHostname() Exception: "<<ex.what()<<"\n";
 	}
-	UnrealResolver* rq = new UnrealResolver(unreal->ios_pool.getIOService());
 
-	rq->onResolve.connect(boost::bind(&UnrealUser::handleResolveResponse,
-		this,
-		boost::asio::placeholders::error,
-		boost::asio::placeholders::iterator));
+	UnrealResolver* rq = new UnrealResolver();
 
-	rq->query(endpoint);*/
+	rq->onResolve.connect(
+		boost::bind(&UnrealUser::handleResolveResponse,
+			this,
+			boost::asio::placeholders::error,
+			boost::asio::placeholders::iterator));
+
+	rq->query(endpoint);
 
 	/* be sure we don't forget it */
-	//resolver_queries.add(socket_, rq);
+	resolver_queries.add(socket_, rq);
 }
 
 /**
@@ -969,16 +974,13 @@ void UnrealUser::resolveHostname()
  */
 void UnrealUser::scheduleAuthTimeout()
 {
-	int authTimeout = unreal->config.get("Limits/AuthTimeout", "12").toInt();
-	UnrealTime ti(UnrealTime::now());
-
-	ti.addSeconds(authTimeout);
-/*
-	UnrealTimer timer(&ti, UnrealBinder0<UnrealUser>(
-			&UnrealUser::checkAuthTimeout, this));
-
-	UnrealReactor& react = unreal->rpool.getReactor();
-	react.observe(timer);*/
+	int authTimeout = unreal->config.get("Limits::AuthTimeout", "12").toInt();
+	
+	timer_.expires_from_now(boost::posix_time::seconds(authTimeout));
+	timer_.async_wait(
+		boost::bind(&UnrealUser::checkAuthTimeout,
+			this,
+			boost::asio::placeholders::error));
 }
 
 /**
@@ -986,16 +988,13 @@ void UnrealUser::scheduleAuthTimeout()
  */
 void UnrealUser::schedulePingTimeout()
 {
-	int ping_freq = static_cast<int>(listener_->pingFrequency());
-	UnrealTime ti(UnrealTime::now());
+	int pingFreq = static_cast<int>(listener_->pingFrequency());
 
-	ti.addSeconds(ping_freq);
-/*
-	UnrealTimer timer(&ti, UnrealBinder0<UnrealUser>(
-			&UnrealUser::checkPingTimeout, this));
-
-	UnrealReactor& react = unreal->rpool.getReactor();
-	react.observe(timer);*/
+	timer_.expires_from_now(boost::posix_time::seconds(pingFreq));
+	timer_.async_wait(
+		boost::bind(&UnrealUser::checkPingTimeout,
+			this,
+			boost::asio::placeholders::error));
 }
 
 /**
@@ -1005,7 +1004,7 @@ void UnrealUser::schedulePingTimeout()
  */
 void UnrealUser::send(const String& data)
 {
-	//socket_->write(data);
+	socket_->write(data);
 }
 
 /**
@@ -1077,7 +1076,7 @@ void UnrealUser::sendreply(IRCNumeric numeric, const String& data)
 	String reply;
 
 	reply.sprintf(":%s %03d %s %s",
-			unreal->config.get("Me/ServerName", "not.configured").c_str(),
+			unreal->me.name().c_str(),
 			num,
 			nickname_.empty() ? "*" : nickname_.c_str(),
 			data.c_str());
@@ -1096,7 +1095,7 @@ void UnrealUser::sendreply(const String& cmd, const String& data)
 	String reply;
 
 	reply.sprintf(":%s %s %s %s",
-			unreal->config.get("Me/ServerName").c_str(),
+			unreal->me.name().c_str(),
 			cmd.c_str(),
 			nickname_.empty() ? "*" : nickname_.c_str(),
 			data.c_str());
@@ -1136,7 +1135,7 @@ void UnrealUser::sendPing()
 	String request_str;
 
 	request_str.sprintf("PING :%s",
-			unreal->config.get("Me/ServerName").c_str());
+			unreal->me.name().c_str());
 
 	send(request_str);
 }

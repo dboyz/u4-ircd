@@ -62,8 +62,7 @@ void uc_pong(UnrealUser* uptr, StringList* argv)
 				String::format(MSG_NEEDMOREPARAMS,
 						CMD_PONG));
 	}
-	else if (argv->at(1) == unreal->config.get("Me/ServerName",
-			"not.configured"))
+	else if (argv->at(1) == unreal->me.name())
 	{
 		if (uptr->lastPongTime().toTS() == 0)
 			uptr->registerUser();

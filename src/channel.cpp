@@ -179,7 +179,8 @@ bool UnrealChannel::canSend(UnrealUser* uptr, String& text)
 		Member* cmptr = findMember(uptr);
 
 		/* permit only when it's having necessary flags */
-		if (cmptr && (!cmptr->isChanOp() && !cmptr->isHalfOp() && !cmptr->isVoiced()))
+		if (cmptr && (!cmptr->isChanOp() && !cmptr->isHalfOp()
+				&& !cmptr->isVoiced()))
 			return false;
 	}
 	else if (isNoExternalMsg() && !findMember(uptr))

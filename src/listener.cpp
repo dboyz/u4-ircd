@@ -305,13 +305,13 @@ void UnrealListener::run()
 		open(endpoint.protocol());
 		
 		/* reuse address if it's anready in use */
-		set_option(reuse_address(true));
+		set_option(reuse_address(true), ec);
 		
 		/* bind acceptor to endpoint */
-		bind(endpoint);
+		bind(endpoint, ec);
 		
 		/* listen for connections */
-		listen(socket_base::max_connections);
+		listen(socket_base::max_connections, ec);
 	}
 	catch (...)
 	{

@@ -66,6 +66,7 @@ public:
 	~UnrealSocket();
 	void connectTo(UnrealResolver::Endpoint& ep);
 	void connectTo(const String& hostname, const uint16_t& portnum);
+	void destroyResolverQuery();
 	UnrealSocketTrafficType traffic();
 	void waitForLine();
 	void write(const String& data);
@@ -77,7 +78,6 @@ public:
 	boost::signal<void(UnrealSocket*, String&)> onRead;
 
 private:
-	void destroyResolverQuery();
 	void handleConnect(const ErrorCode& ec,
 		UnrealResolver::Iterator ep_iter);
 	void handleRead(const ErrorCode& ec, size_t bytes_read);

@@ -66,10 +66,8 @@ int UnrealModule::deinit()
 	myerr = 0;
 	if(lt_dlexit() != 0)
 	{
-		msg.sprintf("Unable to deinitialize ltdl: %s", lt_dlerror());
-
-		throw new UnrealModuleException(msg, LTDL_DEINIT_FAIL);
-
+		unreal->log.write(UnrealLog::Error, "Unable to deinitialize ltdl: %s",
+			lt_dlerror());
 		myerr ++;
 	}
 
@@ -81,10 +79,8 @@ int UnrealModule::deinit()
 
 	if(lt_dladvise_destroy(&dlflags_) != 0)
 	{
-		msg.sprintf("Unable to deinitialize ltdl's advice: %s", lt_dlerror());
-
-		throw new UnrealModuleException(msg, LTDL_DEINIT_ADVISE_FAIL);
-
+		unreal->log.write(UnrealLog::Error, "Unable to deinitialize ltdl's "
+			"advice: %s", lt_dlerror());
 		myerr ++;
 	}
 	return myerr;
@@ -146,25 +142,22 @@ int UnrealModule::init()
 
 	if(lt_dlinit() != 0)
 	{
-		msg.sprintf("Unable to initialize ltdl: %s", lt_dlerror());
-
-		throw new UnrealModuleException(msg, LTDL_INIT_FAIL);
+		unreal->log.write(UnrealLog::Fatal, "Unable to initialize ltdl: %s",
+			lt_dlerror());
 	}
 	if(lt_dladvise_init(&dlflags_) != 0)
 	{
 		dlflags_ = (lt_dladvise)NULL;
-		msg.sprintf("Unable to initialize ltdl's advice: %s", lt_dlerror());
 
-		throw new UnrealModuleException(msg, LTDL_INIT_ADVISE_FAIL);
+		unreal->log.write(UnrealLog::Fatal, "Unable to initialize ltdl's "
+			"advice: %s", lt_dlerror());
 	}
 	/** Aim at the equivlients for dlopen()'s RTLD_NOW | RTLD_GLOBAL */
 	if(lt_dladvise_global(&dlflags_) != 0)
 	{
 		/** There's a chance we can work without this */
-		msg.sprintf("Error settings RTDL_GLOBAL in ld_dladvise(): %s",
-			lt_dlerror());
-
-		throw new UnrealModuleException(msg, LTDL_ADVISE_GLOBAL_FAIL);
+		unreal->log.write(UnrealLog::Error, "Error setting RTDL_GLOBAL in "
+			"ld_dladvise(): %s", lt_dlerror());
 
 		return 1 + deinit();
 	}

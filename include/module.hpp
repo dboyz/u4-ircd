@@ -77,16 +77,6 @@ public:
 	/** module close symbol type */
 	typedef Result (CloseFunc)(UnrealModule&);
 
-	/** error codes */
-	enum ErrorCode
-	{
-		LTDL_DEINIT_FAIL,
-		LTDL_DEINIT_ADVISE_FAIL,
-		LTDL_INIT_FAIL,
-		LTDL_INIT_ADVISE_FAIL,
-		LTDL_ADVISE_GLOBAL_FAIL
-	};
-
 public:
 	UnrealModule(const String& fname);
 	~UnrealModule();
@@ -124,8 +114,5 @@ private:
 	/** module state */
 	ModuleState state_;
 };
-
-/** Module exception */
-typedef UnrealException<UnrealModule::ErrorCode> UnrealModuleException;
 
 #endif /* _UNREALIRCD_MODULE_HPP */

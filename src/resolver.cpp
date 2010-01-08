@@ -25,17 +25,47 @@
 
 #include "base.hpp"
 #include "resolver.hpp"
+#include <boost/bind.hpp>
 
 /**
  * UnrealResolver constructor.
  */
 UnrealResolver::UnrealResolver()
+	: tcp::resolver(unreal->reactor())
 { }
 
 /**
- * Initiate an DNS query w/ host/port.
+ * Callback for resolver result.
+ */
+void UnrealResolver::handleResult(const ErrorCode& ec, Iterator ep_iter)
+{
+	onResolve(ec, ep_iter);
+}
+
+/**
+ * Initiate an DNS query using endpoint specification.
+ *
+ * @param ep Endpoint to lookup
+ */
+void UnrealResolver::query(Endpoint& ep)
+{
+	async_resolve(ep,
+		boost::bind(&UnrealResolver::handleResult,
+			this,
+			boost::asio::placeholders::error,
+			boost::asio::placeholders::iterator));
+}
+
+/**
+ * Initiate an DNS query using host/port.
  */
 void UnrealResolver::query(const String& hostname, const uint16_t& port)
 {
-
+	Query q(hostname, String(port));
+	
+	async_resolve(q,
+		boost::bind(&UnrealResolver::handleResult,
+			this,
+			boost::asio::placeholders::error,
+			boost::asio::placeholders::iterator));
 }

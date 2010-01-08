@@ -30,29 +30,40 @@
 #include "reactor.hpp"
 #include "string.hpp"
 
-namespace ErrorCode
-{
-	namespace Resolver
-	{
-		enum Type
-		{
-			// anything OK
-			OK = 0
-		};
-	}
-}
+#include <boost/asio.hpp>
+#include <boost/signal.hpp>
 
+using namespace boost::asio::ip;
+
+/**
+ * Resolver class.
+ */
 class UnrealResolver
+	: public tcp::resolver
 {
 public:
-	typedef ErrorCode::Resolver::Type Error;
+	/** error code type */
+	typedef boost::system::error_code ErrorCode;
+	
+	/** result iterator */
+	typedef tcp::resolver::iterator Iterator;
+	
+	/** endpoint type */
+	typedef tcp::resolver::endpoint_type Endpoint;
+	
+	/** query type */
+	typedef tcp::resolver::query Query;
 
 public:
 	UnrealResolver();
+	void query(Endpoint& ep);
 	void query(const String& hostname, const uint16_t& port);
 
+public:
+	boost::signal<void(const ErrorCode&, Iterator)> onResolve;
+
 private:
-	//void handleResult(const ErrorCode& ec, Iterator ep_iter);
+	void handleResult(const ErrorCode& ec, Iterator ep_iter);
 };
 
 #endif /* _UNREALIRCD_RESOLVER_HPP */

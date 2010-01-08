@@ -69,15 +69,10 @@ AC_SUBST([CC],[${PTHREAD_CC}])
 #
 
 # boost modules
-AX_BOOST_BASE([1.35])
+AX_BOOST_BASE([1.39])
 AX_BOOST_ASIO
 AX_BOOST_SIGNALS
 AX_BOOST_SYSTEM
-
-# Checks for typedefs, structures, and compiler characteristics.
-AC_HEADER_STDBOOL
-
-# Checks for library functions.
 
 AC_CONFIG_FILES([Makefile
 src/cmd/Makefile])

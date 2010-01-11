@@ -140,11 +140,11 @@ void UnrealUser::checkAuthTimeout(const UnrealTimer::ErrorCode& ec)
 		{
 			if (auth_flags_.isset(AFIdent))
 			{
-				send(":%s NOTICE AUTH :*** No ident response",
-					unreal->me.name().c_str());
-				
 				if (icheck_queries.contains(this))
-					icheck_queries.free(this);
+				{
+					UnrealSocket* sptr = icheck_queries[this];
+					sptr->cancel();
+				}
 
 				destroyIdentRequest();
 				sendPing();
@@ -366,6 +366,11 @@ void UnrealUser::handleIdentCheckError(UnrealSocket* sptr,
 {
 	send(":%s NOTICE AUTH :*** No ident response",
 	    unreal->me.name().c_str());
+
+	UnrealSocket::ErrorCode err = ec;
+
+	if (err.value() == boost::asio::error::operation_aborted)
+		icheck_queries.free(this);
 
 	destroyIdentRequest();
 }

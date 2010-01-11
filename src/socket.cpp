@@ -70,7 +70,7 @@ void UnrealSocket::connectTo(UnrealResolver::Endpoint& ep)
 void UnrealSocket::connectTo(const String& hostname, const uint16_t& port)
 {
 	UnrealResolver* rq = new UnrealResolver();
-	
+
 	rq->onResolve.connect(
 		boost::bind(&UnrealSocket::handleResolveResponse,
 			this,
@@ -78,7 +78,7 @@ void UnrealSocket::connectTo(const String& hostname, const uint16_t& port)
 			boost::asio::placeholders::iterator));
 
 	rq->query(hostname, port);
-	
+
 	/* store it somewhere */
 	resolver_queries.add(this, rq);
 }
@@ -104,7 +104,7 @@ void UnrealSocket::handleConnect(const ErrorCode& ec,
 	UnrealResolver::Iterator ep_iter)
 {
 	ErrorCode ed = ec;
-	
+
 	unreal->log.write(UnrealLog::Normal, "UnrealSocket::handleConnect: %d (%s)",
 		ed.value(), ed.message().c_str());
 
@@ -118,7 +118,7 @@ void UnrealSocket::handleConnect(const ErrorCode& ec,
 	{
 		/* try next endpoint */
 		UnrealResolver::Endpoint endpoint = *ep_iter;
-		
+
 		async_connect(endpoint,
 			boost::bind(&UnrealSocket::handleConnect,
 				this,
@@ -142,7 +142,7 @@ void UnrealSocket::handleConnect(const ErrorCode& ec,
 void UnrealSocket::handleRead(const ErrorCode& ec, size_t bytes_read)
 {
 	traffic_.in += static_cast<uint64_t>(bytes_read);
-	
+
 	if (ec)
 	{
 		ErrorCode edupl = ec;

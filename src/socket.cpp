@@ -150,7 +150,7 @@ void UnrealSocket::handleRead(const ErrorCode& ec, size_t bytes_read)
 		unreal->log.write(UnrealLog::Error, "Socket read on fd %d failed with "
 			"error: %s", native(), edupl.message().c_str());
 
-		onDisconnected(this);
+		onDisconnected(this, ec);
 	}
 	else
 	{
@@ -216,7 +216,7 @@ void UnrealSocket::handleWrite(const ErrorCode& ec, size_t bytes_written)
 		unreal->log.write(UnrealLog::Error, "Socket write on fd %d failed with "
 			"error: %s", native(), edupl.message().c_str());
 
-		onDisconnected(this);
+		onDisconnected(this, ec);
 	}
 
 	traffic_.out += static_cast<uint64_t>(bytes_written);

@@ -77,6 +77,9 @@ UnrealUser::~UnrealUser()
 		unreal->stats.connections_unk--;
 	if (isOper())
 		unreal->stats.operators--;
+
+	if (icheck_queries.contains(this))
+		icheck_queries.free(this);
 }
 
 /**
@@ -135,8 +138,13 @@ void UnrealUser::checkAuthTimeout(const UnrealTimer::ErrorCode& ec)
 		else if (!auth_flags_.isset(AFNick) && !auth_flags_.isset(AFUser)
 				&& last_pong_time_.toTS() == 0)
 		{
-			/* got NICK and USER, but no valid PONG reply */
-			exit("Ping timeout");
+			if (auth_flags_.isset(AFIdent))
+			{
+				destroyIdentRequest();
+				sendPing();
+			}
+			else /* got NICK and USER, but no valid PONG reply */
+				exit("Ping timeout");
 		}
 	}
 }
@@ -180,7 +188,8 @@ void UnrealUser::checkRemoteIdent()
 	sptr->onDisconnected.connect(
 		boost::bind(&UnrealUser::handleIdentCheckDisconnected,
 			this,
-			_1));
+			_1,
+			_2));
 	sptr->onError.connect(
 		boost::bind(&UnrealUser::handleIdentCheckError,
 			this,
@@ -221,32 +230,10 @@ UnrealTime UnrealUser::connectionTime()
  */
 void UnrealUser::destroyIdentRequest()
 {
-	UnrealSocket* sptr = 0;
-
-	send(":%s NOTICE AUTH :Destroying Ident request...",
-	    unreal->me.name().c_str());
-
-/*
-	if (icheck_queries.contains(this))
-	{
-		sptr->cancel();
-		sptr = icheck_queries[this];
-		icheck_queries.remove(this);
-		delete sptr;
-	}
-	else
-	{
-		unreal->log.write(UnrealLog::Normal, "Warning: destroyIdentRequest() "
-				"for non-existing icheck entry!");
-	}
-*/
 	auth_flags_.revoke(AFIdent);
 
 	if (auth_flags_.value() == 0)
 		sendPing();
-
-	send(":%s NOTICE AUTH :Ident request destroyed.",
-	    unreal->me.name().c_str());
 }
 
 void UnrealUser::exit(UnrealSocket::ErrorCode& ec)
@@ -255,9 +242,8 @@ void UnrealUser::exit(UnrealSocket::ErrorCode& ec)
 
 	if (ec)
 	{
-		UnrealSocket::ErrorCode edupl = ec;
-		message.sprintf("Read error: %d (%s)", edupl.value(),
-			edupl.message().c_str());
+		message.sprintf("Read error: %d (%s)", ec.value(),
+			ec.message().c_str());
 	}
 	else
 		message = "Exiting";
@@ -340,9 +326,6 @@ void UnrealUser::handleIdentCheckConnected(UnrealSocket* sptr)
 {
 	String request_str;
 
-	send(":%s NOTICE AUTH :Connected to your ident server, requesting "
-	    "username...", unreal->me.name().c_str());
-
 	request_str.sprintf("%d, %d",
 		socket_->remote_endpoint().port(),
 		socket_->local_endpoint().port());
@@ -357,7 +340,8 @@ void UnrealUser::handleIdentCheckConnected(UnrealSocket* sptr)
  *
  * @param sptr Pointer to Socket
  */
-void UnrealUser::handleIdentCheckDisconnected(UnrealSocket* sptr)
+void UnrealUser::handleIdentCheckDisconnected(UnrealSocket* sptr,
+	const UnrealSocket::ErrorCode& ec)
 {
 	icheck_queries.remove(this);
 	delete sptr;
@@ -375,7 +359,7 @@ void UnrealUser::handleIdentCheckError(UnrealSocket* sptr,
 	const UnrealSocket::ErrorCode& ec)
 {
 	send(":%s NOTICE AUTH :*** No ident response",
-	    unreal->config.get("Me/ServerName").c_str());
+	    unreal->me.name().c_str());
 
 	destroyIdentRequest();
 }
@@ -401,21 +385,13 @@ void UnrealUser::handleIdentCheckRead(UnrealSocket* sptr, String& data)
 		{
 			remote_port = ports.at(0).trimmed().toUInt16();
 			local_port = ports.at(1).trimmed().toUInt16();
-/*
-			std::cout << sptr->local_endpoint().port() << "=="
-				<< local_port
-				<< ", "
-				<< sptr->remote_endpoint().port()
-				<< "=="
-				<< remote_port
-				<<"\n";*/
 
 			String replCmd = tokens.at(1).trimmed();
 
 			if (replCmd == "USERID" && tokens.size() >= 4)
 			{
 				String username = tokens.at(3).trimmed();
-					std::cout<<"username=("<<username<<")\n";
+
 				/* ident reply was OK, set the username */
 				setIdent(username);
 			}

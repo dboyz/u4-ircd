@@ -60,7 +60,8 @@ public:
 	uint16_t bindPort();
 	uint32_t maxConnections();
 	uint32_t pingFrequency();
-	void removeConnection(UnrealSocket* sptr);
+	void removeConnection(UnrealSocket* sptr,
+		const UnrealSocket::ErrorCode& ec);
 	void run();
 	void setBindAddress(const String& address);
 	void setBindPort(const uint16_t& port);

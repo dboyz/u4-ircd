@@ -59,7 +59,7 @@ public:
 		/** awaiting USER message for initial user registration */
 		AFUser	= 0x02,
 
-		/** awaiting DNS lookup response */
+		/** awaiting forward DNS lookup response */
 		AFDNS	= 0x04,
 
 		/** awaiting ident request response */
@@ -129,7 +129,8 @@ private:
 	void checkRemoteIdent();
 	void destroyIdentRequest();
 	void handleIdentCheckConnected(UnrealSocket* sptr);
-	void handleIdentCheckDisconnected(UnrealSocket* sptr);
+	void handleIdentCheckDisconnected(UnrealSocket* sptr,
+		const UnrealSocket::ErrorCode& ec);
 	void handleIdentCheckError(UnrealSocket* sptr,
 		const UnrealSocket::ErrorCode& ec);
 	void handleIdentCheckRead(UnrealSocket* sptr, String& data);

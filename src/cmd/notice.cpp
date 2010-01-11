@@ -80,7 +80,7 @@ void uc_notice(UnrealUser* uptr, StringList* argv)
 				return; /* ignore the message */
 			else
 			{
-				if (!chptr->canSend(uptr, argv->at(2)))
+				if (!chptr->canSend(uptr, argv->at(2)) || uptr->isDeaf())
 					return; /* can't send, so ignore it */
 				else
 					chptr->sendlocalreply(uptr, CMD_NOTICE,

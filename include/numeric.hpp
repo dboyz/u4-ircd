@@ -85,6 +85,7 @@ enum IRCNumeric
 	ERR_NOSUCHSERVER			= 402,
 	ERR_NOSUCHCHANNEL			= 403,
 	ERR_CANNOTSENDTOCHAN		= 404,
+	ERR_TOOMANYCHANNELS			= 405,
 	ERR_NOTEXTTOSEND			= 412,
 	ERR_UNKNOWNCOMMAND			= 421,
 	ERR_NOMOTD					= 422,
@@ -163,6 +164,7 @@ enum IRCNumeric
 #define MSG_NOSUCHSERVER		"%s :No such server"
 #define MSG_NOSUCHCHANNEL		"%s :No such channel"
 #define MSG_CANNOTSENDTOCHAN	"%s :Cannot send to channel"
+#define MSG_TOOMANYCHANNELS		"%s :You have joined too many channels"
 #define MSG_NOTEXTTOSEND		":No text to send"
 #define MSG_UNKNOWNCOMMAND		"%s :Unknown command"
 #define MSG_NOMOTD				":No MOTD available"

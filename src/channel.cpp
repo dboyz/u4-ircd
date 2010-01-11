@@ -454,7 +454,8 @@ void UnrealChannel::modebufSend(UnrealUser* uptr, List<ModeBuf>& mblist)
 			argv << mbuf.uptr->nick();
 		else if (!mbuf.args.empty())
 			argv << mbuf.args;
-		else if (mbuf.mode == UnrealChannelProperties::Key)
+		else if (mbuf.mode == UnrealChannelProperties::Key
+				&& last_state == ModeBuf::Add)
 			argv << key_;
 		else if (mbuf.mode == UnrealChannelProperties::Limit)
 			argv << String(limit_);

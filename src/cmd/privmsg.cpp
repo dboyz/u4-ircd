@@ -77,7 +77,7 @@ void uc_privmsg(UnrealUser* uptr, StringList* argv)
 			targets << argv->at(1);
 
 		for (StringList::Iterator sli = targets.begin(); sli != targets.end();
-				sli++)
+				++sli)
 		{
 			String& target = *sli;
 
@@ -97,6 +97,8 @@ void uc_privmsg(UnrealUser* uptr, StringList* argv)
 						uptr->sendreply(ERR_CANNOTSENDTOCHAN,
 							String::format(MSG_CANNOTSENDTOCHAN,
 								chptr->name().c_str()));
+					else if (uptr->isDeaf())
+						return;
 					else
 						chptr->sendlocalreply(uptr, CMD_PRIVMSG,
 							String::format(":%s",

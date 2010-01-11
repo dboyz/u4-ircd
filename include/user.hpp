@@ -83,6 +83,7 @@ public:
 	const String& hostname();
 	const String& ident();
 	bool isAway();
+	bool isDeaf();
 	bool isInvisible();
 	bool isOper();
 	void joinChannel(const String& chname, const String& key);

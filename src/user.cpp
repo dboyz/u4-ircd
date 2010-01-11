@@ -31,6 +31,7 @@
 #include <cstdio>
 #include <iostream>
 #include <boost/bind.hpp>
+#include <boost/thread/mutex.hpp>
 
 /** ident check query map */
 Map<UnrealUser*, UnrealSocket*> icheck_queries;
@@ -171,17 +172,31 @@ void UnrealUser::checkRemoteIdent()
 
 	send(":%s NOTICE AUTH :*** Checking Ident",
 		unreal->me.name().c_str());
-/*
-	sptr->onConnected
-		.connect(UnrealBinder1<UnrealUser, UnrealSocket*>(&UnrealUser::handleIdentCheckConnected,
-			this));
-			*/
 
-	//UnrealSocket::Endpoint endpoint = socket_->remote_endpoint();
-	//endpoint.port(113);
+	sptr->onConnected.connect(
+		boost::bind(&UnrealUser::handleIdentCheckConnected,
+			this,
+			_1));
+	sptr->onDisconnected.connect(
+		boost::bind(&UnrealUser::handleIdentCheckDisconnected,
+			this,
+			_1));
+	sptr->onError.connect(
+		boost::bind(&UnrealUser::handleIdentCheckError,
+			this,
+			_1,
+			_2));
+	sptr->onRead.connect(
+		boost::bind(&UnrealUser::handleIdentCheckRead,
+			this,
+			_1,
+			_2));
+
+	UnrealResolver::Endpoint endpoint = socket_->remote_endpoint();
+	endpoint.port(113);
 
 	/* connect to remote ident server */
-	//sptr->connect(endpoint);
+	sptr->connectTo(endpoint);
 
 	/* add ident check to query map */
 	icheck_queries.add(this, sptr);
@@ -211,8 +226,10 @@ void UnrealUser::destroyIdentRequest()
 	send(":%s NOTICE AUTH :Destroying Ident request...",
 	    unreal->me.name().c_str());
 
+/*
 	if (icheck_queries.contains(this))
 	{
+		sptr->cancel();
 		sptr = icheck_queries[this];
 		icheck_queries.remove(this);
 		delete sptr;
@@ -222,7 +239,7 @@ void UnrealUser::destroyIdentRequest()
 		unreal->log.write(UnrealLog::Normal, "Warning: destroyIdentRequest() "
 				"for non-existing icheck entry!");
 	}
-
+*/
 	auth_flags_.revoke(AFIdent);
 
 	if (auth_flags_.value() == 0)
@@ -238,9 +255,9 @@ void UnrealUser::exit(UnrealSocket::ErrorCode& ec)
 
 	if (ec)
 	{
-		//UnrealSocket::ErrorCode edupl = ec;
-		//message.sprintf("Read error: %d (%s)", edupl.value(),
-		//		edupl.message().c_str());
+		UnrealSocket::ErrorCode edupl = ec;
+		message.sprintf("Read error: %d (%s)", edupl.value(),
+			edupl.message().c_str());
 	}
 	else
 		message = "Exiting";
@@ -252,8 +269,6 @@ void UnrealUser::exit(UnrealSocket::ErrorCode& ec)
 		std::cout<<"UnrealUser::exit chan<"<<chptr->name()<<">\n";
 		leaveChannel(chptr->name(), message, CMD_QUIT);
 	}
-	//std::cout<<"UnrealUser::exit, chansize="<<channels.size()<<"\n";
-	//leaveChannel("#test", message, CMD_QUIT);
 }
 
 /**
@@ -264,10 +279,10 @@ void UnrealUser::exit(UnrealSocket::ErrorCode& ec)
 void UnrealUser::exit(const String& message)
 {
 	/* close socket */
-	if (/*socket_->is_open()*/true)
+	if (socket_->is_open())
 	{
 		String reply;
-		//UnrealSocket::ErrorCode ec;
+		UnrealSocket::ErrorCode ec;
 
 		reply.sprintf("ERROR :Closing link: %s by %s (%s)",
 			nickname_.empty() ? "*" : nickname_.c_str(),
@@ -275,7 +290,7 @@ void UnrealUser::exit(const String& message)
 			message.c_str());
 
 		send(reply);
-		/*socket_->close(ec);
+		socket_->close(ec);
 
 		if (ec)
 		{
@@ -283,7 +298,7 @@ void UnrealUser::exit(const String& message)
 					"close() returned with errcode %d (%s)",
 					ec.value(),
 					ec.message().c_str());
-		}*/
+		}
 	}
 }
 
@@ -328,22 +343,34 @@ void UnrealUser::handleIdentCheckConnected(UnrealSocket* sptr)
 	send(":%s NOTICE AUTH :Connected to your ident server, requesting "
 	    "username...", unreal->me.name().c_str());
 
-	/*request_str.sprintf("%d, %d",
+	request_str.sprintf("%d, %d",
 		socket_->remote_endpoint().port(),
-		socket_->local_endpoint().port());*/
+		socket_->local_endpoint().port());
 
 	/* send ident request */
-	//sptr->write(request_str);
+	sptr->write(request_str);
 }
 
 /**
- * Asyncronous callback that indicates that an error occured while trying
- * to connect/read data from the ident check socket.
+ * Asyncronous callback that indicates that an disconnected happened while
+ * trying to fetch data from the ident request socket.
+ *
+ * @param sptr Pointer to Socket
+ */
+void UnrealUser::handleIdentCheckDisconnected(UnrealSocket* sptr)
+{
+	icheck_queries.remove(this);
+	delete sptr;
+	destroyIdentRequest();
+}
+
+/**
+ * Asyncronous callback that indicates that an error occured on the ident check
+ * socket.
  *
  * @param sptr Pointer to Socket
  * @param ec Error code
  */
-/*
 void UnrealUser::handleIdentCheckError(UnrealSocket* sptr,
 	const UnrealSocket::ErrorCode& ec)
 {
@@ -352,7 +379,6 @@ void UnrealUser::handleIdentCheckError(UnrealSocket* sptr,
 
 	destroyIdentRequest();
 }
-*/
 
 /**
  * Asyncronous callback that indicates that we received an response message
@@ -391,7 +417,7 @@ void UnrealUser::handleIdentCheckRead(UnrealSocket* sptr, String& data)
 				String username = tokens.at(3).trimmed();
 					std::cout<<"username=("<<username<<")\n";
 				/* ident reply was OK, set the username */
-				setIdent("i=" + username);
+				setIdent(username);
 			}
 			else
 			{
@@ -944,17 +970,7 @@ void UnrealUser::registerUser()
  */
 void UnrealUser::resolveHostname()
 {
-	tcp::endpoint endpoint;
-
-	try
-	{
-		endpoint = socket_->remote_endpoint();
-	}
-	catch (std::exception& ex)
-	{
-		std::cout<<"resolveHostname() Exception: "<<ex.what()<<"\n";
-	}
-
+	tcp::endpoint endpoint = socket_->remote_endpoint();
 	UnrealResolver* rq = new UnrealResolver();
 
 	rq->onResolve.connect(

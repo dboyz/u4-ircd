@@ -103,6 +103,11 @@ void UnrealSocket::destroyResolverQuery()
 void UnrealSocket::handleConnect(const ErrorCode& ec,
 	UnrealResolver::Iterator ep_iter)
 {
+	ErrorCode ed = ec;
+	
+	unreal->log.write(UnrealLog::Normal, "UnrealSocket::handleConnect: %d (%s)",
+		ed.value(), ed.message().c_str());
+
 	if (!ec)
 	{
 		onConnected(this);

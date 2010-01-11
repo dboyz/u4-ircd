@@ -487,6 +487,20 @@ bool UnrealUser::isAway()
 }
 
 /**
+ * Returns whether the user has the deaf usermode set.
+ */
+bool UnrealUser::isDeaf()
+{
+	using namespace UnrealUserProperties;
+	
+	if (ModeTable.contains(Deaf)
+			&& modes_.isset(ModeTable.value(Deaf)))
+		return true;
+	else
+		return false;
+}
+
+/**
  * Returns whether the user has the invisible mode flag set.
  */
 bool UnrealUser::isInvisible()
@@ -611,7 +625,6 @@ UnrealTime UnrealUser::lastPongTime()
 void UnrealUser::leaveChannel(const String& chname, const String& message,
 	const String& type)
 {
-	std::cout<<"UnrealUser::leaveChannel <"<<chname<<"> with message <"<<message<<">\n";
 	UnrealChannel* chptr = UnrealChannel::find(chname);
 
 	if (chptr)
@@ -1216,7 +1229,6 @@ void UnrealUser::setListener(UnrealListener* lptr)
  */
 void UnrealUser::setNick(const String& newnick)
 {
-	std::cout << "UnrealUser::setNick() to <"<<newnick<<">\n";
 	/* if there is already a nickname set, remove it from the nicklist */
 	if (!nickname_.empty())
 	{
@@ -1262,4 +1274,3 @@ UnrealSocket* UnrealUser::socket()
 {
 	return socket_;
 }
-

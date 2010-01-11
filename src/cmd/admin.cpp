@@ -71,14 +71,19 @@ void uc_admin(UnrealUser* uptr, StringList* argv)
 	}
 	else
 	{
+		String buf;
+
 		uptr->sendreply(RPL_ADMINME, String::format(MSG_ADMINME,
 			unreal->me.name().c_str()));
-		uptr->sendreply(RPL_ADMINLOC1,
-			unreal->config.get("Admin::Location").c_str());
-		uptr->sendreply(RPL_ADMINLOC2,
-			unreal->config.get("Admin::Description").c_str());
-		uptr->sendreply(RPL_ADMINEMAIL,
-			unreal->config.get("Admin::Contact").c_str());
+
+		buf = ":" + unreal->config.get("Admin::Location");
+		uptr->sendreply(RPL_ADMINLOC1, buf);
+
+		buf = ":" + unreal->config.get("Admin::Description");
+		uptr->sendreply(RPL_ADMINLOC2, buf);
+
+		buf = ":" + unreal->config.get("Admin::Contact");
+		uptr->sendreply(RPL_ADMINEMAIL, buf);
 	}
 }
 

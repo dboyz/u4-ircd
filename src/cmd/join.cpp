@@ -118,7 +118,15 @@ void uc_join(UnrealUser* uptr, StringList* argv)
 			 * Support for local channels is not provided anymore.
 			 */
 
-			uptr->joinChannel(tmp_chan, key);
+			if (uptr->channels.size() >= unreal->config.get(
+				"Limits::MaxChansPerUser").toSize())
+			{
+				uptr->sendreply(ERR_TOOMANYCHANNELS,
+					String::format(MSG_TOOMANYCHANNELS,
+						tmp_chan.c_str()));
+			}
+			else
+				uptr->joinChannel(tmp_chan, key);
 		}
 	}
 }

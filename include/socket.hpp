@@ -73,7 +73,7 @@ public:
 
 public:
 	boost::signal<void(UnrealSocket*)> onConnected;
-	boost::signal<void(UnrealSocket*)> onDisconnected;
+	boost::signal<void(UnrealSocket*, const ErrorCode&)> onDisconnected;
 	boost::signal<void(UnrealSocket*, const ErrorCode&)> onError;
 	boost::signal<void(UnrealSocket*, String&)> onRead;
 

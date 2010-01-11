@@ -74,7 +74,8 @@ void UnrealListener::addConnection(UnrealSocket* sptr)
 	sptr->onDisconnected.connect(
 		boost::bind(&UnrealListener::removeConnection,
 			this,
-			_1));
+			_1,
+			_2));
 
 	sptr->onRead.connect(
 		boost::bind(&UnrealListener::handleDataResponse,
@@ -256,7 +257,8 @@ uint32_t UnrealListener::pingFrequency()
  *
  * @param sptr Shared UnrealSocket pointer
  */
-void UnrealListener::removeConnection(UnrealSocket* sptr)
+void UnrealListener::removeConnection(UnrealSocket* sptr,
+	const UnrealSocket::ErrorCode& ec)
 {
 	std::cout<<String::format("removeConnection()");
 
@@ -264,6 +266,9 @@ void UnrealListener::removeConnection(UnrealSocket* sptr)
 	if (unreal->users.contains(sptr))
 	{
 		UnrealUser* uptr = unreal->users[sptr];
+
+		if (ec)
+			uptr->exit( const_cast<UnrealSocket::ErrorCode&>(ec) );
 
 		/* if in nicklist, swipe it out there */
 		String lower = uptr->lowerNick();

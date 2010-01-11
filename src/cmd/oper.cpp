@@ -29,6 +29,8 @@
 #include "module.hpp"
 #include "stringlist.hpp"
 
+#include <crypto++/sha.h>
+
 /** Module informations */
 UnrealModule::Info modinf =
 {

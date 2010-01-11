@@ -140,6 +140,12 @@ void UnrealUser::checkAuthTimeout(const UnrealTimer::ErrorCode& ec)
 		{
 			if (auth_flags_.isset(AFIdent))
 			{
+				send(":%s NOTICE AUTH :*** No ident response",
+					unreal->me.name().c_str());
+				
+				if (icheck_queries.contains(this))
+					icheck_queries.free(this);
+
 				destroyIdentRequest();
 				sendPing();
 			}
@@ -613,22 +619,28 @@ void UnrealUser::leaveChannel(const String& chname, const String& message,
 		{
 			String msg;
 
-			chptr->removeMember(this);
-
-			/* if the channel got empty, delete it */
-			if (chptr->members.size() == 0)
-			{
-				delete chptr;
-				return;
-			}
-			else if (!message.empty())
+			if (!message.empty())
 				msg = " :" + message;
 
 			if (type == CMD_PART)
+			{
 				chptr->sendlocalreply(this, type, msg);
+				chptr->removeMember(this);
+				
+				if (chptr->members.size() == 0)
+					delete chptr;
+			}
 			else if (type == CMD_QUIT)
 			{
 				String reply;
+
+				chptr->removeMember(this);
+				
+				if (chptr->members.size() == 0)
+				{
+					delete chptr;
+					return;
+				}
 
 				/* build custom message for QUIT */
 				reply.sprintf(":%s!%s@%s %s%s",

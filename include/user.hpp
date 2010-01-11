@@ -129,8 +129,9 @@ private:
 	void checkRemoteIdent();
 	void destroyIdentRequest();
 	void handleIdentCheckConnected(UnrealSocket* sptr);
-	//void handleIdentCheckError(UnrealSocket* sptr,
-	//		const UnrealSocket::Error& ec);
+	void handleIdentCheckDisconnected(UnrealSocket* sptr);
+	void handleIdentCheckError(UnrealSocket* sptr,
+		const UnrealSocket::ErrorCode& ec);
 	void handleIdentCheckRead(UnrealSocket* sptr, String& data);
 	void handleResolveResponse(const UnrealResolver::ErrorCode& ec,
 		UnrealResolver::Iterator response);

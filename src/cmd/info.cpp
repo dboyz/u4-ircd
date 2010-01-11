@@ -49,17 +49,17 @@ StringList readInfoFile()
 {
 	StringList sl;
 
-	sl << "UnrealIRCd, Version 4";
-	sl << String("");
-	sl << "This program is free software; you can redistribute it and/or";
-	sl << "modify it under the terms of the GNU General Public License as";
-	sl << "published by the Free Software Foundation; either version 3, or";
-	sl << "(at your option) any later version.";
-	sl << String("");
-	sl << "UnrealIRCd 4 was written in C++ with a new, modern code base - ";
-	sl << "to make your IRC experience even better.";
-	sl << String("");
-	sl << "Thanks to all people who made this possible.";
+	sl << ":UnrealIRCd, Version 4";
+	sl << ": ";
+	sl << ":This program is free software; you can redistribute it and/or";
+	sl << ":modify it under the terms of the GNU General Public License as";
+	sl << ":published by the Free Software Foundation; either version 3, or";
+	sl << ":(at your option) any later version.";
+	sl << ": ";
+	sl << ":UnrealIRCd 4 was written in C++ with a new, modern code base - ";
+	sl << ":to make your IRC experience even better.";
+	sl << ": ";
+	sl << ":Thanks to all people who made this possible.";
 
 	return sl;
 }
@@ -86,10 +86,10 @@ void uc_info(UnrealUser* uptr, StringList* argv)
 	{
 		StringList output = readInfoFile();
 
-		output << String("") << String("");
-		output << String::format("Revision: %s", PACKAGE_CHANGESET);
-		output << String::format("Birth date: %s %s", __DATE__, __TIME__);
-		output << String::format("On-line since %s",
+		output << String(": ") << String(": ");
+		output << String::format(":Revision: %s", PACKAGE_CHANGESET);
+		output << String::format(":Birth date: %s %s", __DATE__, __TIME__);
+		output << String::format(":On-line since %s",
 			unreal->me.bootTime().toString("%Y-%M-%dT%H:%M:%S %Z").c_str());
 
 		/* now send it */

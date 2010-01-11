@@ -93,11 +93,6 @@ void uc_mode(UnrealUser* uptr, StringList* argv)
 					String::format(MSG_CHANNELCREATED,
 						chptr->creationTime().toTS()));
 			}
-			else if (!cmptr->isChanOp() && !uptr->isOper())
-			{
-				chptr->sendreply(uptr, ERR_CHANOPRIVSNEEDED,
-					MSG_CHANOPRIVSNEEDED);
-			}
 			else
 			{
 				/* propagate mode change; removed unrequired stuff from argv */

@@ -28,6 +28,10 @@
 #include "cmdmap.hpp"
 #include <iostream>
 
+/* cast */
+#define FLAG_TO_UINT(x) \
+	static_cast<uint16_t>(x)
+
 /** channel mode definitions */
 namespace UnrealChannelProperties
 {
@@ -548,6 +552,10 @@ void UnrealChannel::parseModeChange(UnrealUser* uptr, StringList* argv)
 	size_t par = 1;
 	String flagset = argv->at(0);
 	List<ModeBuf> mbuf_changeset;
+	Member* cmptr = findMember(uptr);
+
+	if (!cmptr)
+		return;
 
 	/* mode table */
 	UnrealChannelModeTable& modetab = UnrealChannelProperties::ModeTable;
@@ -576,6 +584,16 @@ void UnrealChannel::parseModeChange(UnrealUser* uptr, StringList* argv)
 						< (par + 1))
 				{
 					sendBanList(uptr);
+					continue;
+				}
+				
+				/* check for privileges */
+				else if (((cmo == UnrealChannelProperties::Voice
+						&& !cmptr->isChanOp() && !cmptr->isHalfOp())
+					|| (cmo != UnrealChannelProperties::Voice
+						&& !cmptr->isChanOp())) && !uptr->isOper())
+				{
+					sendreply(uptr, ERR_CHANOPRIVSNEEDED, MSG_CHANOPRIVSNEEDED);
 					continue;
 				}
 
@@ -678,8 +696,23 @@ void UnrealChannel::parseModeChange(UnrealUser* uptr, StringList* argv)
 					sendBanList(uptr);
 					continue;
 				}
-				if (cmo.param_count > 0 && argv->size()
-						< (par + cmo.param_count))
+				
+				/* check for privileges */
+				else if (((cmo == UnrealChannelProperties::Voice
+						&& !cmptr->isChanOp() && !cmptr->isHalfOp())
+					|| (cmo != UnrealChannelProperties::Voice
+						&& !cmptr->isChanOp())) && !uptr->isOper())
+				{
+					sendreply(uptr, ERR_CHANOPRIVSNEEDED, MSG_CHANOPRIVSNEEDED);
+					continue;
+				}
+				
+				/* check if the mode change requires additional parameters;
+				 * removing the channel limit usually doesn't require the limit
+				 */
+				else if (cmo.param_count > 0 && argv->size()
+						< (par + cmo.param_count)
+						&& cmo != UnrealChannelProperties::Limit)
 				{
 					uptr->sendreply(ERR_NEEDMOREPARAMS,
 						String::format(MSG_NEEDMOREPARAMS,
@@ -880,7 +913,7 @@ void UnrealChannel::sendreply(UnrealUser* uptr, IRCNumeric numeric,
 	String reply;
 
 	reply.sprintf(":%s %03d %s %s %s",
-		unreal->config.get("Me/ServerName").c_str(),
+		unreal->me.name().c_str(),
 		num,
 		uptr->nick().c_str(),
 		name_.c_str(),

@@ -67,15 +67,16 @@ void uc_list(UnrealUser* uptr, StringList* argv)
 	 */
 	uint32_t min_users = 0, max_users = 0;
 
+/*
 	if (argv->size() >= 2)
 	{
 		String& arg = argv->at(1);
 
-		if (arg.at(0) == '<')
+		if (!arg.empty() && arg.at(0) == '<')
 			min_users = arg.mid(1).toUInt();
-		else if (arg.at(0) == '>')
+		else if (!arg.empty() && arg.at(0) == '>')
 			max_users = arg.mid(1).toUInt();
-	}
+	}*/
 
 	uptr->sendreply(RPL_LISTSTART, MSG_LISTSTART);
 

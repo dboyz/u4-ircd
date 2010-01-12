@@ -72,7 +72,7 @@ void uc_notice(UnrealUser* uptr, StringList* argv)
 	{
 		String target = argv->at(1);
 
-		if (target.at(0) == '#')
+		if (target.at(0) == '#' || target.at(0) == '&')
 		{
 			UnrealChannel* chptr = UnrealChannel::find(target);
 

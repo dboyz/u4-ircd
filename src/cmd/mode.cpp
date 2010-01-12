@@ -69,7 +69,7 @@ void uc_mode(UnrealUser* uptr, StringList* argv)
 	{
 		String& target = argv->at(1);
 
-		if (target.at(0) == '#')
+		if (target.at(0) == '#' || target.at(0) == '&')
 		{
 			UnrealChannel* chptr = UnrealChannel::find(target);
 			UnrealChannel::Member* cmptr = 0;

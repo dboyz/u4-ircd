@@ -111,7 +111,7 @@ void uc_join(UnrealUser* uptr, StringList* argv)
 				key = kl.takeFirst();
 
 			/* if no channel prefix was provided, add it */
-			if (tmp_chan.at(0) != '#')
+			if (tmp_chan.at(0) != '#' && tmp_chan.at(0) != '&')
 				tmp_chan.prepend("#");
 
 			/*

@@ -87,7 +87,8 @@ void uc_info(UnrealUser* uptr, StringList* argv)
 		StringList output = readInfoFile();
 
 		output << String(": ") << String(": ");
-		output << String::format(":Revision: %s", UnrealVersion::package_changeset.c_str());
+		output << String::format(":Revision: %s",
+			UnrealVersion::package_changeset.c_str());
 		output << String::format(":Birth date: %s %s", __DATE__, __TIME__);
 		output << String::format(":On-line since %s",
 			unreal->me.bootTime().toString("%Y-%M-%dT%H:%M:%S %Z").c_str());

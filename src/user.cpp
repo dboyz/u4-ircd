@@ -242,6 +242,12 @@ void UnrealUser::destroyIdentRequest()
 		sendPing();
 }
 
+/**
+ * Exit client with an specific error code as given by the networking
+ * subsystem.
+ *
+ * @param ec Error code
+ */
 void UnrealUser::exit(UnrealSocket::ErrorCode& ec)
 {
 	String message;
@@ -442,17 +448,19 @@ void UnrealUser::handleResolveResponse(const UnrealResolver::ErrorCode& ec,
 		setHostname(tmp);
 		setRealHostname(tmp);
 
-		// let the user know about the success
+		/* let the user know about the success */
 		send(":%s NOTICE AUTH :*** Retrieved hostname (%s)",
                 unreal->me.name().c_str(),
 				hostname_.c_str());
 	}
 
-	// remove the previously allocated resolver
+	/* remove the previously allocated resolver */
 	socket_->destroyResolverQuery();
 
-	// revoke auth flag for DNS lookup
+	/* revoke auth flag for DNS lookup */
 	auth_flags_.revoke(AFDNS);
+
+	// TODO: perform reverse DNS lookup
 
 	if (auth_flags_.value() == 0)
 		sendPing();

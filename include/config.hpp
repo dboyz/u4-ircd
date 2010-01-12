@@ -31,10 +31,10 @@
 #include "stringlist.hpp"
 
 /** max length per config line for buffer */
-#define CONFIG_LINE_LENGHT_LIMIT	1024
+#define CONFIG_LINE_LENGTH_LIMIT	1024
 
 /** default config file */
-#define CONFIG_DEFAULT_FILE			"../etc/unreal.conf"
+#define CONFIG_DEFAULT_FILE			SYSCONFDIR "/unrealircd4.conf"
 #define CONFIG_ITEM_SEPARATOR		"::"
 
 class UnrealConfig

@@ -44,6 +44,8 @@ AC_DEFINE([PACKAGE_VERSION_MAJOR], [4], [Major version number])
 AC_DEFINE([PACKAGE_VERSION_MINOR], [0], [Minor version number])
 AC_DEFINE([PACKAGE_VERSION_RELEASE], [0], [Release number. i.e., bugfix release number])
 
+# paths
+AC_DEFINE_DIR([SYSCONFDIR], [sysconfdir], [System configuration directory (normally /etc)])
 
 # Checks for programs.
 AC_PROG_CXX

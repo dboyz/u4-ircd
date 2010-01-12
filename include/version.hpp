@@ -50,15 +50,20 @@ extern "C"
 #include "config.h"
 }
 
+#include "string.hpp"
+
 /**
-   The PACKAGE_CHANGESET macro is available if the HAVE_PACKAGE_CHANGESET
-   macro is defined. You must confirm that HAVE_PACKAGE_CHANGESET is set
-   before just using PACKAGE_CHANGESET because releases will not need or
-   use the PACKAGE_CHANGESET macro because they are...  releases!
+   Handle to the package_changeset symbol.
  */
-#ifdef HAVE_PACKAGE_CHANGESET
-#include "hgrev.hpp"
-#endif
+class UnrealVersion
+{
+public:
+  /**
+     Contains the Mercurial revision specifier from
+     compiletime _or_ "release" if this is a release.
+   */
+  static String package_changeset;
+};
 
 /**
    A replacement for PACKAGE_STRING which contains no spaces

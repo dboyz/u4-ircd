@@ -28,7 +28,12 @@ AC_CONFIG_SRCDIR([src/unreal.cpp])
 AC_CONFIG_HEADERS([include/config.h])
 AM_INIT_AUTOMAKE([1.11])
 
-# VCS or includes/hgrev.hpp
+#
+# VCS/UnrealVersion::package_changeset support:
+# Users building from the repo must keep Mercurial
+# installed so that their builds reveal the
+# changeset identifier they are derived from.
+#
 AM_CONDITIONAL([VCS],[test -e .hg])
 AS_IF([test -e .hg],[
 	AC_DEFINE([HAVE_PACKAGE_CHANGESET], [1], [Define if PACKAGE_CHANGESET should be used])
@@ -43,6 +48,9 @@ AC_DEFINE([PACKAGE_VERSION_RELEASE], [0], [Release number. i.e., bugfix release 
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_LIBTOOL
+# needed for src/version.cpp / tools/verionblaster.sh
+AC_PROG_MKDIR_P
+AC_PROG_SED
 
 # Checks for libraries/headers.
 

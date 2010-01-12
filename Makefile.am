@@ -38,8 +38,15 @@ AM_LDFLAGS = @BOOST_LDFLAGS@
 LIBS = @LTDL_LIBS@ @PTHREAD_LIBS@ @BOOST_ASIO_LIB@ @BOOST_SYSTEM_LIB@ \
 	@BOOST_SIGNALS_LIB@
 
+# catch all for needed files:
+EXTRA_DIST = src/version.cpp.in
+
 # config file:
-sysconf_DATA = etc/unrealircd4.conf
+dist_sysconf_DATA = etc/unrealircd4.conf
+
+# docs:
+dist_doc_DATA = docs/codingstyle.txt \
+	docs/configuration.txt
 
 #
 # Binaries:
@@ -52,12 +59,14 @@ bin_PROGRAMS = unrealircd4
 pkginclude_HEADERS = \
 	include/base.hpp \
 	include/bitmask.hpp \
+	include/binder.hpp \
 	include/channel.hpp \
 	include/cmdmap.hpp \
 	include/command.hpp \
 	include/config.hpp \
 	include/exception.hpp \
 	include/isupport.hpp \
+	include/limits.hpp \
 	include/list.hpp \
 	include/listener.hpp \
 	include/log.hpp \
@@ -113,9 +122,9 @@ unrealircd4_LDFLAGS = $(AM_LDFLAGS) -export-dynamic
 #
 # src/version.cpp:
 #
-NEED_VERSION_CPP = $(top_srcdir)/src/version.cpp.in $(top_srcdir)/tools/versionblast.sh
+NEED_VERSION_CPP = $(top_srcdir)/src/version.cpp.in
 if VCS
-NEED_VERSION_CPP += $(top_srcdir)/.hg/dirstate
+NEED_VERSION_CPP += $(top_srcdir)/.hg/dirstate $(top_srcdir)/tools/versionblast.sh
 endif
 
 $(top_builddir)/src/version.cpp: $(NEED_VERSION_CPP)

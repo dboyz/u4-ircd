@@ -23,7 +23,7 @@
  ##################################################################
 
 AC_PREREQ([2.13])
-AC_INIT([unrealircd-cpp], [4.0.0], [http://bugs.unrealircd.org/])
+AC_INIT([unrealircd4], [4.0.0], [http://bugs.unrealircd.org/])
 AC_CONFIG_SRCDIR([src/unreal.cpp])
 AC_CONFIG_HEADERS([include/config.h])
 AM_INIT_AUTOMAKE([1.11])

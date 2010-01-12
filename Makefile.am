@@ -33,7 +33,7 @@ AM_DEFAULT_SOURCE_EXT = .cpp
 AM_CPPFLAGS = @BOOST_CPPFLAGS@
 AM_CXXFLAGS = @PTHREAD_CFLAGS@ -Wall
 #AM_CXXFLAGS = -std=c++0x -Wall
-AM_LDFLAGS = @BOOST_LDFLAGS@
+AM_LDFLAGS = @BOOST_LDFLAGS@ -lcrypto++
 
 LIBS = @LTDL_LIBS@ @PTHREAD_LIBS@ @BOOST_ASIO_LIB@ @BOOST_SYSTEM_LIB@ \
 	@BOOST_SIGNALS_LIB@
@@ -67,6 +67,7 @@ pkginclude_HEADERS = \
 	include/config.hpp \
 	include/exception.hpp \
 	include/isupport.hpp \
+	include/hash.hpp \
 	include/limits.hpp \
 	include/list.hpp \
 	include/listener.hpp \
@@ -95,6 +96,7 @@ unrealircd4_SOURCES = \
 	src/channel.cpp \
 	src/command.cpp \
 	src/config.cpp \
+	src/hash.cpp \
 	src/listener.cpp \
 	src/log.cpp \
 	src/module.cpp \

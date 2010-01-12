@@ -478,7 +478,7 @@ void UnrealBase::setupISupport()
 	if (config.get("Features::EnableHalfOp", "false").toBool())
 	{
 		prefix = "(ohv)@%+";
-		statusmsg = "@+";
+		statusmsg = "@%+";
 	}
 	
 	if (config.get("Features::EnableLocalChannels", "true").toBool())

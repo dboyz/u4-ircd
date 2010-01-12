@@ -94,6 +94,7 @@ unrealircd_SOURCES = \
 	src/timer.cpp \
 	src/unreal.cpp \
 	src/user.cpp \
+	src/version.cpp \
 	$(pkginclude_HEADERS)
 
 # we need to _not_ have AM_LDFLAGS added to the binary because it has libtool
@@ -107,23 +108,12 @@ unrealircd_SOURCES = \
 unrealircd_LDFLAGS = $(AM_LDFLAGS) -export-dynamic
 
 #
-# include/hgrev.hpp:
+# src/version.cpp:
 #
-
-# only define repo vars if needed
-NEED_HGREV_HPP = 
+NEED_VERSION_CPP = $(top_srcdir)/src/version.cpp.in $(top_srcdir)/tools/versionblast.sh
 if VCS
-NEED_HGREV_HPP += include/hgrev.hpp
+NEED_VERSION_CPP += $(top_srcdir)/.hg/dirstate
 endif
 
-include/hgrev.hpp: .hg/dirstate
-	cd $(top_srcdir)
-	echo \#define\ PACKAGE_CHANGESET\ \"$(hg -R $(top_srcdir) id -i)\" > $(top_srcdir)/include/hgrev.hpp
-
-
-# there must be something cleaner than this.
-# there must be some type of Makefile-time
-# file generation hook. If anything, this is
-# where parallel building will break, especially
-# with SUBDIRS :-/
-$(unrealircd_SOURCES): $(NEED_HGREV_HPP)
+$(top_builddir)/src/version.cpp: $(NEED_VERSION_CPP)
+	MKDIR_P="$(MKDIR_P)" SED="$(SED)" top_builddir="$(top_builddir)" top_srcdir="$(top_srcdir)" $(top_srcdir)/tools/versionblast.sh

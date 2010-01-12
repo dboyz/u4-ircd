@@ -71,7 +71,7 @@ void uc_version(UnrealUser* uptr, StringList* argv)
 				PACKAGE_VERSTR,
 				PACKAGE_PATCHLEVEL,
 				unreal->me.name().c_str(),
-				PACKAGE_CHANGESET));
+				UnrealVersion::package_changeset.c_str() ));
 	}
 }
 

@@ -39,7 +39,8 @@ LIBS = @LTDL_LIBS@ @PTHREAD_LIBS@ @BOOST_ASIO_LIB@ @BOOST_SYSTEM_LIB@ \
 	@BOOST_SIGNALS_LIB@
 
 # catch all for needed files:
-EXTRA_DIST = src/version.cpp.in
+EXTRA_DIST = src/version.cpp.in \
+	$(top_srcdir)/tools/versionblast.sh
 
 # config file:
 dist_sysconf_DATA = etc/unrealircd4.conf
@@ -106,8 +107,8 @@ unrealircd4_SOURCES = \
 	src/timer.cpp \
 	src/unreal.cpp \
 	src/user.cpp \
-	src/version.cpp \
 	$(pkginclude_HEADERS)
+nodist_unrealircd4_SOURCES = $(top_builddir)/src/version.cpp
 
 # we need to _not_ have AM_LDFLAGS added to the binary because it has libtool
 # flags which don't work with binaries. Thus, we set this variable which
@@ -122,10 +123,13 @@ unrealircd4_LDFLAGS = $(AM_LDFLAGS) -export-dynamic
 #
 # src/version.cpp:
 #
-NEED_VERSION_CPP = $(top_srcdir)/src/version.cpp.in
+NEED_VERSION_CPP = $(top_srcdir)/src/version.cpp.in $(top_srcdir)/tools/versionblast.sh
+DOCP =
 if VCS
-NEED_VERSION_CPP += $(top_srcdir)/.hg/dirstate $(top_srcdir)/tools/versionblast.sh
+NEED_VERSION_CPP += $(top_srcdir)/.hg/dirstate
+else
+DOCP += cp $(top_srcdir)/src/version.cpp.in $(top_builddir)/src/version.cpp
 endif
 
 $(top_builddir)/src/version.cpp: $(NEED_VERSION_CPP)
-	MKDIR_P="$(MKDIR_P)" SED="$(SED)" top_builddir="$(top_builddir)" top_srcdir="$(top_srcdir)" $(top_srcdir)/tools/versionblast.sh
+	MKDIR_P="$(MKDIR_P)" SED="$(SED)" top_builddir="$(top_builddir)" top_srcdir="$(top_srcdir)" DOCP="$(DOCP)" $(top_srcdir)/tools/versionblast.sh

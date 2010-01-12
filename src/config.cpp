@@ -241,8 +241,8 @@ bool UnrealConfig::read(const String& file)
 
 	while (!fst.eof() && fst.good())
 	{
-		char buf[CONFIG_LINE_LENGHT_LIMIT];
-		fst.getline(buf, CONFIG_LINE_LENGHT_LIMIT);
+		char buf[CONFIG_LINE_LENGTH_LIMIT];
+		fst.getline(buf, CONFIG_LINE_LENGTH_LIMIT);
 
 		String line = String(buf).trimmed();
 		lineno++;

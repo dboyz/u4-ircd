@@ -38,11 +38,14 @@ AM_LDFLAGS = @BOOST_LDFLAGS@
 LIBS = @LTDL_LIBS@ @PTHREAD_LIBS@ @BOOST_ASIO_LIB@ @BOOST_SYSTEM_LIB@ \
 	@BOOST_SIGNALS_LIB@
 
+# config file:
+sysconf_DATA = etc/unrealircd4.conf
+
 #
 # Binaries:
 #
 
-bin_PROGRAMS = unrealircd
+bin_PROGRAMS = unrealircd4
 
 # this is pkginclude because these headers are needed
 # by modules that will be compiled against UnrealIRCd-CPP
@@ -77,7 +80,7 @@ pkginclude_HEADERS = \
 	include/user.hpp \
 	include/version.hpp
 
-unrealircd_SOURCES = \
+unrealircd4_SOURCES = \
 	src/base.cpp \
 	src/channel.cpp \
 	src/command.cpp \
@@ -105,7 +108,7 @@ unrealircd_SOURCES = \
 # supposedly we need -export-dynamic (eaten by libtool)
 # so that modules can link to the IRCd's module object
 #  when loaded
-unrealircd_LDFLAGS = $(AM_LDFLAGS) -export-dynamic
+unrealircd4_LDFLAGS = $(AM_LDFLAGS) -export-dynamic
 
 #
 # src/version.cpp:

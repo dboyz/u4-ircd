@@ -26,6 +26,7 @@
 #include "base.hpp"
 #include "cmdmap.hpp"
 #include "command.hpp"
+#include "hash.hpp"
 #include "module.hpp"
 #include "stringlist.hpp"
 
@@ -92,11 +93,28 @@ struct OperatorType
 	 */
 	bool checkPassword(const String& pw)
 	{
-		String real_pw = password;
+		UnrealHash::Type hash_type = UnrealHash::Invalid;
+		size_t pos_s, pos_e;
 
-		// TODO: add hashing algorithms
+		if ((pos_s = password.find_first_of("$")) != String::npos)
+		{
+			if ((pos_e = password.find_first_of("$", pos_s + 1))
+					!= String::npos)
+			{
+				String typestr = password.mid(pos_s + 1, (pos_e - pos_s - 1));
 
-		return real_pw == pw;
+				if ((hash_type = UnrealHash::strtotype(typestr))
+						!= UnrealHash::Invalid)
+				{
+					String real_pw = password.mid(pos_e + 1);
+					String hash = UnrealHash::calculate(pw, hash_type);
+					
+					return (hash.toUpper() == real_pw.toUpper());
+				}
+			}
+		}
+
+		return password == pw;
 	}
 
 	/** operator mask, if any */

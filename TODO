@@ -20,35 +20,35 @@ Legend:
     [ ] CLOSE
     [ ] GLINE
     [ ] INVITE
-    [ ] ISON
-    [ ] JOIN   
-    [ ] KICK
+    [X] ISON
+    [X] JOIN   
+    [X] KICK
     [ ] KILL
     [ ] KNOCK
     [ ] LINKS
-    [ ] LIST
+    [X] LIST
     [X] LUSERS
     [ ] MAP
-    [ ] MODE
+    [X] MODE
     [ ] MODULES
-    [ ] MOTD
-    [ ] NAMES
+    [X] MOTD
+    [X] NAMES
     [X] NICK
     [X] NOTICE
-    [ ] OPER
-    [ ] PART
+    [X] OPER
+    [X] PART
     [ ] PASS
-    [ ] PING
+    [X] PING
     [X] PONG
     [X] PRIVMSG
-    [ ] QUIT
+    [X] QUIT
     [ ] REHASH
     [ ] SILENCE
-    [ ] TOPIC
+    [X] TOPIC
     [X] USER
     [X] USERHOST
-    [ ] VERSION
-    [ ] WHO
+    [X] VERSION
+    [X] WHO
     [X] WHOIS
     [ ] WHOWAS
     [ ] WATCH

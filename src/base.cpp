@@ -459,26 +459,34 @@ void UnrealBase::setupISupport()
 
 	isupport.add("SILENCE", "0");
 	isupport.add("MODES", "6");
-	isupport.add("MAXCHANNELS", config.get("limits/max_channels", "20"));
-	isupport.add("MAXBANS", config.get("limits/max_bans", "30"));
-	isupport.add("NICKLEN", config.get("limits/nicklen", "18"));
-	isupport.add("TOPICLEN", config.get("limits/topiclen", "250"));
-	isupport.add("AWAYLEN", config.get("limits/awaylen", "250"));
-	isupport.add("KICKLEN", config.get("limits/kicklen", "250"));
-	isupport.add("CHANNELLEN", config.get("limits/channellen", "200"));
-	isupport.add("CHANTYPES", "#");
-	isupport.add("STATUSMSG", "@%+");
+	isupport.add("MAXCHANNELS", config.get("Limits::MaxChannelsPerUser", "20"));
+	isupport.add("MAXBANS", config.get("Limits::MaxBansPerChannel", "30"));
+	isupport.add("NICKLEN", config.get("Limits::Nicklen", "18"));
+	isupport.add("TOPICLEN", config.get("Limits::Topiclen", "250"));
+	isupport.add("AWAYLEN", config.get("Limits::Awaylen", "250"));
+	isupport.add("KICKLEN", config.get("Limits::Kicklen", "250"));
+	isupport.add("CHANNELLEN", config.get("Limits::Channellen", "200"));
 	isupport.add("CHANMODES", "b,k,l,imnsp");
 	isupport.add("CASEMAPPING", "rfc1459");
-	isupport.add("NETWORK", config.get("Me/Network", "ExampleNet"));
+	isupport.add("NETWORK", config.get("Me::Network", "ExampleNet"));
 
 	/* build PREFIX */
 	String prefix = "(ov)@+";
+	String statusmsg = "@+";
+	String chantypes = "#";
 
 	if (config.get("Features::EnableHalfOp", "false").toBool())
+	{
 		prefix = "(ohv)@%+";
+		statusmsg = "@+";
+	}
+	
+	if (config.get("Features::EnableLocalChannels", "true").toBool())
+		chantypes = "&#";
 
 	isupport.add("PREFIX", prefix);
+	isupport.add("STATUSMSG", statusmsg);
+	isupport.add("CHANTYPES", chantypes);
 }
 
 /**

@@ -81,7 +81,7 @@ void uc_privmsg(UnrealUser* uptr, StringList* argv)
 		{
 			String& target = *sli;
 
-			if (target.at(0) == '#')
+			if (target.at(0) == '#' || target.at(0) == '&')
 			{
 				UnrealChannel* chptr = UnrealChannel::find(target);
 

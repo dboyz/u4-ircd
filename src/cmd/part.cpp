@@ -84,7 +84,7 @@ void uc_part(UnrealUser* uptr, StringList* argv)
 		{
 			String tmp_chan = *chan;
 
-			if (tmp_chan.at(0) != '#')
+			if (tmp_chan.at(0) != '#' && tmp_chan.at(0) != '&')
 				tmp_chan.prepend("#");
 
 			uptr->leaveChannel(tmp_chan, msg, CMD_PART);

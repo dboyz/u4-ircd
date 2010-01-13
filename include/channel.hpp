@@ -140,6 +140,7 @@ public:
 	Ban* findBan(const String& mask);
 	Member* findMember(UnrealUser* uptr);
 	bool isBanned(UnrealUser* uptr);
+	bool isInvited(UnrealUser* uptr);
 	bool isInviteOnly();
 	bool isKey();
 	bool isLimit();
@@ -164,6 +165,8 @@ public:
 			const String& data, bool skip_sender = false);
 	void sendreply(UnrealUser* uptr, IRCNumeric numeric,
 			const String& data);
+	void sendreply(UnrealUser* uptr, const String& cmd,
+			const String& data);
 	void setCreationTime(const UnrealTime& ts);
 	void setKey(const String& keystr);
 	void setLastJoinTime(const UnrealTime& ts);
@@ -178,6 +181,7 @@ public:
 
 public:
 	List<Ban*> banlist;
+	List<String> invites;
 	Map<UnrealUser*, Member*> members;
 
 private:

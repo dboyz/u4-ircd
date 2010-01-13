@@ -44,9 +44,6 @@ AC_DEFINE([PACKAGE_VERSION_MAJOR], [4], [Major version number])
 AC_DEFINE([PACKAGE_VERSION_MINOR], [0], [Minor version number])
 AC_DEFINE([PACKAGE_VERSION_RELEASE], [0], [Release number. i.e., bugfix release number])
 
-# paths
-AC_DEFINE_DIR([SYSCONFDIR], [sysconfdir], [System configuration directory (normally /etc)])
-
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_LIBTOOL
@@ -100,7 +97,7 @@ AX_BOOST_SYSTEM
 
 # Common Makefile.am substitutions:
 LIBS="${LTDL_LIBS} ${PTHREAD_LIBS} ${BOOST_ASIO_LIB} ${BOOST_SYSTEM_LIB} ${BOOST_SIGNALS_LIB} ${CRYPTOPP_LIBS}"
-AC_SUBST([AM_CPPFLAGS], [${BOOST_CPPFLAGS}])
+AC_SUBST([AM_CPPFLAGS], ["${BOOST_CPPFLAGS} -DSYSCONFDIR='\"\$(sysconfdir)\"'"])
 AC_SUBST([AM_CXXFLAGS], ["${PTHREAD_CFLAGS} -Wall"]) # someday: -std=c++0x
 
 AC_CONFIG_FILES([Makefile

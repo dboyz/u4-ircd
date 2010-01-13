@@ -283,6 +283,20 @@ bool UnrealChannel::isBanned(UnrealUser* uptr)
 }
 
 /**
+ * Returns whether the specified user has been invited to the channel.
+ *
+ * @param uptr User pointer
+ * @return True if invited, otherwise false
+ */
+bool UnrealChannel::isInvited(UnrealUser* uptr)
+{
+	/* XXX: we may replace invites per nick-basis with user-entry basis,
+	 * as invites remain valid on nick changes then.
+	 */
+	return invites.contains(uptr->lowerNick());
+}
+
+/**
  * Returns whether the channel is invite-only.
  *
  * @return true when invite-only, otherwise false
@@ -769,6 +783,8 @@ void UnrealChannel::parseModeChange(UnrealUser* uptr, StringList* argv)
 					setKey("");
 				else if (cmo == UnrealChannelProperties::Limit)
 					setLimit(0);
+				else if (cmo == UnrealChannelProperties::InviteOnly)
+					invites.clear();
 				else if (cmo == UnrealChannelProperties::Ban)
 				{
 					String mask = argv->at(par++);
@@ -942,6 +958,29 @@ void UnrealChannel::sendreply(UnrealUser* uptr, IRCNumeric numeric,
 	reply.sprintf(":%s %03d %s %s %s",
 		unreal->me.name().c_str(),
 		num,
+		uptr->nick().c_str(),
+		name_.c_str(),
+		data.c_str());
+
+	uptr->send(reply);
+}
+
+/**
+ * Send a command reply to a single user containing channel name, originating
+ * from the server.
+ *
+ * @param uptr Pointer to user sending reply to
+ * @param cmd Command
+ * @param data Data block
+ */
+void UnrealChannel::sendreply(UnrealUser* uptr, const String& cmd,
+		const String& data)
+{
+	String reply;
+
+	reply.sprintf(":%s %s %s %s %s",
+		unreal->me.name().c_str(),
+		cmd.c_str(),
 		uptr->nick().c_str(),
 		name_.c_str(),
 		data.c_str());

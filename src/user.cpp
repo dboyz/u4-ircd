@@ -552,61 +552,68 @@ void UnrealUser::joinChannel(const String& chname, const String& key)
 		chptr = new UnrealChannel(chname);
 		flags = UnrealChannel::Member::ChanOp;
 	}
-	else if (chptr->isKey() && key != chptr->key() && !isOper())
+
+	/* invited users may override almost anything */
+	bool force = chptr->isInvited(this);
+
+	if (chptr->isKey() && key != chptr->key() && !isOper() && !force)
 	{
 		sendreply(ERR_BADCHANNELKEY,
 			String::format(MSG_BADCHANNELKEY,
 				chptr->name().c_str()));
-		return;
 	}
 	else if (chptr->isLimit() && chptr->members.size() >= chptr->limit()
-		&& !isOper())
+		&& !isOper() && !force)
 	{
 		sendreply(ERR_CHANNELISFULL,
 			String::format(MSG_CHANNELISFULL,
 				chptr->name().c_str()));
-		return;
 	}
 	else if (chptr->findMember(this))
 		return; /* ignore this join-attempt */
-	else if (chptr->isBanned(this))
+	else if (chptr->isBanned(this) && !force)
 	{
 		sendreply(ERR_BANNEDFROMCHAN,
 			String::format(MSG_BANNEDFROMCHAN,
 				chptr->name().c_str()));
-		return;
 	}
-
-	/* add us to the channel */
-	chptr->addMember(this, flags);
-
-	/* let anyone know that we're joining */
-	chptr->sendlocalreply(this, CMD_JOIN, String());
-
-	if (chptr->creationTime().toTS() > 0)
-		chptr->sendreply(this, RPL_CHANNELCREATED,
-			String::format(MSG_CHANNELCREATED,
-				chptr->creationTime().toTS()));
-
-	StringList tmp_strl;
-	tmp_strl << "0" << chptr->name();
-
-	/* look up some commands */
-	UnrealUserCommand* ucptr;
-	UnrealUserCommand::Function fn;
-
-	/* sending names */
-	if ((ucptr = UnrealUserCommand::find(CMD_NAMES)))
+	else
 	{
-		fn = ucptr->fn();
-		fn(this, &tmp_strl);
-	}
+		/* add us to the channel */
+		chptr->addMember(this, flags);
 
-	/* and the topic */
-	if ((ucptr = UnrealUserCommand::find(CMD_TOPIC)))
-	{
-		fn = ucptr->fn();
-		fn(this, &tmp_strl);
+		/* let anyone know that we're joining */
+		chptr->sendlocalreply(this, CMD_JOIN, String());
+
+		if (chptr->creationTime().toTS() > 0)
+			chptr->sendreply(this, RPL_CHANNELCREATED,
+				String::format(MSG_CHANNELCREATED,
+					chptr->creationTime().toTS()));
+
+		StringList tmp_strl;
+		tmp_strl << "0" << chptr->name();
+
+		/* look up some commands */
+		UnrealUserCommand* ucptr;
+		UnrealUserCommand::Function fn;
+
+		/* sending names */
+		if ((ucptr = UnrealUserCommand::find(CMD_NAMES)))
+		{
+			fn = ucptr->fn();
+			fn(this, &tmp_strl);
+		}
+
+		/* and the topic */
+		if ((ucptr = UnrealUserCommand::find(CMD_TOPIC)))
+		{
+			fn = ucptr->fn();
+			fn(this, &tmp_strl);
+		}
+
+		/* if the user was invited, remove the invite entry */
+		if (chptr->invites.contains(lowerNick()))
+			chptr->invites.remove(lowerNick());
 	}
 }
 

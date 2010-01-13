@@ -34,6 +34,7 @@ pkglib_LTLIBRARIES = \
 	help.la \
 	info.la \
 	insmod.la \
+	invite.la \
 	ison.la \
 	join.la \
 	kick.la \

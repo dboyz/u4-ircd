@@ -41,6 +41,9 @@
 #define CMD_INSMOD		"INSMOD"
 #define TOK_INSMOD		"IMO"
 
+#define CMD_INVITE		"INVITE"
+#define TOK_INVITE		"I"
+
 #define CMD_ISON		"ISON"
 #define TOK_ISON		"ISON"
 

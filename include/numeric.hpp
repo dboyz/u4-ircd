@@ -68,6 +68,7 @@ enum IRCNumeric
 	RPL_NOTOPIC					= 331,
 	RPL_TOPIC					= 332,
 	RPL_TOPICLASTCHANGED		= 333,
+	RPL_INVITING				= 341,
 	RPL_VERSION					= 351,
 	RPL_WHOREPLY				= 352,
 	RPL_NAMREPLY				= 353,
@@ -94,6 +95,7 @@ enum IRCNumeric
 	ERR_NICKNAMEINUSE			= 433,
 	ERR_USERNOTINCHANNEL		= 441,
 	ERR_NOTONCHANNEL			= 442,
+	ERR_USERONCHANNEL			= 443,
 	ERR_NEEDMOREPARAMS 			= 461,
 	ERR_ALREADYREGISTERED		= 462,
 	ERR_PASSWDMISMATCH			= 464,
@@ -173,6 +175,7 @@ enum IRCNumeric
 #define MSG_NICKNAMEINUSE		"%s :Nickname is already in use"
 #define MSG_USERNOTINCHANNEL	"%s :They aren't on that channel"
 #define MSG_NOTONCHANNEL		":You're not on that channel"
+#define MSG_USERONCHANNEL		"%s %s :is already on channel"
 #define MSG_NEEDMOREPARAMS		"%s :Not enough parameters"
 #define MSG_ALREADYREGISTERED	":You may not reregister"
 #define MSG_PASSWDMISMATCH		":Password incorrect"

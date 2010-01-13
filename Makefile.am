@@ -30,13 +30,7 @@ SUBDIRS = . src/cmd
 INCLUDES = -I$(top_srcdir)/include
 
 AM_DEFAULT_SOURCE_EXT = .cpp
-AM_CPPFLAGS = @BOOST_CPPFLAGS@
-AM_CXXFLAGS = @PTHREAD_CFLAGS@ -Wall
-#AM_CXXFLAGS = -std=c++0x -Wall
-AM_LDFLAGS = @BOOST_LDFLAGS@ -lcrypto++
-
-LIBS = @LTDL_LIBS@ @PTHREAD_LIBS@ @BOOST_ASIO_LIB@ @BOOST_SYSTEM_LIB@ \
-	@BOOST_SIGNALS_LIB@
+AM_LDFLAGS = $(BOOST_LDFLAGS)
 
 # catch all for needed files:
 EXTRA_DIST = src/version.cpp.in \

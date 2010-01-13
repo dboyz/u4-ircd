@@ -65,7 +65,21 @@ AC_CHECK_HEADER([ltdl.h],
   [AC_CHECK_LIB([ltdl], [lt_dladvise_init],
     [LIBLTDL=-lltdl], [LIBLTDL=])],
   [LIBLTDL=])
+AS_IF([test -z "${LIBLTDL}"],
+  [AC_MSG_ERROR([I need ltdl (provided by libtool)])])
 AC_SUBST([LTDL_LIBS], [${LIBLTDL}])
+
+# crypto++ ( http://cryptopp.org/ )
+# https://sourceforge.net/tracker/?func=detail&aid=2929583&group_id=6152&atid=356152
+AC_LANG_PUSH([C++])
+AC_CHECK_HEADER([crypto++/cryptlib.h],
+  [AC_CHECK_LIB([crypto++], [_ZN8CryptoPP7Grouper4Put2EPKhmib],
+    [CRYPTOPP_LIBS=-lcrypto++], [CRYPTOPP_LIBS=])],
+  [CRYPTOPP_LIBS=])
+AC_LANG_POP([C++])
+AS_IF([test -z "${CRYPTOPP_LIBS}"],
+  [AC_MSG_ERROR([I need crypto++ ( http://cryptopp.org/ )])])
+AC_SUBST([CRYPTOPP_LIBS], [${CRYPTOPP_LIBS}])
 
 # pthreads
 ACX_PTHREAD([],
@@ -83,6 +97,11 @@ AX_BOOST_BASE([1.35])
 AX_BOOST_ASIO
 AX_BOOST_SIGNALS
 AX_BOOST_SYSTEM
+
+# Common Makefile.am substitutions:
+LIBS="${LTDL_LIBS} ${PTHREAD_LIBS} ${BOOST_ASIO_LIB} ${BOOST_SYSTEM_LIB} ${BOOST_SIGNALS_LIB} ${CRYPTOPP_LIBS}"
+AC_SUBST([AM_CPPFLAGS], [${BOOST_CPPFLAGS}])
+AC_SUBST([AM_CXXFLAGS], ["${PTHREAD_CFLAGS} -Wall"]) # someday: -std=c++0x
 
 AC_CONFIG_FILES([Makefile
 src/cmd/Makefile])

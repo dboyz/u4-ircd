@@ -139,6 +139,7 @@ public:
 	static UnrealChannel* find(const String& chname);
 	Ban* findBan(const String& mask);
 	Member* findMember(UnrealUser* uptr);
+	bool isBanned(UnrealUser* uptr);
 	bool isInviteOnly();
 	bool isKey();
 	bool isLimit();

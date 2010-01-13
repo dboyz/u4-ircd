@@ -190,9 +190,7 @@ bool UnrealChannel::canSend(UnrealUser* uptr, String& text)
 	else if (isNoExternalMsg() && !findMember(uptr))
 		return false; /* no external messages */
 
-	// TODO: check for ban. Banned users can not talk to channels.
-
-	return true;
+	return !isBanned(uptr);
 }
 
 /**
@@ -254,6 +252,34 @@ UnrealChannel::Member* UnrealChannel::findMember(UnrealUser* uptr)
 		return members[uptr];
 	else
 		return 0;
+}
+
+/**
+ * Returns whether the specified user is banned from the channel.
+ *
+ * @param uptr User entry
+ * @return True if banned, otherwise false
+ */
+bool UnrealChannel::isBanned(UnrealUser* uptr)
+{
+	String mask;
+
+	/* build the mask */
+	mask.sprintf("%s!%s@%s",
+		uptr->nick().c_str(),
+		uptr->ident().c_str(),
+		uptr->hostname().c_str());
+
+	/* iterate throug the banlist and look if some ban match */
+	foreach (BanIterator, cbi, banlist)
+	{
+		Ban* cbptr = *cbi;
+
+		if (mask.match(cbptr->mask))
+			return true;
+	}
+
+	return false;
 }
 
 /**

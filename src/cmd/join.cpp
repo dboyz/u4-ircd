@@ -119,7 +119,7 @@ void uc_join(UnrealUser* uptr, StringList* argv)
 			 */
 
 			if (uptr->channels.size() >= unreal->config.get(
-				"Limits::MaxChansPerUser").toSize())
+				"Limits::MaxChansPerUser", "20").toSize())
 			{
 				uptr->sendreply(ERR_TOOMANYCHANNELS,
 					String::format(MSG_TOOMANYCHANNELS,

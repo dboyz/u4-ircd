@@ -569,6 +569,13 @@ void UnrealUser::joinChannel(const String& chname, const String& key)
 	}
 	else if (chptr->findMember(this))
 		return; /* ignore this join-attempt */
+	else if (chptr->isBanned(this))
+	{
+		sendreply(ERR_BANNEDFROMCHAN,
+			String::format(MSG_BANNEDFROMCHAN,
+				chptr->name().c_str()));
+		return;
+	}
 
 	/* add us to the channel */
 	chptr->addMember(this, flags);

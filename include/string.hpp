@@ -44,8 +44,11 @@ class String
 	: public std::string
 {
 public:
-	/** Alias the Iterator */
+	/** iterator */
 	typedef std::string::iterator Iterator;
+	
+	/** const_iterator */
+	typedef std::string::const_iterator ConstIterator;
 
 public:
 	String() {}
@@ -64,9 +67,81 @@ public:
 	bool contains(const String& str) const;
 	static String format(const char* fmt, ...);
 	String left(size_t count);
+
+	/**
+ 	 * Simple wildcard pattern matcher.
+ 	 *
+ 	 * @param pattern Pattern string to check against
+ 	 * @return True if matching, otherwise false
+ 	 */
+	inline bool match(const String& pattern)
+	{
+		ConstIterator m = pattern.begin();
+		ConstIterator n = begin();
+		ConstIterator ma = end();
+		ConstIterator na = begin();
+
+		if (pattern.empty())
+			return false;
+
+		for (;;)
+		{
+			if (*m == '*')
+			{
+				while (*m == '*')
+					++m;
+		
+				ma = m;
+				na = n;
+			}
+		
+			if (m == pattern.end())
+			{
+				if (n == end())
+					return true;
+				if (ma == end())
+					return false;
+			
+				for (--m; (m > pattern.begin()) && (*m == '?'); --m);
+			
+				if (*m == '*')
+					return true;
+			
+				m = ma;
+				n = ++na;
+			}
+			else if (n == end())
+			{
+				while (*m == '*')
+					++m;
+			
+				return (m == pattern.end());
+			}
+		
+			if ((String::toLower(*m) != String::toLower(*n))
+					&& !((*m == '_') && (*n == ' ')) && (*m != '?'))
+			{
+				if (ma == end())
+					return false;
+
+				m = ma;
+				n = ++na;
+			}
+			else
+			{
+				++m;
+				++n;
+			}
+		}
+	
+		return false;
+	}
+
 	String mid(size_t start, size_t count = npos);
-	inline String& prepend(const char* str) { this->insert(0, str); return *this; }
-	inline String& prepend(const String& str) { this->insert(0, str); return *this; }
+	inline String& prepend(const char* str)
+		{ this->insert(0, str); return *this; }
+	inline String& prepend(const String& str)
+		{ this->insert(0, str); return *this; }
 	static String repeat(char ch, size_t count);
 	String right(size_t count);
 	StringList split(const String& separator);
@@ -79,6 +154,21 @@ public:
 	int32_t toInt32();
 	int64_t toInt64();
 	String toLower();
+
+	/**
+ 	 * Convert an character to lowercase.
+ 	 *
+ 	 * @param ch Input character
+ 	 * @return Lowercase version of ch
+ 	 */
+	inline static char toLower(char ch)
+	{
+		if (ch >= 'A' && ch <= 'Z')
+			ch += 32;
+		
+		return ch;
+	}
+
 	size_t toSize();
 	uint32_t toUInt();
 	uint8_t toUInt8();
@@ -86,6 +176,21 @@ public:
 	uint32_t toUInt32();
 	uint64_t toUInt64();
 	String toUpper();
+
+	/**
+ 	 * Convert an character to uppercase.
+ 	 *
+ 	 * @param ch Input character
+ 	 * @return Uppercase version of ch
+ 	 */
+	inline static char toUpper(char ch)
+	{
+		if (ch >= 'a' && ch <= 'z')
+			ch -= 32;
+		
+		return ch;
+	}
+
 	String trimmed();
 
 	String& operator<<(const String& str) { append(str); return *this; }

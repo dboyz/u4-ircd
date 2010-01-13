@@ -386,9 +386,9 @@ String String::toLower()
 {
 	String buf(c_str());
 
-	for (char* s = (char*)buf.c_str(); *s; s++)
-		if (*s >= 'A' && *s <= 'Z')
-			*s = *s + 32;
+	for (Iterator ch = buf.begin(); ch != buf.end(); ++ch)
+		if (*ch >= 'A' && *ch <= 'Z')
+			*ch = *ch + 32;
 
 	return buf;
 }
@@ -451,9 +451,9 @@ String String::toUpper()
 {
 	String buf(c_str());
 
-	for (char* s = (char*)buf.c_str(); *s; s++)
-		if (*s >= 'a' && *s <= 'z')
-			*s = *s - 32;
+	for (Iterator ch = buf.begin(); ch != buf.end(); ++ch)
+		if (*ch >= 'a' && *ch <= 'z')
+			*ch = *ch - 32;
 
 	return buf;
 }

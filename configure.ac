@@ -66,27 +66,31 @@ AS_IF([test -z "${LIBLTDL}"],
   [AC_MSG_ERROR([I need ltdl (provided by libtool)])])
 AC_SUBST([LTDL_LIBS], [${LIBLTDL}])
 
-# crypto++ ( http://cryptopp.org/ )
-# https://sourceforge.net/tracker/?func=detail&aid=2929583&group_id=6152&atid=356152
-AC_MSG_CHECKING([crypto++])
-AC_LANG_PUSH([C++])
-SAVED_LIBS="${LIBS}"
-LIBS="${LIBS} -lcrypto++"
-AC_LINK_IFELSE(
-  [AC_LANG_PROGRAM([[#include <crypto++/hex.h>]], [[CryptoPP::HexEncoder he; return 0;]])],
-  [CRYPTOPP_LIBS="-lcrypto++"
-	AC_MSG_RESULT([yes])],
-  [AC_MSG_RESULT([no])
-	AC_MSG_ERROR([I need crypto++ ( http://cryptopp.org/ )])])
-LIBS="${LIBS}"
-AC_LANG_POP([C++])
-
 # pthreads
+# Must be checked early because crypto++ requires pthreads (and doesn't yet use pkg-config)
 ACX_PTHREAD([],
 	[
 		AC_MSG_ERROR([I need pthreads])
 	])
 AC_SUBST([CC],[${PTHREAD_CC}])
+
+# crypto++ ( http://cryptopp.org/ )
+# https://sourceforge.net/tracker/?func=detail&aid=2929583&group_id=6152&atid=356152
+AC_MSG_CHECKING([crypto++])
+AC_LANG_PUSH([C++])
+SAVED_LIBS="${LIBS}"
+LIBS="${LIBS} -lcrypto++ ${PTHREAD_LIBS}"
+SAVED_CXXFLAGS="${CXXFLAGS}"
+CXXFLAGS="${CXXFLAGS} ${PTHREAD_CFLAGS}"
+AC_LINK_IFELSE(
+  [AC_LANG_PROGRAM([[#include <crypto++/hex.h>]], [[CryptoPP::HexEncoder he; return 0;]])],
+  [AC_MSG_RESULT([yes])
+	CRYPTOPP_LIBS="-lcrypto++"],
+  [AC_MSG_RESULT([no])
+	AC_MSG_ERROR([I need crypto++ ( http://cryptopp.org/ )])])
+LIBS="${SAVED_LIBS}"
+CXXFLAGS="${SAVED_CXXFLAGS}"
+AC_LANG_POP([C++])
 
 #
 # epoll()/select() implementation choice
@@ -99,7 +103,7 @@ AX_BOOST_SIGNALS
 AX_BOOST_SYSTEM
 
 # Common Makefile.am substitutions:
-LIBS="${LTDL_LIBS} ${PTHREAD_LIBS} ${BOOST_ASIO_LIB} ${BOOST_SYSTEM_LIB} ${BOOST_SIGNALS_LIB} ${CRYPTOPP_LIBS}"
+LIBS="${BOOST_ASIO_LIB} ${BOOST_SYSTEM_LIB} ${BOOST_SIGNALS_LIB} ${CRYPTOPP_LIBS} ${LTDL_LIBS} ${PTHREAD_LIBS}"
 AC_SUBST([AM_CPPFLAGS], ["${BOOST_CPPFLAGS} -DSYSCONFDIR='\"\$(sysconfdir)\"'"])
 AC_SUBST([AM_CXXFLAGS], ["${PTHREAD_CFLAGS} -Wall"]) # someday: -std=c++0x
 

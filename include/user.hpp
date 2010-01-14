@@ -76,10 +76,12 @@ public:
 	Bitmask<uint8_t>& authflags();
 	const String& awayMessage();
 	UnrealTime connectionTime();
+	static void destroy(UnrealUser* uptr);
 	void exit(UnrealSocket::ErrorCode& ec);
 	void exit(const String& message);
 	static UnrealUser* find(UnrealSocket* sptr);
 	static UnrealUser* find(const String& nickname);
+	bool havePendingRequests();
 	const String& hostname();
 	const String& ident();
 	bool isAway();

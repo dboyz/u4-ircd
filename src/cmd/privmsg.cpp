@@ -106,6 +106,30 @@ void uc_privmsg(UnrealUser* uptr, StringList* argv)
 							true);
 				}
 			}
+			else if (target.at(0) == '$' && uptr->isOper())
+			{
+				/* mask sending - IRC operators only */
+				Map<UnrealSocket*, UnrealUser*>::Iterator ui;
+				String pattern = target.mid(1);
+				String mask;
+
+				for (ui = unreal->users.begin(); ui != unreal->users.end();++ui)
+				{
+					UnrealUser* user = ui->second;
+
+					mask.sprintf("%s!%s@%s",
+						user->nick().c_str(),
+						user->ident().c_str(),
+						user->hostname().c_str());
+					
+					if (mask.match(pattern))
+					{
+						uptr->sendreply(user, CMD_PRIVMSG,
+							String::format(":%s",
+								argv->at(2).c_str()));
+					}
+				}					
+			}
 			else
 			{
 				UnrealUser* tuptr = UnrealUser::find(target);

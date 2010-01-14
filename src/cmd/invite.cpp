@@ -107,7 +107,7 @@ void uc_invite(UnrealUser* uptr, StringList* argv)
 				tuptr->nick().c_str(),
 				chptr->name().c_str()));
 	}
-	else if (!chptr->invites.contains(tuptr->lowerNick()))
+	else if (!chptr->invites.contains(tuptr))
 	{
 		/* send invite notification to user we invite */
 		uptr->sendreply(tuptr, CMD_INVITE, chptr->name());
@@ -116,7 +116,7 @@ void uc_invite(UnrealUser* uptr, StringList* argv)
 		chptr->sendreply(uptr, RPL_INVITING, tuptr->nick());
 
 		/* add to active invites */
-		chptr->invites << tuptr->lowerNick();
+		chptr->invites << tuptr;
 	}
 }
 

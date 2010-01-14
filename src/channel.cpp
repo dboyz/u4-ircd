@@ -290,10 +290,7 @@ bool UnrealChannel::isBanned(UnrealUser* uptr)
  */
 bool UnrealChannel::isInvited(UnrealUser* uptr)
 {
-	/* XXX: we may replace invites per nick-basis with user-entry basis,
-	 * as invites remain valid on nick changes then.
-	 */
-	return invites.contains(uptr->lowerNick());
+	return invites.contains(uptr);
 }
 
 /**

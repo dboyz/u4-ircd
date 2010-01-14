@@ -96,6 +96,7 @@ public:
 			const String& type);
 	UnrealListener* listener();
 	String lowerNick();
+	bool match(const String& pattern);
 	Bitmask<uint16_t>& modes();
 	String modestr();
 	const String& nick();

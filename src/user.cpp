@@ -74,13 +74,14 @@ UnrealUser::UnrealUser(UnrealSocket* sptr)
  */
 UnrealUser::~UnrealUser()
 {
-	unreal->stats.users_local_cur--;
+	if (unreal->stats.users_local_cur > 0)
+		unreal->stats.users_local_cur--;
 
-	if (isInvisible())
+	if (isInvisible() && unreal->stats.users_inv > 0)
 		unreal->stats.users_inv--;
-	if (auth_flags_.value() != 0)
+	if (auth_flags_.value() != 0 && unreal->stats.connections_unk > 0)
 		unreal->stats.connections_unk--;
-	if (isOper())
+	if (isOper() && unreal->stats.operators > 0)
 		unreal->stats.operators--;
 
 	if (icheck_queries.contains(this))
@@ -838,6 +839,24 @@ Bitmask<uint16_t>& UnrealUser::modes()
 }
 
 /**
+ * Returns whether the mask of the user matches the specified pattern.
+ *
+ * @param pattern Glob-pattern to check matching
+ * @return True if matching, otherwise false
+ */
+bool UnrealUser::match(const String& pattern)
+{
+	String mask;
+	
+	mask.sprintf("%s!%s@%s",
+		nickname_.c_str(),
+		ident_.c_str(),
+		hostname_.c_str());
+
+	return mask.match(pattern);
+}
+
+/**
  * Returns a readable version of the user modes.
  *
  * @return User mode string w/ params
@@ -1111,6 +1130,8 @@ void UnrealUser::resolveHostname()
 	{
 		unreal->log.write(UnrealLog::Debug, "resolveHostname: Client socket "
 			"disappeared when getting remote endpoint");
+
+		auth_flags_.revoke(AFDNS);
 		return;
 	}
 

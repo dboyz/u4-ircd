@@ -265,8 +265,6 @@ uint32_t UnrealListener::pingFrequency()
 void UnrealListener::removeConnection(UnrealSocket* sptr,
 	const UnrealSocket::ErrorCode& ec)
 {
-	std::cout<<String::format("removeConnection()");
-
 	/* if an user, remove it from the userlist */
 	if (unreal->users.contains(sptr))
 	{
@@ -278,10 +276,11 @@ void UnrealListener::removeConnection(UnrealSocket* sptr,
 		/* destroy user object */
 		UnrealUser::destroy(uptr);
 	}
-	else
+	else if (unreal->stats.connections_unk > 0)
 		unreal->stats.connections_unk--;
 
-	unreal->stats.connections_cur--;
+	if (unreal->stats.connections_cur > 0)
+		unreal->stats.connections_cur--;
 
 	connections.remove(sptr);
 }

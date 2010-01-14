@@ -68,15 +68,18 @@ AC_SUBST([LTDL_LIBS], [${LIBLTDL}])
 
 # crypto++ ( http://cryptopp.org/ )
 # https://sourceforge.net/tracker/?func=detail&aid=2929583&group_id=6152&atid=356152
+AC_MSG_CHECKING([crypto++])
 AC_LANG_PUSH([C++])
-AC_CHECK_HEADER([crypto++/cryptlib.h],
-  [AC_CHECK_LIB([crypto++], [_ZN8CryptoPP7Grouper4Put2EPKhmib],
-    [CRYPTOPP_LIBS=-lcrypto++], [CRYPTOPP_LIBS=])],
-  [CRYPTOPP_LIBS=])
+SAVED_LIBS="${LIBS}"
+LIBS="${LIBS} -lcrypto++"
+AC_LINK_IFELSE(
+  [AC_LANG_PROGRAM([[#include <crypto++/hex.h>]], [[CryptoPP::HexEncoder he; return 0;]])],
+  [CRYPTOPP_LIBS="-lcrypto++"
+	AC_MSG_RESULT([yes])],
+  [AC_MSG_RESULT([no])
+	AC_MSG_ERROR([I need crypto++ ( http://cryptopp.org/ )])])
+LIBS="${LIBS}"
 AC_LANG_POP([C++])
-AS_IF([test -z "${CRYPTOPP_LIBS}"],
-  [AC_MSG_ERROR([I need crypto++ ( http://cryptopp.org/ )])])
-AC_SUBST([CRYPTOPP_LIBS], [${CRYPTOPP_LIBS}])
 
 # pthreads
 ACX_PTHREAD([],

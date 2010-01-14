@@ -262,20 +262,11 @@ UnrealChannel::Member* UnrealChannel::findMember(UnrealUser* uptr)
  */
 bool UnrealChannel::isBanned(UnrealUser* uptr)
 {
-	String mask;
-
-	/* build the mask */
-	mask.sprintf("%s!%s@%s",
-		uptr->nick().c_str(),
-		uptr->ident().c_str(),
-		uptr->hostname().c_str());
-
-	/* iterate throug the banlist and look if some ban match */
 	foreach (BanIterator, cbi, banlist)
 	{
 		Ban* cbptr = *cbi;
 
-		if (mask.match(cbptr->mask))
+		if (uptr->match(cbptr->mask))
 			return true;
 	}
 

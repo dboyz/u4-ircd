@@ -117,12 +117,7 @@ void uc_privmsg(UnrealUser* uptr, StringList* argv)
 				{
 					UnrealUser* user = ui->second;
 
-					mask.sprintf("%s!%s@%s",
-						user->nick().c_str(),
-						user->ident().c_str(),
-						user->hostname().c_str());
-					
-					if (mask.match(pattern))
+					if (user->match(pattern))
 					{
 						uptr->sendreply(user, CMD_PRIVMSG,
 							String::format(":%s",

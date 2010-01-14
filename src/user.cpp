@@ -212,7 +212,19 @@ void UnrealUser::checkRemoteIdent()
 			_1,
 			_2));
 
-	UnrealResolver::Endpoint endpoint = socket_->remote_endpoint();
+	/* validate socket */
+	UnrealSocket::ErrorCode ec;
+	UnrealResolver::Endpoint endpoint = socket_->remote_endpoint(ec);
+
+	if (ec)
+	{
+		unreal->log.write(UnrealLog::Debug, "checkRemoteIdent: Client socket "
+			"disappeared before we could get remote endpoint");
+
+		delete sptr;
+		return;
+	}
+
 	endpoint.port(113);
 
 	/* connect to remote ident server */
@@ -1092,7 +1104,16 @@ void UnrealUser::registerUser()
  */
 void UnrealUser::resolveHostname()
 {
-	tcp::endpoint endpoint = socket_->remote_endpoint();
+	UnrealSocket::ErrorCode ec;
+	UnrealResolver::Endpoint endpoint = socket_->remote_endpoint(ec);
+
+	if (ec)
+	{
+		unreal->log.write(UnrealLog::Debug, "resolveHostname: Client socket "
+			"disappeared when getting remote endpoint");
+		return;
+	}
+
 	UnrealResolver* rq = new UnrealResolver();
 
 	rq->onResolve.connect(

@@ -612,8 +612,8 @@ void UnrealUser::joinChannel(const String& chname, const String& key)
 		}
 
 		/* if the user was invited, remove the invite entry */
-		if (chptr->invites.contains(lowerNick()))
-			chptr->invites.remove(lowerNick());
+		if (chptr->invites.contains(this))
+			chptr->invites.remove(this);
 	}
 }
 

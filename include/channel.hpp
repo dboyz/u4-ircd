@@ -181,7 +181,7 @@ public:
 
 public:
 	List<Ban*> banlist;
-	List<String> invites;
+	List<UnrealUser*> invites;
 	Map<UnrealUser*, Member*> members;
 
 private:

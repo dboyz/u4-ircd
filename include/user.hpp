@@ -86,6 +86,7 @@ public:
 	const String& ident();
 	bool isAway();
 	bool isDeaf();
+	bool isIntroduced();
 	bool isInvisible();
 	bool isOper();
 	void joinChannel(const String& chname, const String& key);

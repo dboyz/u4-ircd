@@ -35,9 +35,14 @@
  * operator privileges
  */
 UnrealUserCommand::UnrealUserCommand(const String& name, Function cfn,
-		bool oper_only)
-	: name_(name), fn_(cfn), oper_only_(oper_only), active_(true)
+		bool oper_only, bool reg_only)
+	: name_(name), fn_(cfn)
 {
+	if (oper_only)
+		flags_ << OperOnly;
+	if (reg_only)
+		flags_ << Registered;
+
 	unreal->user_commands.add(name, this);
 }
 
@@ -89,7 +94,7 @@ UnrealUserCommand::Function UnrealUserCommand::fn()
  */
 bool UnrealUserCommand::isActive()
 {
-	return active_;
+	return !flags_.isset(Suspended);
 }
 
 /**
@@ -99,7 +104,17 @@ bool UnrealUserCommand::isActive()
  */
 bool UnrealUserCommand::isOperOnly()
 {
-	return oper_only_;
+	return flags_.isset(OperOnly);
+}
+
+/**
+ * Returns whether the command requires IRC users to be registered to use them.
+ *
+ * @return true when registered, otherwise false
+ */
+bool UnrealUserCommand::isRegistered()
+{
+	return flags_.isset(Registered);
 }
 
 /**
@@ -109,7 +124,10 @@ bool UnrealUserCommand::isOperOnly()
  */
 void UnrealUserCommand::setActive(bool state)
 {
-	active_ = state;
+	if (state && flags_.isset(Suspended))
+		flags_.revoke(Suspended);
+	else if (!state && !flags_.isset(Suspended))
+		flags_ << Suspended;
 }
 
 /**
@@ -119,5 +137,21 @@ void UnrealUserCommand::setActive(bool state)
  */
 void UnrealUserCommand::setOperOnly(bool state)
 {
-	oper_only_ = state;
+	if (state && !flags_.isset(OperOnly))
+		flags_ << OperOnly;
+	else if (!state && flags_.isset(OperOnly))
+		flags_.revoke(OperOnly);
+}
+
+/**
+ * Set whether the command requires IRC users to be registered to use them.
+ *
+ * @param state New state
+ */
+void UnrealUserCommand::setRegistered(bool state)
+{
+	if (state && !flags_.isset(Registered))
+		flags_ << Registered;
+	else if (!state && flags_.isset(Registered))
+		flags_.revoke(Registered);
 }

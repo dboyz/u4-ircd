@@ -62,7 +62,6 @@ UnrealListener::~UnrealListener()
  */
 void UnrealListener::addConnection(UnrealSocket* sptr)
 {
-	std::cout<<"addConnection()\n";
 	if (connections.size() >= max_connections_)
 	{
 		/* all connection slots in use, drop the connection */
@@ -205,8 +204,14 @@ void UnrealListener::handleDataResponse(UnrealSocket* sptr, String& data)
 
 			if (ucptr)
 			{
+				/* command that require users to be fully registered
+				 * are checked here
+				 */
+				if (ucptr->isRegistered() && !uptr->isIntroduced())
+					uptr->sendreply(ERR_NOTREGISTERED, MSG_NOTREGISTERED);
+
 				/* look if the command is suspended */
-				if (!ucptr->isActive())
+				else if (!ucptr->isActive())
 					uptr->sendreply(CMD_NOTICE,
 							String::format(MSG_CMDNOTAVAILABLE,
 									cmd.c_str()));

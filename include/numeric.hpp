@@ -96,6 +96,7 @@ enum IRCNumeric
 	ERR_USERNOTINCHANNEL		= 441,
 	ERR_NOTONCHANNEL			= 442,
 	ERR_USERONCHANNEL			= 443,
+	ERR_NOTREGISTERED			= 451,
 	ERR_NEEDMOREPARAMS 			= 461,
 	ERR_ALREADYREGISTERED		= 462,
 	ERR_PASSWDMISMATCH			= 464,
@@ -176,6 +177,7 @@ enum IRCNumeric
 #define MSG_USERNOTINCHANNEL	"%s :They aren't on that channel"
 #define MSG_NOTONCHANNEL		":You're not on that channel"
 #define MSG_USERONCHANNEL		"%s %s :is already on channel"
+#define MSG_NOTREGISTERED		":You have not registered"
 #define MSG_NEEDMOREPARAMS		"%s :Not enough parameters"
 #define MSG_ALREADYREGISTERED	":You may not reregister"
 #define MSG_PASSWDMISMATCH		":Password incorrect"

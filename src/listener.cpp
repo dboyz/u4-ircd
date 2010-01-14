@@ -270,15 +270,8 @@ void UnrealListener::removeConnection(UnrealSocket* sptr,
 		if (ec)
 			uptr->exit( const_cast<UnrealSocket::ErrorCode&>(ec) );
 
-		/* if in nicklist, swipe it out there */
-		String lower = uptr->lowerNick();
-
-		if (unreal->nicks.contains(lower))
-			unreal->nicks.remove(lower);
-
-		unreal->users.remove(sptr);
-
-		delete uptr;
+		/* destroy user object */
+		UnrealUser::destroy(uptr);
 	}
 	else
 		unreal->stats.connections_unk--;

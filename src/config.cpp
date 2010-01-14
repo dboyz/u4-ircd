@@ -82,7 +82,7 @@ size_t UnrealConfig::getLastIndex(const String& key)
 	String strKey = key + "_#SEQ-" + String(index) + "#";
 
 	for (Map<String, String>::Iterator i = entries_.begin();
-			i != entries_.end(); i++)
+			i != entries_.end(); ++i)
 	{
 		String current = i->first;
 
@@ -110,7 +110,7 @@ bool UnrealConfig::getQuotedContent(String& inp, String& val)
 
 	val.clear();
 
-	for (String::Iterator siter = inp.begin(); siter != inp.end(); siter++)
+	for (String::Iterator siter = inp.begin(); siter != inp.end(); ++siter)
 	{
 		if (*siter == '\\')
 		{
@@ -265,13 +265,17 @@ bool UnrealConfig::read(const String& file)
 		}
 		else if ((cpos = line.find("/*")) != String::npos)
 		{
-			if ((cpos2 = line.find("*/", cpos)) != String::npos)
+			if (cpos > 0 && line[cpos - 1] == '\\')
+			{
+				/* escape starting comments */
+			}
+			else if ((cpos2 = line.find("*/", cpos)) != String::npos)
 			{
 				// they end in the same line
 				line = line.mid(cpos2 + 2);
 				cpos = String::npos;
 
-				if (line.size() == 0)
+				if (line.size() == 0 && cpos2 > 0 && line[cpos2 - 1] != '\\')
 					continue;
 			}
 			else

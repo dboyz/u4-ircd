@@ -36,6 +36,11 @@
 /** ident check query map */
 Map<UnrealUser*, UnrealSocket*> icheck_queries;
 
+/** a list with user entries that should be destroyed once all additional
+  * operations have finished
+  */
+List<UnrealUser*> user_destructs;
+
 /** user mode definitions */
 namespace UnrealUserProperties
 {
@@ -230,6 +235,53 @@ UnrealTime UnrealUser::connectionTime()
 }
 
 /**
+ * Destroy the user object once pending operations have been finished.
+ *
+ * @param uptr User pointer
+ */
+void UnrealUser::destroy(UnrealUser* uptr)
+{
+	/* check for pending requests. when there are none, destruct the user object
+	 * immediately
+	 */
+	if (!uptr->havePendingRequests())
+	{
+		if (user_destructs.contains(uptr))
+		{
+			unreal->log.write(UnrealLog::Debug,
+				"UnrealUser::destruct(): fd %d - destroy user found on "
+				"destruction list",
+					uptr->socket()->native());
+			
+			user_destructs.remove(uptr);
+		}
+
+		/* remove from nick list, if found */
+		String ln = uptr->lowerNick();
+
+		if (!ln.empty() && unreal->nicks.contains(ln))
+			unreal->nicks.remove(ln);
+
+		/* remove from user list */
+		unreal->users.remove(uptr->socket());
+
+		delete uptr;
+	}
+	else
+	{
+		/* add to the destruct list. callback handlers of pending requests
+		 * have to check if there are user destructions in the list,
+		 * and if so - call this function again to free the user object.
+		 */
+		user_destructs << uptr;
+		
+		unreal->log.write(UnrealLog::Debug,
+			"UnrealUser::destruct(): fd %d - adding to destruction list",
+				uptr->socket()->native());
+	}
+}
+
+/**
  * Destroy the remote ident request session.
  *
  * @param sptr Socket pointer
@@ -264,7 +316,6 @@ void UnrealUser::exit(UnrealSocket::ErrorCode& ec)
 	while (channels.size() > 0)
 	{
 		UnrealChannel* chptr = channels.at(0);
-		std::cout<<"UnrealUser::exit chan<"<<chptr->name()<<">\n";
 		leaveChannel(chptr->name(), message, CMD_QUIT);
 	}
 }
@@ -358,6 +409,10 @@ void UnrealUser::handleIdentCheckDisconnected(UnrealSocket* sptr,
 	icheck_queries.remove(this);
 	delete sptr;
 	destroyIdentRequest();
+
+	/* check for destruction request, as ident request is done */
+	if (user_destructs.contains(this))
+		UnrealUser::destroy(this);
 }
 
 /**
@@ -398,12 +453,18 @@ void UnrealUser::handleIdentCheckRead(UnrealSocket* sptr, String& data)
 		StringList ports = tokens.at(0).split(",");
 		uint16_t local_port = 0, remote_port = 0;
 
+		unreal->log.write(UnrealLog::Debug, "icheck_read: ports.size() = %u",
+			ports.size());
+	
 		if (ports.size() >= 2)
 		{
 			remote_port = ports.at(0).trimmed().toUInt16();
 			local_port = ports.at(1).trimmed().toUInt16();
 
 			String replCmd = tokens.at(1).trimmed();
+
+			unreal->log.write(UnrealLog::Debug, "icheck_read: replCmd = [%s]",
+				replCmd.c_str());
 
 			if (replCmd == "USERID" && tokens.size() >= 4)
 			{
@@ -433,6 +494,12 @@ void UnrealUser::handleIdentCheckRead(UnrealSocket* sptr, String& data)
 	destroyIdentRequest();
 }
 
+/**
+ * Callback for resolver replies.
+ *
+ * @param ec Error code
+ * @param response Response iterator
+ */
 void UnrealUser::handleResolveResponse(const UnrealResolver::ErrorCode& ec,
 	UnrealResolver::Iterator response)
 {
@@ -460,10 +527,29 @@ void UnrealUser::handleResolveResponse(const UnrealResolver::ErrorCode& ec,
 	/* revoke auth flag for DNS lookup */
 	auth_flags_.revoke(AFDNS);
 
+	/* check for destruction request, as asyncronous DNS request is done */
+	if (user_destructs.contains(this))
+	{
+		UnrealUser::destroy(this);
+		return;
+	}
+
 	// TODO: perform reverse DNS lookup
 
 	if (auth_flags_.value() == 0)
 		sendPing();
+}
+
+/**
+ * Returns whether there is a pending DNS or Ident request. Used to track
+ * user entries that can't be destroyed immediately, otherwise asyncronous
+ * callback signals may emit on non-existing objects.
+ *
+ * @return True on pending requests, otherwise false
+ */
+bool UnrealUser::havePendingRequests()
+{
+	return (auth_flags_.isset(AFDNS) || auth_flags_.isset(AFIdent));
 }
 
 /**

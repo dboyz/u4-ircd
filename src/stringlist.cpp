@@ -36,7 +36,7 @@ String StringList::join(const String& glue)
 {
 	String result;
 
-	for (Iterator i = begin(); i != end(); i++)
+	for (Iterator i = begin(); i != end(); ++i)
 	{
 		result << *i;
 

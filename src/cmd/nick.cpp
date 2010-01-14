@@ -147,7 +147,7 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
 	module.info = modinf;
 
 	/* register command */
-	uc = new UnrealUserCommand(CMD_NICK, &uc_nick);
+	uc = new UnrealUserCommand(CMD_NICK, &uc_nick, false, false);
 
 	return UnrealModule::Success;
 }

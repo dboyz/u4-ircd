@@ -26,6 +26,8 @@
 #ifndef _UNREALIRCD_COMMAND_HPP
 #define _UNREALIRCD_COMMAND_HPP
 
+#include "bitmask.hpp"
+#include "platform.hpp"
 #include "user.hpp"
 #include "string.hpp"
 #include "stringlist.hpp"
@@ -37,18 +39,33 @@ public:
 	typedef void (*Function)(UnrealUser*, StringList*);
 
 public:
+	enum FlagType
+	{
+		/** IRC operator privileges required to use the command */
+		OperOnly 	= 0x01,
+		
+		/** full registered status required to use the command */
+		Registered 	= 0x02,
+		
+		/** command suspended */
+		Suspended 	= 0x04
+	};
+
+public:
 	UnrealUserCommand(const String& name, Function cfn,
-		bool oper_only = false);
+		bool oper_only = false, bool reg_only = true);
 	~UnrealUserCommand();
 	static UnrealUserCommand* find(const String& name);
 	String name();
 	Function fn();
 	bool isActive();
 	bool isOperOnly();
+	bool isRegistered();
 	void setActive(bool state);
 	void setFn(const Function& fn);
 	void setName(const String& name);
 	void setOperOnly(bool state);
+	void setRegistered(bool state);
 
 private:
 	/** command name */
@@ -56,12 +73,9 @@ private:
 
 	/** command function */
 	Function fn_;
-
-	/** defines whether the command requires operator privileges */
-	bool oper_only_;
-
-	/** defines whether the command is active */
-	bool active_;
+	
+	/** command flags */
+	Bitmask<uint8_t> flags_;
 };
 
 #endif /* _UNREALIRCD_COMMAND_HPP */

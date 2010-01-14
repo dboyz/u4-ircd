@@ -595,6 +595,14 @@ bool UnrealUser::isDeaf()
 }
 
 /**
+ * Returns whether the user has been registered to the network.
+ */
+bool UnrealUser::isIntroduced()
+{
+	return auth_flags_.value() == 0;
+}
+
+/**
  * Returns whether the user has the invisible mode flag set.
  */
 bool UnrealUser::isInvisible()

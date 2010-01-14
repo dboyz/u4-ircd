@@ -83,7 +83,7 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
 	module.info = modinf;
 
 	/* register command */
-	uc = new UnrealUserCommand(CMD_PONG, &uc_pong);
+	uc = new UnrealUserCommand(CMD_PONG, &uc_pong, false, false);
 
 	return UnrealModule::Success;
 }

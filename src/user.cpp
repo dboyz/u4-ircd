@@ -1081,7 +1081,9 @@ void UnrealUser::registerUser()
 	sendISupport();
 
 	/* modify stats */
-	unreal->stats.connections_unk--;
+	if (unreal->stats.connections_unk > 0)
+		unreal->stats.connections_unk--;
+
 	unreal->stats.users_local_cur++;
 
 	if (unreal->users.size() > unreal->stats.users_max)
@@ -1100,7 +1102,15 @@ void UnrealUser::registerUser()
 
 	/* message of the day */
 	if ((ucptr = UnrealUserCommand::find(CMD_MOTD)))
-		ucptr->fn()(this, 0);
+	{
+		if (unreal->config.get("Features::ShortMOTD", "false").toBool())
+		{
+			sendreply(CMD_NOTICE, ":You can get the message of the day "
+				"by using /MOTD");
+		}
+		else
+			ucptr->fn()(this, 0);
+	}
 	else
 		sendreply(ERR_NOMOTD, MSG_NOMOTD);
 

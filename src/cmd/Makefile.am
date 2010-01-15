@@ -38,6 +38,7 @@ pkglib_LTLIBRARIES = \
 	ison.la \
 	join.la \
 	kick.la \
+	kill.la \
 	list.la \
 	lsmod.la \
 	lusers.la \

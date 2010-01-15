@@ -53,6 +53,9 @@
 #define CMD_KICK		"KICK"
 #define TOK_KICK		"K"
 
+#define CMD_KILL		"KILL"
+#define TOK_KILL		"D"
+
 #define CMD_LIST		"LIST"
 #define TOK_LIST		"LI"
 

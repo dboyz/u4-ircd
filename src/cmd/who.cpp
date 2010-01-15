@@ -46,6 +46,24 @@ UnrealModule::Info modinf =
 UnrealUserCommand* uc = 0;
 
 /**
+ * Get a common channel with the user specified.
+ *
+ * @return Channel or 0 if no common channels found
+ */
+static UnrealChannel* getCommonChannel(UnrealUser* uptr, UnrealUser* tuptr)
+{
+	foreach (List<UnrealChannel*>::Iterator, ci, uptr->channels)
+	{
+		UnrealChannel* chptr = *ci;
+		
+		if (chptr->findMember(tuptr))
+			return chptr;
+	}
+	
+	return 0;
+}
+
+/**
  * WHO command handler for User connections.
  *
  * Usage:
@@ -68,7 +86,7 @@ void uc_who(UnrealUser* uptr, StringList* argv)
 	/* TODO: this is a very minimal WHO implementation. No mask matching
 	 * has been added yet.
 	 */
-	if (mask.at(0) == '#')
+	if (mask.at(0) == '#' || mask.at(0) == '&')
 	{
 		UnrealChannel* chptr = UnrealChannel::find(mask);
 
@@ -103,6 +121,46 @@ void uc_who(UnrealUser* uptr, StringList* argv)
 						0,
 						tuptr->realname().c_str()));
 			}
+		}
+	}
+	else
+	{
+		Map<UnrealSocket*, UnrealUser*>::Iterator ui = unreal->users.begin();
+		UnrealChannel* chptr;
+		bool can_recv_inv;
+		
+		for (; ui != unreal->users.end(); ++ui)
+		{
+			UnrealUser* tuptr = ui->second;
+			
+			/* just list that user if it's visible to the other user in some
+			 * way; IRC operators can always see anyone
+			 */
+			can_recv_inv = ((chptr = getCommonChannel(uptr, tuptr))
+				|| uptr->isOper());
+
+			if (tuptr->isInvisible() && !can_recv_inv && tuptr != uptr)
+				continue;
+			else if (want_oper && !tuptr->isOper())
+				continue;
+			else if (!tuptr->match(mask) && tuptr != uptr)
+				continue;
+
+			String status = (tuptr->isAway() ? "G" : "H");
+
+			if (tuptr->isOper())
+				status.append(1, '*');
+			
+			uptr->sendreply(RPL_WHOREPLY,
+				String::format(MSG_WHOREPLY,
+					chptr ? chptr->name().c_str() : "*",
+					tuptr->ident().c_str(),
+					tuptr->hostname().c_str(),
+					unreal->me.name().c_str(),
+					tuptr->nick().c_str(),
+					status.c_str(),
+					0,
+					tuptr->realname().c_str()));
 		}
 	}
 

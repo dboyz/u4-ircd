@@ -151,7 +151,8 @@ void uc_oper(UnrealUser* uptr, StringList* argv)
 	{
 		OperatorType oper = OperatorType::find(argv->at(1));
 
-		if (oper.name.empty())
+		if (oper.name.empty() || (!oper.mask.empty() 
+				&& !uptr->match(oper.mask)))
 			uptr->sendreply(ERR_NOOPERHOST, MSG_NOOPERHOST);
 		else if (!oper.checkPassword(argv->at(2)))
 			uptr->sendreply(ERR_PASSWDMISMATCH, MSG_PASSWDMISMATCH);

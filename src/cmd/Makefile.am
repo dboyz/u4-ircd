@@ -53,6 +53,7 @@ pkglib_LTLIBRARIES = \
 	pong.la \
 	privmsg.la \
 	quit.la \
+	rehash.la \
 	rmmod.la \
 	topic.la \
 	user.la \

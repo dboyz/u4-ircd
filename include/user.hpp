@@ -77,7 +77,7 @@ public:
 	const String& awayMessage();
 	UnrealTime connectionTime();
 	static void destroy(UnrealUser* uptr);
-	void exit(UnrealSocket::ErrorCode& ec);
+	void exit(UnrealSocket::ErrorCode& ec, const String& msg = String());
 	void exit(const String& message);
 	static UnrealUser* find(UnrealSocket* sptr);
 	static UnrealUser* find(const String& nickname);

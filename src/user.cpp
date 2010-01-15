@@ -313,7 +313,7 @@ void UnrealUser::destroyIdentRequest()
  *
  * @param ec Error code
  */
-void UnrealUser::exit(UnrealSocket::ErrorCode& ec)
+void UnrealUser::exit(UnrealSocket::ErrorCode& ec, const String& msg)
 {
 	String message;
 
@@ -322,6 +322,8 @@ void UnrealUser::exit(UnrealSocket::ErrorCode& ec)
 		message.sprintf("Read error: %d (%s)", ec.value(),
 			ec.message().c_str());
 	}
+	else if (!msg.empty())
+		message = msg;
 	else
 		message = "Exiting";
 

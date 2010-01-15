@@ -81,6 +81,7 @@ enum IRCNumeric
 	RPL_MOTDSTART				= 375,
 	RPL_ENDOFMOTD				= 376,
 	RPL_YOUREOPER				= 381,
+	RPL_REHASHING				= 382,
 
 	ERR_NOSUCHNICK				= 401,
 	ERR_NOSUCHSERVER			= 402,
@@ -162,6 +163,7 @@ enum IRCNumeric
 #define MSG_MOTDSTART			":- %s Message of the Day - "
 #define MSG_ENDOFMOTD			":End of /MOTD command."
 #define MSG_YOUREOPER			":You're now an IRC operator"
+#define MSG_REHASHING			"%s :Rehashing"
 
 #define MSG_NOSUCHNICK			"%s :No such nick"
 #define MSG_NOSUCHSERVER		"%s :No such server"

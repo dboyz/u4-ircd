@@ -52,6 +52,7 @@ public:
 	Map<String, String> map();
 	StringList moduleList();
 	bool read(const String& file);
+	bool rehash();
 	bool replaceVars(String& str, String& ret, const String& category);
 	size_t sequenceCount(const String& blk);
 	void set(const String& key, const String& value);

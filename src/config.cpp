@@ -190,8 +190,7 @@ String UnrealConfig::getVarContent(const String& key, const String& category)
 void UnrealConfig::initDefaults()
 {
 	/* prepare default sequences */
-	sequences_ << String("DNS/Server")
-			   << String("Listener")
+	sequences_ << String("Listener")
 			   << String("Operator");
 
 	/* prepare default variable contents */
@@ -654,6 +653,22 @@ bool UnrealConfig::read(const String& file)
 	}
 
 	return true;
+}
+
+/**
+ * Rehash server configuration.
+ */
+bool UnrealConfig::rehash()
+{
+	entries_.clear();
+	files_.clear();
+	modules_.clear();
+	sequences_.clear();
+	warnings_ = 0;
+
+	initDefaults();
+
+	return read(filename_);
 }
 
 /**

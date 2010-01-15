@@ -101,6 +101,12 @@
 #define CMD_QUIT		"QUIT"
 #define TOK_QUIT		"Q"
 
+#define CMD_REHASH		"REHASH"
+#define TOK_REHASH		"REHASH"
+
+#define CMD_RESTART		"RESTART"
+#define TOK_RESTART		"RESTART"
+
 #define CMD_RMMOD		"RMMOD"
 #define TOK_RMMOD		"RMO"
 

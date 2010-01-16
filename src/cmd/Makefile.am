@@ -61,4 +61,5 @@ pkglib_LTLIBRARIES = \
 	userhost.la \
 	version.la \
 	who.la \
-	whois.la
+	whois.la \
+	whowas.la

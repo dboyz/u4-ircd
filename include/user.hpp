@@ -1,6 +1,6 @@
 /*****************************************************************
  * Unreal Internet Relay Chat Daemon, Version 4
- * File         client.hpp
+ * File         user.hpp
  * Description  User representation
  *
  * Copyright(C) 2009, 2010
@@ -96,6 +96,7 @@ public:
 			const String& type);
 	UnrealListener* listener();
 	String lowerNick();
+	String mask();
 	bool match(const String& pattern);
 	Bitmask<uint16_t>& modes();
 	String modestr();
@@ -127,6 +128,15 @@ public:
 
 public:
 	List<UnrealChannel*> channels;
+
+public:
+	/** signal emitted when a new user object is created */
+	static boost::signal<void(UnrealUser*)>
+			onCreate;
+	
+	/** signal emitted when a user object is about to be destroyed */
+	static boost::signal<void(UnrealUser*)>
+			onDestroy;
 
 private:
 	void checkAuthTimeout(const UnrealTimer::ErrorCode& ec);

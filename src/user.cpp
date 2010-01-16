@@ -1,6 +1,6 @@
 /*****************************************************************
  * Unreal Internet Relay Chat Daemon, Version 4
- * File         client.cpp
+ * File         user.cpp
  * Description  User representation
  *
  * Copyright(C) 2009, 2010
@@ -41,6 +41,10 @@ Map<UnrealUser*, UnrealSocket*> icheck_queries;
   */
 List<UnrealUser*> user_destructs;
 
+/** special signals */
+boost::signal<void(UnrealUser*)> UnrealUser::onCreate;
+boost::signal<void(UnrealUser*)> UnrealUser::onDestroy;
+
 /** user mode definitions */
 namespace UnrealUserProperties
 {
@@ -67,7 +71,9 @@ namespace UnrealUserProperties
  */
 UnrealUser::UnrealUser(UnrealSocket* sptr)
 	: socket_(sptr), connection_time_(UnrealTime::now())
-{ }
+{
+	UnrealUser::onCreate(this);
+}
 
 /**
  * UnrealUser destructor.
@@ -86,6 +92,8 @@ UnrealUser::~UnrealUser()
 
 	if (icheck_queries.contains(this))
 		icheck_queries.free(this);
+
+	UnrealUser::onDestroy(this);
 }
 
 /**
@@ -831,13 +839,20 @@ String UnrealUser::lowerNick()
 }
 
 /**
- * Returns the user modes bitmask.
+ * Returns the full mask (format nick!ident@host) for the user.
  *
- * @return Bitmask
+ * @return Full mask notation
  */
-Bitmask<uint16_t>& UnrealUser::modes()
+String UnrealUser::mask()
 {
-	return modes_;
+	String mask;
+	
+	mask.sprintf("%s!%s@%s",
+		nickname_.c_str(),
+		ident_.c_str(),
+		hostname_.c_str());
+
+	return mask;
 }
 
 /**
@@ -848,14 +863,19 @@ Bitmask<uint16_t>& UnrealUser::modes()
  */
 bool UnrealUser::match(const String& pattern)
 {
-	String mask;
-	
-	mask.sprintf("%s!%s@%s",
-		nickname_.c_str(),
-		ident_.c_str(),
-		hostname_.c_str());
+	String m = mask();
 
-	return mask.match(pattern);
+	return m.match(pattern);
+}
+
+/**
+ * Returns the user modes bitmask.
+ *
+ * @return Bitmask
+ */
+Bitmask<uint16_t>& UnrealUser::modes()
+{
+	return modes_;
 }
 
 /**

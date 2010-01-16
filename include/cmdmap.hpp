@@ -128,4 +128,7 @@
 #define CMD_WHOIS		"WHOIS"
 #define TOK_WHOIS		"W"
 
+#define CMD_WHOWAS		"WHOWAS"
+#define TOK_WHOWAS		"WW"
+
 #endif /* _UNREALIRCD_CMDMAP_HPP */

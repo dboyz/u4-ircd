@@ -56,6 +56,7 @@ enum IRCNumeric
 	RPL_WHOIS_USER				= 311,
 	RPL_WHOIS_SERVER			= 312,
 	RPL_WHOIS_OPERATOR			= 313,
+	RPL_WHOWASUSER				= 314,
 	RPL_ENDOFWHO				= 315,
 	RPL_WHOIS_IDLE				= 317,
 	RPL_ENDOFWHOIS				= 318,
@@ -75,6 +76,7 @@ enum IRCNumeric
 	RPL_ENDOFNAMES				= 366,
 	RPL_BANLIST					= 367,
 	RPL_ENDOFBANLIST			= 368,
+	RPL_ENDOFWHOWAS				= 369,
 	RPL_INFO					= 371,
 	RPL_MOTD					= 372,
 	RPL_ENDOFINFO				= 374,
@@ -139,6 +141,7 @@ enum IRCNumeric
 #define MSG_WHOIS_USER			"%s %s %s * :%s"
 #define MSG_WHOIS_SERVER		"%s %s :%s"
 #define MSG_WHOIS_OPERATOR		"%s :is an IRC operator"
+#define MSG_WHOWASUSER			"%s %s %s * :%s"
 #define MSG_ENDOFWHO			"%s :End of /WHO list."
 #define MSG_WHOIS_IDLE			"%s %d %d :seconds idle, signon time"
 #define MSG_ENDOFWHOIS			"%s :End of /WHOIS list."
@@ -157,6 +160,7 @@ enum IRCNumeric
 #define MSG_ENDOFNAMES			"%s :End of /NAMES list."
 #define MSG_BANLIST				"%s %s %d"
 #define MSG_ENDOFBANLIST		":End of channel ban list"
+#define MSG_ENDOFWHOWAS			":End of WHOWAS"
 #define MSG_INFO				":%s"
 #define MSG_MOTD				":- %s"
 #define MSG_ENDOFINFO			":End of /INFO command."

@@ -26,27 +26,27 @@
 #ifndef _UNREALIRCD_LIMITS_HPP
 #define _UNREALIRCD_LIMITS_HPP
 
-#include "base.hpp"
+#include <base.hpp>
 
 /** maximum line size for IRC contents, as defined by RFC 1459 */
 #define U4_BUFSIZE		512
 
 /** nick length limit */
-#define U4_NICKLEN		unreal->config.get("limits/nicklen", 18).toUInt()
+#define U4_NICKLEN		unreal->config.get("Limits/Nicklen", 18).toUInt()
 
 /** user (ident) length limit */
-#define U4_USERLEN		unreal->config.get("limits/userlen", 10).toUInt()
+#define U4_USERLEN		unreal->config.get("Limits/Userlen", 10).toUInt()
 
 /** topic length limit */
-#define U4_TOPICLEN		unreal->config.get("limits/topiclen", 250).toUInt()
+#define U4_TOPICLEN		unreal->config.get("Limits/Topiclen", 250).toUInt()
 
 /** away message length limit */
-#define U4_AWAYLEN		unreal->config.get("limits/awaylen", 250).toUInt()
+#define U4_AWAYLEN		unreal->config.get("Limits/Awaylen", 250).toUInt()
 
 /** kick message length limit */
-#define U4_KICKLEN		unreal->config.get("limits/kicklen", 250).toUInt()
+#define U4_KICKLEN		unreal->config.get("Limits/Kicklen", 250).toUInt()
 
 /** channel name length limit */
-#define U4_CHANNELLEN 	unreal->config.get("limits/channellen", 200).toUInt()
+#define U4_CHANNELLEN 	unreal->config.get("Limits/Channellen", 200).toUInt()
 
 #endif /* _UNREALIRCD_LIMITS_HPP */

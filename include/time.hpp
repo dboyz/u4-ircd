@@ -26,7 +26,7 @@
 #ifndef _UNREALIRCD_TIME_HPP
 #define _UNREALIRCD_TIME_HPP
 
-#include "string.hpp"
+#include <string.hpp>
 #include <ctime>
 
 /**

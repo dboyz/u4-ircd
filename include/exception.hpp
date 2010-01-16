@@ -27,7 +27,7 @@
 #define _UNREALIRCD_EXCEPTION_HPP
 
 #include <exception>
-#include "string.hpp"
+#include <string.hpp>
 
 /**
  * Generic exception class.

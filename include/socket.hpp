@@ -26,13 +26,12 @@
 #ifndef _UNREALIRCD_SOCKET_HPP
 #define _UNREALIRCD_SOCKET_HPP
 
-#include "limits.hpp"
-#include "map.hpp"
-#include "platform.hpp"
-#include "reactor.hpp"
-#include "resolver.hpp"
-#include "signal.hpp"
-#include "string.hpp"
+#include <limits.hpp>
+#include <map.hpp>
+#include <platform.hpp>
+#include <reactor.hpp>
+#include <resolver.hpp>
+#include <string.hpp>
 
 #include <boost/asio.hpp>
 #include <boost/signal.hpp>

@@ -26,15 +26,15 @@
 #ifndef _UNREALIRCD_CHANNEL_HPP
 #define _UNREALIRCD_CHANNEL_HPP
 
-#include "bitmask.hpp"
-#include "list.hpp"
-#include "map.hpp"
-#include "mode.hpp"
-#include "modebuf.hpp"
-#include "numeric.hpp"
-#include "string.hpp"
-#include "time.hpp"
-#include "user.hpp"
+#include <bitmask.hpp>
+#include <list.hpp>
+#include <map.hpp>
+#include <mode.hpp>
+#include <modebuf.hpp>
+#include <numeric.hpp>
+#include <string.hpp>
+#include <time.hpp>
+#include <user.hpp>
 
 class UnrealUser;
 

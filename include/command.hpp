@@ -26,12 +26,15 @@
 #ifndef _UNREALIRCD_COMMAND_HPP
 #define _UNREALIRCD_COMMAND_HPP
 
-#include "bitmask.hpp"
-#include "platform.hpp"
-#include "user.hpp"
-#include "string.hpp"
-#include "stringlist.hpp"
+#include <bitmask.hpp>
+#include <platform.hpp>
+#include <user.hpp>
+#include <string.hpp>
+#include <stringlist.hpp>
 
+/**
+ * User Command representation.
+ */
 class UnrealUserCommand
 {
 public:

@@ -55,6 +55,7 @@ pkglib_LTLIBRARIES = \
 	privmsg.la \
 	quit.la \
 	rehash.la \
+	restart.la \
 	rmmod.la \
 	topic.la \
 	user.la \

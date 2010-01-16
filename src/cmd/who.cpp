@@ -23,34 +23,42 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#include "base.hpp"
-#include "cmdmap.hpp"
-#include "command.hpp"
-#include "module.hpp"
-#include "stringlist.hpp"
+#include <base.hpp>
+#include <command.hpp>
+#include <stringlist.hpp>
 
-/** Module informations */
-UnrealModule::Info modinf =
+#include <cmd/who.hpp>
+
+/** class instance */
+UnrealCH_who* handler = NULL;
+
+/**
+ * Unreal Command Handler for "WHO" - Constructor.
+ *
+ * @param mptr Module pointer
+ */
+UnrealCH_who::UnrealCH_who(UnrealModule* mptr)
 {
-	/** Module name */
-	"WHO command handler",
+	setInfo(&mptr->inf);
+	
+	/* allocate additional contents */
+	command_ = new UnrealUserCommand(CMD_WHO, &UnrealCH_who::exec);
+}
 
-	/** Module version */
-	"1.0",
-
-	/** Module author */
-	"(Packaged)"
-};
-
-/** Command Instance */
-UnrealUserCommand* uc = 0;
+/**
+ * Unreal Command Handler for "WHO" - Destructor.
+ */
+UnrealCH_who::~UnrealCH_who()
+{
+	delete command_;
+}
 
 /**
  * Get a common channel with the user specified.
  *
  * @return Channel or 0 if no common channels found
  */
-static UnrealChannel* getCommonChannel(UnrealUser* uptr, UnrealUser* tuptr)
+UnrealChannel* UnrealCH_who::commonChannel(UnrealUser* uptr, UnrealUser* tuptr)
 {
 	foreach (List<UnrealChannel*>::Iterator, ci, uptr->channels)
 	{
@@ -75,7 +83,7 @@ static UnrealChannel* getCommonChannel(UnrealUser* uptr, UnrealUser* tuptr)
  * @param uptr Originating user
  * @param argv Argument list
  */
-void uc_who(UnrealUser* uptr, StringList* argv)
+void UnrealCH_who::exec(UnrealUser* uptr, StringList* argv)
 {
 	bool want_oper = (argv->size() >= 3 && argv->at(2) == "o");
 	String mask = "*";
@@ -115,7 +123,7 @@ void uc_who(UnrealUser* uptr, StringList* argv)
 						chptr->name().c_str(),
 						tuptr->ident().c_str(),
 						tuptr->hostname().c_str(),
-						unreal->me.name().c_str(),
+						unreal->me->name().c_str(),
 						tuptr->nick().c_str(),
 						status.c_str(),
 						0,
@@ -136,7 +144,7 @@ void uc_who(UnrealUser* uptr, StringList* argv)
 			/* just list that user if it's visible to the other user in some
 			 * way; IRC operators can always see anyone
 			 */
-			can_recv_inv = ((chptr = getCommonChannel(uptr, tuptr))
+			can_recv_inv = ((chptr = UnrealCH_who::commonChannel(uptr, tuptr))
 				|| uptr->isOper());
 
 			if (tuptr->isInvisible() && !can_recv_inv && tuptr != uptr)
@@ -156,7 +164,7 @@ void uc_who(UnrealUser* uptr, StringList* argv)
 					chptr ? chptr->name().c_str() : "*",
 					tuptr->ident().c_str(),
 					tuptr->hostname().c_str(),
-					unreal->me.name().c_str(),
+					unreal->me->name().c_str(),
 					tuptr->nick().c_str(),
 					status.c_str(),
 					0,
@@ -170,19 +178,28 @@ void uc_who(UnrealUser* uptr, StringList* argv)
 }
 
 /**
+ * Updates the module information.
+ *
+ * @param inf Module information object pointer
+ */
+void UnrealCH_who::setInfo(UnrealModuleInf* inf)
+{
+	inf->setAPIVersion( MODULE_API_VERSION );
+	inf->setAuthor("UnrealIRCd Development Team");
+	inf->setDescription("Command Handler for the /WHO command");
+	inf->setName("UnrealCH_who");
+	inf->setVersion("1.0.0");
+}
+
+/**
  * Module initialization function.
  * Called when the Module is loaded.
  *
  * @param module Reference to Module
  */
-UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrInit(UnrealModule* mptr)
 {
-	/* update module info */
-	module.info = modinf;
-
-	/* register command */
-	uc = new UnrealUserCommand(CMD_WHO, &uc_who);
-
+	handler = new UnrealCH_who(mptr);
 	return UnrealModule::Success;
 }
 
@@ -190,9 +207,8 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
  * Module close function.
  * It's called before the Module is unloaded.
  */
-UNREAL_DLL UnrealModule::Result unrClose(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrClose(UnrealModule* mptr)
 {
-	delete uc;
-
+	delete handler;
 	return UnrealModule::Success;
 }

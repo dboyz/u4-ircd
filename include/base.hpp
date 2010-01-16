@@ -26,23 +26,23 @@
 #ifndef _UNREALIRCD_BASE_H
 #define _UNREALIRCD_BASE_H
 
-#include "channel.hpp"
-#include "command.hpp"
-#include "config.hpp"
-#include "isupport.hpp"
-#include "list.hpp"
-#include "listener.hpp"
-#include "log.hpp"
-#include "map.hpp"
-#include "module.hpp"
-#include "reactor.hpp"
-#include "server.hpp"
-#include "stats.hpp"
-#include "string.hpp"
-#include "stringlist.hpp"
-#include "time.hpp"
-#include "user.hpp"
-#include "version.hpp"
+#include <channel.hpp>
+#include <command.hpp>
+#include <config.hpp>
+#include <isupport.hpp>
+#include <list.hpp>
+#include <listener.hpp>
+#include <log.hpp>
+#include <map.hpp>
+#include <module.hpp>
+#include <reactor.hpp>
+#include <server.hpp>
+#include <stats.hpp>
+#include <string.hpp>
+#include <stringlist.hpp>
+#include <time.hpp>
+#include <user.hpp>
+#include <version.hpp>
 
 /** generic foreach */
 #define foreach(x, y, z) \
@@ -68,6 +68,7 @@ public:
 	void exit(int code = 0);
 	FState fstate();
 	UnrealReactor& reactor();
+	void restart();
 	void run();
 
 public:
@@ -108,12 +109,13 @@ public:
 	UnrealLocalStat stats;
 
 	/** local server entry */
-	UnrealServer me;
+	UnrealServer* me;
 
 private:
 	void checkConfig();
 	void checkPermissions();
 	void finish();
+	void init();
 	void initLog();
 	void initModes();
 	void initModules();

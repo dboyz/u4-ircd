@@ -23,33 +23,38 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#include "base.hpp"
-#include "cmdmap.hpp"
-#include "command.hpp"
-#include "module.hpp"
-#include "stringlist.hpp"
+#include <base.hpp>
+#include <command.hpp>
+#include <stringlist.hpp>
 
-/** Module informations */
-UnrealModule::Info modinf =
+#include <cmd/notice.hpp>
+
+/** class instance */
+UnrealCH_notice* handler = NULL;
+
+/**
+ * Unreal Command Handler for "NOTICE" - Constructor.
+ *
+ * @param mptr Module pointer
+ */
+UnrealCH_notice::UnrealCH_notice(UnrealModule* mptr)
 {
-	/** Module name */
-	"NOTICE command handler",
+	setInfo(&mptr->inf);
+	
+	/* allocate additional contents */
+	command_ = new UnrealUserCommand(CMD_NOTICE, &UnrealCH_notice::exec);
+}
 
-	/** Module version */
-	"1.0",
-
-	/** Module author */
-	"(Packaged)"
-};
-
-/** Command Instance */
-UnrealUserCommand* uc = 0;
+/**
+ * Unreal Command Handler for "NOTICE" - Destructor.
+ */
+UnrealCH_notice::~UnrealCH_notice()
+{
+	delete command_;
+}
 
 /**
  * NOTICE command handler for User connections.
- *
- * Note: As RFC 1459 says, the difference between NOTICE and PRIVMSG
- * is that NOTICE never sends errors back to the sender.
  *
  * Usage:
  * NOTICE <target> :<message>
@@ -60,7 +65,7 @@ UnrealUserCommand* uc = 0;
  * @param uptr Originating user
  * @param argv Argument list
  */
-void uc_notice(UnrealUser* uptr, StringList* argv)
+void UnrealCH_notice::exec(UnrealUser* uptr, StringList* argv)
 {
 	if (argv->size() < 3)
 	{
@@ -104,19 +109,28 @@ void uc_notice(UnrealUser* uptr, StringList* argv)
 }
 
 /**
+ * Updates the module information.
+ *
+ * @param inf Module information object pointer
+ */
+void UnrealCH_notice::setInfo(UnrealModuleInf* inf)
+{
+	inf->setAPIVersion( MODULE_API_VERSION );
+	inf->setAuthor("UnrealIRCd Development Team");
+	inf->setDescription("Command Handler for the /NOTICE command");
+	inf->setName("UnrealCH_notice");
+	inf->setVersion("1.0.0");
+}
+
+/**
  * Module initialization function.
  * Called when the Module is loaded.
  *
  * @param module Reference to Module
  */
-UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrInit(UnrealModule* mptr)
 {
-	/* update module info */
-	module.info = modinf;
-
-	/* register command */
-	uc = new UnrealUserCommand(CMD_NOTICE, &uc_notice);
-
+	handler = new UnrealCH_notice(mptr);
 	return UnrealModule::Success;
 }
 
@@ -124,9 +138,8 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
  * Module close function.
  * It's called before the Module is unloaded.
  */
-UNREAL_DLL UnrealModule::Result unrClose(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrClose(UnrealModule* mptr)
 {
-	delete uc;
-
+	delete handler;
 	return UnrealModule::Success;
 }

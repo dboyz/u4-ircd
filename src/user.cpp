@@ -23,10 +23,20 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#include "base.hpp"
-#include "cmdmap.hpp"
-#include "limits.hpp"
-#include "user.hpp"
+#include <base.hpp>
+#include <limits.hpp>
+#include <user.hpp>
+
+#include <cmd/join.hpp>
+#include <cmd/lusers.hpp>
+#include <cmd/mode.hpp>
+#include <cmd/motd.hpp>
+#include <cmd/names.hpp>
+#include <cmd/notice.hpp>
+#include <cmd/part.hpp>
+#include <cmd/quit.hpp>
+#include <cmd/topic.hpp>
+
 #include <cstdarg>
 #include <cstdio>
 #include <iostream>
@@ -199,7 +209,7 @@ void UnrealUser::checkRemoteIdent()
 	UnrealSocket* sptr = new UnrealSocket();
 
 	send(":%s NOTICE AUTH :*** Checking Ident",
-		unreal->me.name().c_str());
+		unreal->me->name().c_str());
 
 	sptr->onConnected.connect(
 		boost::bind(&UnrealUser::handleIdentCheckConnected,
@@ -358,7 +368,7 @@ void UnrealUser::exit(const String& message)
 
 		reply.sprintf("ERROR :Closing link: %s by %s (%s)",
 			nickname_.empty() ? "*" : nickname_.c_str(),
-			unreal->me.name().c_str(),
+			unreal->me->name().c_str(),
 			message.c_str());
 
 		send(reply);
@@ -449,7 +459,7 @@ void UnrealUser::handleIdentCheckError(UnrealSocket* sptr,
 	const UnrealSocket::ErrorCode& ec)
 {
 	send(":%s NOTICE AUTH :*** No ident response",
-	    unreal->me.name().c_str());
+	    unreal->me->name().c_str());
 
 	UnrealSocket::ErrorCode err = ec;
 
@@ -509,10 +519,10 @@ void UnrealUser::handleIdentCheckRead(UnrealSocket* sptr, String& data)
 
 	if (haveError)
 		send(":%s NOTICE AUTH :*** No valid ident response",
-		    unreal->me.name().c_str());
+		    unreal->me->name().c_str());
 	else
 		send(":%s NOTICE AUTH :*** Got ident response",
-		    unreal->me.name().c_str());
+		    unreal->me->name().c_str());
 
 	destroyIdentRequest();
 }
@@ -529,7 +539,7 @@ void UnrealUser::handleResolveResponse(const UnrealResolver::ErrorCode& ec,
 	if (ec)
 	{
 		send(":%s NOTICE AUTH :Couldn't look up your hostname",
-		    unreal->me.name().c_str());
+		    unreal->me->name().c_str());
 	}
 	else
 	{
@@ -540,7 +550,7 @@ void UnrealUser::handleResolveResponse(const UnrealResolver::ErrorCode& ec,
 
 		/* let the user know about the success */
 		send(":%s NOTICE AUTH :*** Retrieved hostname (%s)",
-                unreal->me.name().c_str(),
+                unreal->me->name().c_str(),
 				hostname_.c_str());
 	}
 
@@ -1086,15 +1096,15 @@ void UnrealUser::registerUser()
 			nickname_.c_str()));
 	sendreply(RPL_YOURHOST,
 		String::format(MSG_YOURHOST,
-			unreal->me.name().c_str(),
+			unreal->me->name().c_str(),
 			version.c_str()));
 	sendreply(RPL_CREATED,
 		String::format(MSG_CREATED,
-			unreal->me.bootTime().toString("%Y-%M-%dT%H:%M:%S %Z").c_str()));
+			unreal->me->bootTime().toString("%Y-%M-%dT%H:%M:%S %Z").c_str()));
 
 	sendreply(RPL_MYINFO,
 		String::format(MSG_MYINFO,
-			unreal->me.name().c_str(),
+			unreal->me->name().c_str(),
 			version.c_str(),
 			user_modes.c_str(),
 			chan_modes.c_str()));
@@ -1288,7 +1298,7 @@ void UnrealUser::sendreply(IRCNumeric numeric, const String& data)
 	String reply;
 
 	reply.sprintf(":%s %03d %s %s",
-			unreal->me.name().c_str(),
+			unreal->me->name().c_str(),
 			num,
 			nickname_.empty() ? "*" : nickname_.c_str(),
 			data.c_str());
@@ -1307,7 +1317,7 @@ void UnrealUser::sendreply(const String& cmd, const String& data)
 	String reply;
 
 	reply.sprintf(":%s %s %s %s",
-			unreal->me.name().c_str(),
+			unreal->me->name().c_str(),
 			cmd.c_str(),
 			nickname_.empty() ? "*" : nickname_.c_str(),
 			data.c_str());
@@ -1347,7 +1357,7 @@ void UnrealUser::sendPing()
 	String request_str;
 
 	request_str.sprintf("PING :%s",
-			unreal->me.name().c_str());
+			unreal->me->name().c_str());
 
 	send(request_str);
 }

@@ -26,8 +26,8 @@
 #ifndef _UNREALIRCD_MODE_HPP
 #define _UNREALIRCD_MODE_HPP
 
-#include "map.hpp"
-#include "platform.hpp"
+#include <map.hpp>
+#include <platform.hpp>
 #include <limits>
 
 class UnrealChannel;

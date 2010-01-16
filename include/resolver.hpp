@@ -26,9 +26,9 @@
 #ifndef _UNREALIRCD_RESOLVER_HPP
 #define _UNREALIRCD_RESOLVER_HPP
 
-#include "map.hpp"
-#include "reactor.hpp"
-#include "string.hpp"
+#include <map.hpp>
+#include <reactor.hpp>
+#include <string.hpp>
 
 #include <boost/asio.hpp>
 #include <boost/signal.hpp>

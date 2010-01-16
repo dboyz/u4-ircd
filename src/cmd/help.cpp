@@ -23,27 +23,37 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#include "base.hpp"
-#include "cmdmap.hpp"
-#include "command.hpp"
-#include "module.hpp"
-#include "stringlist.hpp"
+#include <base.hpp>
+#include <command.hpp>
+#include <module.hpp>
+#include <stringlist.hpp>
 
-/** Module informations */
-UnrealModule::Info modinf =
+#include <cmd/help.hpp>
+#include <cmd/notice.hpp>
+
+/** class instance */
+UnrealCH_help* handler = NULL;
+
+/**
+ * Unreal Command Handler for "HELP" - Constructor.
+ *
+ * @param mptr Module pointer
+ */
+UnrealCH_help::UnrealCH_help(UnrealModule* mptr)
 {
-	/** Module name */
-	"HELP command handler",
+	setInfo(&mptr->inf);
+	
+	/* allocate additional contents */
+	command_ = new UnrealUserCommand(CMD_HELP, &UnrealCH_help::exec);
+}
 
-	/** Module version */
-	"1.0",
-
-	/** Module author */
-	"(Packaged)"
-};
-
-/** Command Instance */
-UnrealUserCommand* uc = 0;
+/**
+ * Unreal Command Handler for "HELP" - Destructor.
+ */
+UnrealCH_help::~UnrealCH_help()
+{
+	delete command_;
+}
 
 /**
  * HELP command handler for User connections.
@@ -57,24 +67,38 @@ UnrealUserCommand* uc = 0;
  * @param uptr Originating user
  * @param argv Argument list
  */
-void uc_help(UnrealUser* uptr, StringList* argv)
+void UnrealCH_help::exec(UnrealUser* uptr, StringList* argv)
 {
-	String target = unreal->me.name();
+	String target = unreal->me->name();
 
 	if (argv->size() >= 2)
 		target = argv->at(1);
 
-	if (target == unreal->me.name())
+	if (target == unreal->me->name())
 	{
 		/* print all commands available on this server */
 		Map<String, UnrealUserCommand*>::Iterator cmd_iter;
 
 		for (cmd_iter = unreal->user_commands.begin();
-				cmd_iter != unreal->user_commands.end(); cmd_iter++)
+				cmd_iter != unreal->user_commands.end(); ++cmd_iter)
 		{
 			uptr->sendreply(CMD_NOTICE, (cmd_iter->first).c_str());
 		}
 	}
+}
+
+/**
+ * Updates the module information.
+ *
+ * @param inf Module information object pointer
+ */
+void UnrealCH_help::setInfo(UnrealModuleInf* inf)
+{
+	inf->setAPIVersion( MODULE_API_VERSION );
+	inf->setAuthor("UnrealIRCd Development Team");
+	inf->setDescription("Command Handler for the /HELP command");
+	inf->setName("UnrealCH_help");
+	inf->setVersion("1.0.0");
 }
 
 /**
@@ -83,14 +107,9 @@ void uc_help(UnrealUser* uptr, StringList* argv)
  *
  * @param module Reference to Module
  */
-UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrInit(UnrealModule* mptr)
 {
-	/* update module info */
-	module.info = modinf;
-
-	/* register command */
-	uc = new UnrealUserCommand(CMD_HELP, &uc_help);
-
+	handler = new UnrealCH_help(mptr);
 	return UnrealModule::Success;
 }
 
@@ -98,9 +117,8 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
  * Module close function.
  * It's called before the Module is unloaded.
  */
-UNREAL_DLL UnrealModule::Result unrClose(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrClose(UnrealModule* mptr)
 {
-	delete uc;
-
+	delete handler;
 	return UnrealModule::Success;
 }

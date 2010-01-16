@@ -23,27 +23,36 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#include "base.hpp"
-#include "cmdmap.hpp"
-#include "command.hpp"
-#include "module.hpp"
-#include "stringlist.hpp"
+#include <base.hpp>
+#include <command.hpp>
+#include <module.hpp>
+#include <stringlist.hpp>
 
-/** Module informations */
-UnrealModule::Info modinf =
+#include <cmd/motd.hpp>
+
+/** class instance */
+UnrealCH_motd* handler = NULL;
+
+/**
+ * Unreal Command Handler for "MOTD" - Constructor.
+ *
+ * @param mptr Module pointer
+ */
+UnrealCH_motd::UnrealCH_motd(UnrealModule* mptr)
 {
-	/** Module name */
-	"MOTD command handler",
+	setInfo(&mptr->inf);
+	
+	/* allocate additional contents */
+	command_ = new UnrealUserCommand(CMD_MOTD, &UnrealCH_motd::exec);
+}
 
-	/** Module version */
-	"1.0",
-
-	/** Module author */
-	"(Packaged)"
-};
-
-/** Command Instance */
-UnrealUserCommand* uc = 0;
+/**
+ * Unreal Command Handler for "MOTD" - Destructor.
+ */
+UnrealCH_motd::~UnrealCH_motd()
+{
+	delete command_;
+}
 
 /**
  * MOTD command handler for User connections.
@@ -57,7 +66,7 @@ UnrealUserCommand* uc = 0;
  * @param uptr Originating user
  * @param argv Argument list
  */
-void uc_motd(UnrealUser* uptr, StringList* argv)
+void UnrealCH_motd::exec(UnrealUser* uptr, StringList* argv)
 {
 	String target;
 
@@ -75,7 +84,7 @@ void uc_motd(UnrealUser* uptr, StringList* argv)
 		{
 			uptr->sendreply(RPL_MOTDSTART,
 				String::format(MSG_MOTDSTART,
-					unreal->me.name().c_str()));
+					unreal->me->name().c_str()));
 
 			while (is.good())
 			{
@@ -91,8 +100,22 @@ void uc_motd(UnrealUser* uptr, StringList* argv)
 			return;
 		}
 	}
+	else
+		uptr->sendreply(ERR_NOMOTD, MSG_NOMOTD);
+}
 
-	uptr->sendreply(ERR_NOMOTD, MSG_NOMOTD);
+/**
+ * Updates the module information.
+ *
+ * @param inf Module information object pointer
+ */
+void UnrealCH_motd::setInfo(UnrealModuleInf* inf)
+{
+	inf->setAPIVersion( MODULE_API_VERSION );
+	inf->setAuthor("UnrealIRCd Development Team");
+	inf->setDescription("Command Handler for the /MOTD command");
+	inf->setName("UnrealCH_motd");
+	inf->setVersion("1.0.0");
 }
 
 /**
@@ -101,14 +124,9 @@ void uc_motd(UnrealUser* uptr, StringList* argv)
  *
  * @param module Reference to Module
  */
-UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrInit(UnrealModule* mptr)
 {
-	/* update module info */
-	module.info = modinf;
-
-	/* register command */
-	uc = new UnrealUserCommand(CMD_MOTD, &uc_motd);
-
+	handler = new UnrealCH_motd(mptr);
 	return UnrealModule::Success;
 }
 
@@ -116,9 +134,8 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
  * Module close function.
  * It's called before the Module is unloaded.
  */
-UNREAL_DLL UnrealModule::Result unrClose(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrClose(UnrealModule* mptr)
 {
-	delete uc;
-
+	delete handler;
 	return UnrealModule::Success;
 }

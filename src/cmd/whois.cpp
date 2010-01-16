@@ -23,28 +23,35 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#include "base.hpp"
-#include "cmdmap.hpp"
-#include "command.hpp"
-#include "module.hpp"
-#include "stringlist.hpp"
-#include <iostream>
+#include <base.hpp>
+#include <command.hpp>
+#include <stringlist.hpp>
 
-/** Module informations */
-UnrealModule::Info modinf =
+#include <cmd/whois.hpp>
+
+/** class instance */
+UnrealCH_whois* handler = NULL;
+
+/**
+ * Unreal Command Handler for "WHOIS" - Constructor.
+ *
+ * @param mptr Module pointer
+ */
+UnrealCH_whois::UnrealCH_whois(UnrealModule* mptr)
 {
-	/** Module name */
-	"WHOIS command handler",
+	setInfo(&mptr->inf);
+	
+	/* allocate additional contents */
+	command_ = new UnrealUserCommand(CMD_WHOIS, &UnrealCH_whois::exec);
+}
 
-	/** Module version */
-	"1.0",
-
-	/** Module author */
-	"(Packaged)"
-};
-
-/** Command Instance */
-UnrealUserCommand* uc = 0;
+/**
+ * Unreal Command Handler for "WHOIS" - Destructor.
+ */
+UnrealCH_whois::~UnrealCH_whois()
+{
+	delete command_;
+}
 
 /**
  * WHOIS command handler for User connections.
@@ -58,7 +65,7 @@ UnrealUserCommand* uc = 0;
  * @param uptr Originating user
  * @param argv Argument list
  */
-void uc_whois(UnrealUser* uptr, StringList* argv)
+void UnrealCH_whois::exec(UnrealUser* uptr, StringList* argv)
 {
 	if (argv->size() < 2)
 	{
@@ -81,7 +88,7 @@ void uc_whois(UnrealUser* uptr, StringList* argv)
 		if (nicks.size() == 0)
 			nicks << argv->at(nick_arg);
 
-		for (StringList::Iterator sit = nicks.begin();sit != nicks.end();sit++)
+		for (StringList::Iterator sit = nicks.begin();sit != nicks.end(); ++sit)
 		{
 			UnrealUser* tuptr = UnrealUser::find(*sit);
 
@@ -107,7 +114,7 @@ void uc_whois(UnrealUser* uptr, StringList* argv)
 
 					for (List<UnrealChannel*>::Iterator chan
 							= tuptr->channels.begin();
-							chan != tuptr->channels.end(); chan++)
+							chan != tuptr->channels.end(); ++chan)
 					{
 						UnrealChannel* chptr = *chan;
 						UnrealChannel::Member* cmptr=chptr->findMember(tuptr);
@@ -147,7 +154,7 @@ void uc_whois(UnrealUser* uptr, StringList* argv)
 				uptr->sendreply(RPL_WHOIS_SERVER,
 					String::format(MSG_WHOIS_SERVER,
 						tuptr->nick().c_str(),
-						unreal->me.name().c_str(),
+						unreal->me->name().c_str(),
 						unreal->config.get("Me::Description",
 							"Example IRC Server").c_str()));
 
@@ -181,19 +188,28 @@ void uc_whois(UnrealUser* uptr, StringList* argv)
 }
 
 /**
+ * Updates the module information.
+ *
+ * @param inf Module information object pointer
+ */
+void UnrealCH_whois::setInfo(UnrealModuleInf* inf)
+{
+	inf->setAPIVersion( MODULE_API_VERSION );
+	inf->setAuthor("UnrealIRCd Development Team");
+	inf->setDescription("Command Handler for the /WHOIS command");
+	inf->setName("UnrealCH_whois");
+	inf->setVersion("1.0.0");
+}
+
+/**
  * Module initialization function.
  * Called when the Module is loaded.
  *
  * @param module Reference to Module
  */
-UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrInit(UnrealModule* mptr)
 {
-	/* update module info */
-	module.info = modinf;
-
-	/* register command */
-	uc = new UnrealUserCommand(CMD_WHOIS, &uc_whois);
-
+	handler = new UnrealCH_whois(mptr);
 	return UnrealModule::Success;
 }
 
@@ -201,9 +217,8 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
  * Module close function.
  * It's called before the Module is unloaded.
  */
-UNREAL_DLL UnrealModule::Result unrClose(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrClose(UnrealModule* mptr)
 {
-	delete uc;
-
+	delete handler;
 	return UnrealModule::Success;
 }

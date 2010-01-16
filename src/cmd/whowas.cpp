@@ -23,37 +23,44 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#include "base.hpp"
-#include "command.hpp"
-#include "module.hpp"
-#include "stringlist.hpp"
-#include "include/whowas.hpp"
-#include <iostream>
+#include <base.hpp>
+#include <command.hpp>
+#include <stringlist.hpp>
+
+#include <cmd/whowas.hpp>
 
 /** WHOWAS entry mapping */
-std::multimap<String, WhowasEntry_t> WHOWAS::entries;
+std::multimap<String, WhowasEntry_t> UnrealCH_whowas::entries;
 
-/** Module informations */
-UnrealModule::Info modinf =
+/** class instance */
+UnrealCH_whowas* handler = NULL;
+
+/**
+ * Unreal Command Handler for "WHOWAS" - Constructor.
+ *
+ * @param mptr Module pointer
+ */
+UnrealCH_whowas::UnrealCH_whowas(UnrealModule* mptr)
 {
-	/** Module name */
-	"WHOWAS command handler",
+	setInfo(&mptr->inf);
+	
+	/* allocate additional contents */
+	command_ = new UnrealUserCommand(CMD_WHOWAS, &UnrealCH_whowas::exec);
 
-	/** Module version */
-	"1.0",
+	/* connect signals we're interested in */
+	UnrealUser::onDestroy.connect(&UnrealCH_whowas::handleLeavingUser);
+}
 
-	/** Module author */
-	"(Packaged)"
-};
+/**
+ * Unreal Command Handler for "WHOWAS" - Destructor.
+ */
+UnrealCH_whowas::~UnrealCH_whowas()
+{
+	delete command_;
 
-/** Command Instance */
-UnrealUserCommand* uc = 0;
-
-/** Command name */
-const char* WHOWAS::COMMAND = "WHOWAS";
-
-/** Command token */
-const char* WHOWAS::TOKEN   = "WW";
+	/* disconnect signals */
+	UnrealUser::onDestroy.disconnect(&UnrealCH_whowas::handleLeavingUser);
+}
 
 /**
  * WHOWAS command handler for User connections.
@@ -67,13 +74,13 @@ const char* WHOWAS::TOKEN   = "WW";
  * @param uptr Originating user
  * @param argv Argument list
  */
-void WHOWAS::exec(UnrealUser* uptr, StringList* argv)
+void UnrealCH_whowas::exec(UnrealUser* uptr, StringList* argv)
 {
 	if (argv->size() < 2)
 	{
 		uptr->sendreply(ERR_NEEDMOREPARAMS,
 			String::format(MSG_NEEDMOREPARAMS,
-				WHOWAS::COMMAND));
+				CMD_WHOWAS));
 	}
 
 	size_t count = -1, current = 0;
@@ -84,7 +91,7 @@ void WHOWAS::exec(UnrealUser* uptr, StringList* argv)
 	/* use lowercase nick to search through the history */
 	String ln = argv->at(1).toLower();
 
-	std::multimap<String, WhowasEntry_t>* history = &WHOWAS::entries;
+	std::multimap<String, WhowasEntry_t>* history = &UnrealCH_whowas::entries;
 	std::multimap<String, WhowasEntry_t>::const_iterator wi;
 	
 	for (wi = history->find(ln); wi != history->end(); ++wi)
@@ -113,12 +120,12 @@ void WHOWAS::exec(UnrealUser* uptr, StringList* argv)
  *
  * @param uptr User pointer of leaving user
  */
-void WHOWAS::handleLeavingUser(UnrealUser* uptr)
+void UnrealCH_whowas::handleLeavingUser(UnrealUser* uptr)
 {
 	static size_t history_limit = unreal->config.get("Limits::WhowasHistory",
 		"600").toSize();
 	String ln = uptr->lowerNick();
-	std::multimap<String, WhowasEntry_t>* history = &WHOWAS::entries;
+	std::multimap<String, WhowasEntry_t>* history = &UnrealCH_whowas::entries;
 	
 	/* limit the number of entries in the WHOWAS history list.
 	 * if that limit exceeds, remove the last entry from the list. */
@@ -142,21 +149,28 @@ void WHOWAS::handleLeavingUser(UnrealUser* uptr)
 }
 
 /**
+ * Updates the module information.
+ *
+ * @param inf Module information object pointer
+ */
+void UnrealCH_whowas::setInfo(UnrealModuleInf* inf)
+{
+	inf->setAPIVersion( MODULE_API_VERSION );
+	inf->setAuthor("UnrealIRCd Development Team");
+	inf->setDescription("Command Handler for the /WHOWAS command");
+	inf->setName("UnrealCH_whowas");
+	inf->setVersion("1.0.0");
+}
+
+/**
  * Module initialization function.
  * Called when the Module is loaded.
  *
  * @param module Reference to Module
  */
-UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrInit(UnrealModule* mptr)
 {
-	/* update module info */
-	module.info = modinf;
-
-	/* register command */
-	uc = new UnrealUserCommand(WHOWAS::COMMAND, &WHOWAS::exec);
-
-	UnrealUser::onDestroy.connect(&WHOWAS::handleLeavingUser);
-
+	handler = new UnrealCH_whowas(mptr);
 	return UnrealModule::Success;
 }
 
@@ -164,11 +178,8 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
  * Module close function.
  * It's called before the Module is unloaded.
  */
-UNREAL_DLL UnrealModule::Result unrClose(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrClose(UnrealModule* mptr)
 {
-	delete uc;
-
-	UnrealUser::onDestroy.disconnect(&WHOWAS::handleLeavingUser);
-
+	delete handler;
 	return UnrealModule::Success;
 }

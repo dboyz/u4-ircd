@@ -26,7 +26,7 @@
 #ifndef _UNREALIRCD_MODEBUF_HPP
 #define _UNREALIRCD_MODEBUF_HPP
 
-#include "string.hpp"
+#include <string.hpp>
 
 class UnrealUser;
 

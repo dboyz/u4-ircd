@@ -451,9 +451,12 @@ bool UnrealConfig::read(const String& file)
 		{
 			String r;
 			String s = line.mid(11);
+			
+			std::cout << "LoadModule: s("<<s<<") len=("<<line.length()<<")\n";
 
 			replaceVars(s, r, "");
 
+			std::cout << "  after replaceVars("<<s<<")\n";
 			r.clear();
 			if (!getQuotedContent(s, r))
 			{
@@ -468,6 +471,8 @@ bool UnrealConfig::read(const String& file)
 
 				continue;
 			}
+			
+			std::cout << "  finally("<<r<<")\n";
 
 			modules_ << r;
 		}

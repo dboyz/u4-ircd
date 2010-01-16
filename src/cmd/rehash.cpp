@@ -23,27 +23,35 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#include "base.hpp"
-#include "cmdmap.hpp"
-#include "command.hpp"
-#include "module.hpp"
-#include "stringlist.hpp"
+#include <base.hpp>
+#include <command.hpp>
+#include <stringlist.hpp>
 
-/** Module informations */
-UnrealModule::Info modinf =
+#include <cmd/rehash.hpp>
+
+/** class instance */
+UnrealCH_rehash* handler = NULL;
+
+/**
+ * Unreal Command Handler for "REHASH" - Constructor.
+ *
+ * @param mptr Module pointer
+ */
+UnrealCH_rehash::UnrealCH_rehash(UnrealModule* mptr)
 {
-	/** Module name */
-	"REHASH command handler",
+	setInfo(&mptr->inf);
+	
+	/* allocate additional contents */
+	command_ = new UnrealUserCommand(CMD_REHASH, &UnrealCH_rehash::exec);
+}
 
-	/** Module version */
-	"1.0",
-
-	/** Module author */
-	"(Packaged)"
-};
-
-/** Command Instance */
-UnrealUserCommand* uc = 0;
+/**
+ * Unreal Command Handler for "REHASH" - Destructor.
+ */
+UnrealCH_rehash::~UnrealCH_rehash()
+{
+	delete command_;
+}
 
 /**
  * REHASH command handler for User connections.
@@ -54,7 +62,7 @@ UnrealUserCommand* uc = 0;
  * @param uptr Originating user
  * @param argv Argument list
  */
-void uc_rehash(UnrealUser* uptr, StringList* argv)
+void UnrealCH_rehash::exec(UnrealUser* uptr, StringList* argv)
 {
 	unreal->config.rehash();
 
@@ -64,19 +72,28 @@ void uc_rehash(UnrealUser* uptr, StringList* argv)
 }
 
 /**
+ * Updates the module information.
+ *
+ * @param inf Module information object pointer
+ */
+void UnrealCH_rehash::setInfo(UnrealModuleInf* inf)
+{
+	inf->setAPIVersion( MODULE_API_VERSION );
+	inf->setAuthor("UnrealIRCd Development Team");
+	inf->setDescription("Command Handler for the /REHASH command");
+	inf->setName("UnrealCH_rehash");
+	inf->setVersion("1.0.0");
+}
+
+/**
  * Module initialization function.
  * Called when the Module is loaded.
  *
  * @param module Reference to Module
  */
-UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrInit(UnrealModule* mptr)
 {
-	/* update module info */
-	module.info = modinf;
-
-	/* register command */
-	uc = new UnrealUserCommand(CMD_REHASH, &uc_rehash, true);
-
+	handler = new UnrealCH_rehash(mptr);
 	return UnrealModule::Success;
 }
 
@@ -84,9 +101,8 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
  * Module close function.
  * It's called before the Module is unloaded.
  */
-UNREAL_DLL UnrealModule::Result unrClose(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrClose(UnrealModule* mptr)
 {
-	delete uc;
-
+	delete handler;
 	return UnrealModule::Success;
 }

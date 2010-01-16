@@ -26,12 +26,11 @@
 #ifndef _UNREALIRCD_LISTENER_HPP
 #define _UNREALIRCD_LISTENER_HPP
 
-#include "list.hpp"
-#include "reactor.hpp"
-#include "signal.hpp"
-#include "socket.hpp"
-#include "string.hpp"
-#include "stringlist.hpp"
+#include <list.hpp>
+#include <reactor.hpp>
+#include <socket.hpp>
+#include <string.hpp>
+#include <stringlist.hpp>
 
 #include <boost/asio.hpp>
 #include <boost/signal.hpp>

@@ -47,10 +47,10 @@
 */
 extern "C"
 {
-#include "config.h"
+#include <config.h>
 }
 
-#include "string.hpp"
+#include <string.hpp>
 
 /**
    Handle to the package_changeset symbol.

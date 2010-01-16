@@ -26,13 +26,12 @@
 #ifndef _UNREALIRCD_MODULE_HPP
 #define _UNREALIRCD_MODULE_HPP
 
-#include "exception.hpp"
-#include "platform.hpp"
-#include "string.hpp"
-
+#include <platform.hpp>
+#include <string.hpp>
+#include <iostream>
 #include <ltdl.h>
 
-#define UNREAL_DLL extern "C"
+#define UNREAL_DLL			extern "C"
 
 /** module initialization symbol name */
 #define MODULE_INIT_FN		"unrInit"
@@ -40,20 +39,43 @@
 /** module close symbol name */
 #define MODULE_CLOSE_FN		"unrClose"
 
+/** default module API version */
+#define MODULE_API_VERSION	4
+
 /**
  * This class holds informations that are updated by the modules itself
  * on initialization.
  */
-struct UnrealModuleInf
+class UnrealModuleInf
 {
-	/** module name info */
-	String name;
+public:
+	UnrealModuleInf();
+	uint8_t apiVersion();
+	const String& author();
+	const String& description();
+	const String& name();
+	void setAPIVersion(const uint8_t& api_v);
+	void setAuthor(const String& author);
+	void setDescription(const String& descr);
+	void setName(const String& name);
+	void setVersion(const String& version);
+	const String& version();
 
-	/** module version info */
-	String version;
+private:
+	/** API version number */
+	uint8_t api_version_;
 
-	/** module author info */
-	String author;
+	/** Module Author; desired format: Name <email@host.xx> */
+	String author_;
+
+	/** Module Description */
+	String description_;
+
+	/** Module Name */
+	String name_;
+
+	/** Module Version String */
+	String version_;
 };
 
 /**
@@ -68,14 +90,11 @@ public:
 	/** enumerate module result */
 	enum Result { Success, Failed };
 
-	/** alias the Inf class */
-	typedef UnrealModuleInf Info;
-
 	/** module initialization symbol type */
-	typedef Result (InitFunc)(UnrealModule&);
+	typedef Result (InitFunc)(UnrealModule*);
 
 	/** module close symbol type */
-	typedef Result (CloseFunc)(UnrealModule&);
+	typedef Result (CloseFunc)(UnrealModule*);
 
 public:
 	UnrealModule(const String& fname);
@@ -92,11 +111,12 @@ public:
 	bool load();
 	void *resolve(const String& name);
 	void setFileName(const String& fname);
+	void setState(ModuleState state);
 	ModuleState state();
 	void unload();
 
 public:
-	Info info;
+	UnrealModuleInf inf;
 
 private:
 	/** ltdl module loading ``advice'' */

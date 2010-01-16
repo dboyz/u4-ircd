@@ -23,9 +23,9 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#include "base.hpp"
-#include "channel.hpp"
-#include "cmdmap.hpp"
+#include <base.hpp>
+#include <channel.hpp>
+#include <cmd/mode.hpp>
 #include <iostream>
 
 /* cast */
@@ -944,7 +944,7 @@ void UnrealChannel::sendreply(UnrealUser* uptr, IRCNumeric numeric,
 	String reply;
 
 	reply.sprintf(":%s %03d %s %s %s",
-		unreal->me.name().c_str(),
+		unreal->me->name().c_str(),
 		num,
 		uptr->nick().c_str(),
 		name_.c_str(),
@@ -967,7 +967,7 @@ void UnrealChannel::sendreply(UnrealUser* uptr, const String& cmd,
 	String reply;
 
 	reply.sprintf(":%s %s %s %s %s",
-		unreal->me.name().c_str(),
+		unreal->me->name().c_str(),
 		cmd.c_str(),
 		uptr->nick().c_str(),
 		name_.c_str(),

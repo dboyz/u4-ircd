@@ -27,7 +27,7 @@
 
 SUBDIRS = . src/cmd
 
-INCLUDES = -I$(top_srcdir)/include
+INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/src/cmd/include
 
 AM_DEFAULT_SOURCE_EXT = .cpp
 AM_LDFLAGS = $(BOOST_LDFLAGS)
@@ -54,9 +54,7 @@ bin_PROGRAMS = unrealircd4
 pkginclude_HEADERS = \
 	include/base.hpp \
 	include/bitmask.hpp \
-	include/binder.hpp \
 	include/channel.hpp \
-	include/cmdmap.hpp \
 	include/command.hpp \
 	include/config.hpp \
 	include/exception.hpp \
@@ -75,7 +73,6 @@ pkginclude_HEADERS = \
 	include/reactor.hpp \
 	include/resolver.hpp \
 	include/server.hpp \
-	include/signal.hpp \
 	include/socket.hpp \
 	include/stats.hpp \
 	include/string.hpp \

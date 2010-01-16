@@ -26,7 +26,7 @@
 #ifndef _UNREALIRCD_STRINGLIST_HPP
 #define _UNREALIRCD_STRINGLIST_HPP
 
-#include "list.hpp"
+#include <list.hpp>
 
 class String;
 

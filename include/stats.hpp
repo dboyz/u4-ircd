@@ -26,7 +26,7 @@
 #ifndef _UNREALIRCD_STATS_HPP
 #define _UNREALIRCD_STATS_HPP
 
-#include "platform.hpp"
+#include <platform.hpp>
 #include <cstring>
 
 /**

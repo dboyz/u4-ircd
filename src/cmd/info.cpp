@@ -23,29 +23,76 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#include "base.hpp"
-#include "cmdmap.hpp"
-#include "command.hpp"
-#include "module.hpp"
-#include "stringlist.hpp"
+#include <base.hpp>
+#include <command.hpp>
+#include <module.hpp>
+#include <stringlist.hpp>
 
-/** Module informations */
-UnrealModule::Info modinf =
+#include <cmd/info.hpp>
+
+/** class instance */
+UnrealCH_info* handler = NULL;
+
+/**
+ * Unreal Command Handler for "INFO" - Constructor.
+ *
+ * @param mptr Module pointer
+ */
+UnrealCH_info::UnrealCH_info(UnrealModule* mptr)
 {
-	/** Module name */
-	"INFO command handler",
+	setInfo(&mptr->inf);
+	
+	/* allocate additional contents */
+	command_ = new UnrealUserCommand(CMD_INFO, &UnrealCH_info::exec);
+}
 
-	/** Module version */
-	"1.0",
+/**
+ * Unreal Command Handler for "INFO" - Destructor.
+ */
+UnrealCH_info::~UnrealCH_info()
+{
+	delete command_;
+}
 
-	/** Module author */
-	"(Packaged)"
-};
+/**
+ * INFO command handler for User connections.
+ *
+ * Usage:
+ * INFO [<target>]
+ *
+ * Message example:
+ * INFO some.server.net
+ *
+ * @param uptr Originating user
+ * @param argv Argument list
+ */
+void UnrealCH_info::exec(UnrealUser* uptr, StringList* argv)
+{
+	String target = unreal->me->name();
 
-/** Command Instance */
-UnrealUserCommand* uc = 0;
+	if (argv->size() >= 2)
+		target = argv->at(1);
 
-StringList readInfoFile()
+	if (target == unreal->me->name())
+	{
+		StringList output = readInfoFile();
+
+		output << String(": ") << String(": ");
+		output << String::format(":Revision: %s",
+			UnrealVersion::package_changeset.c_str());
+		output << String::format(":Birth date: %s %s", __DATE__, __TIME__);
+		output << String::format(":On-line since %s",
+			unreal->me->bootTime().toString("%Y-%M-%dT%H:%M:%S %Z").c_str());
+
+		/* now send it */
+		for (StringList::Iterator i = output.begin(); i != output.end(); ++i)
+			uptr->sendreply(RPL_INFO, (*i).c_str());
+
+		uptr->sendreply(RPL_ENDOFINFO, MSG_ENDOFINFO);
+	}
+}
+
+StringList UnrealCH_info::readInfoFile()
 {
 	StringList sl;
 
@@ -63,42 +110,19 @@ StringList readInfoFile()
 
 	return sl;
 }
+
 /**
- * INFO command handler for User connections.
+ * Updates the module information.
  *
- * Usage:
- * INFO [<target>]
- *
- * Message example:
- * INFO some.server.net
- *
- * @param uptr Originating user
- * @param argv Argument list
+ * @param inf Module information object pointer
  */
-void uc_info(UnrealUser* uptr, StringList* argv)
+void UnrealCH_info::setInfo(UnrealModuleInf* inf)
 {
-	String target = unreal->me.name();
-
-	if (argv->size() >= 2)
-		target = argv->at(1);
-
-	if (target == unreal->me.name())
-	{
-		StringList output = readInfoFile();
-
-		output << String(": ") << String(": ");
-		output << String::format(":Revision: %s",
-			UnrealVersion::package_changeset.c_str());
-		output << String::format(":Birth date: %s %s", __DATE__, __TIME__);
-		output << String::format(":On-line since %s",
-			unreal->me.bootTime().toString("%Y-%M-%dT%H:%M:%S %Z").c_str());
-
-		/* now send it */
-		for (StringList::Iterator i = output.begin(); i != output.end(); ++i)
-			uptr->sendreply(RPL_INFO, (*i).c_str());
-
-		uptr->sendreply(RPL_ENDOFINFO, MSG_ENDOFINFO);
-	}
+	inf->setAPIVersion( MODULE_API_VERSION );
+	inf->setAuthor("UnrealIRCd Development Team");
+	inf->setDescription("Command Handler for the /INFO command");
+	inf->setName("UnrealCH_info");
+	inf->setVersion("1.0.0");
 }
 
 /**
@@ -107,14 +131,9 @@ void uc_info(UnrealUser* uptr, StringList* argv)
  *
  * @param module Reference to Module
  */
-UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrInit(UnrealModule* mptr)
 {
-	/* update module info */
-	module.info = modinf;
-
-	/* register command */
-	uc = new UnrealUserCommand(CMD_INFO, &uc_info);
-
+	handler = new UnrealCH_info(mptr);
 	return UnrealModule::Success;
 }
 
@@ -122,9 +141,8 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
  * Module close function.
  * It's called before the Module is unloaded.
  */
-UNREAL_DLL UnrealModule::Result unrClose(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrClose(UnrealModule* mptr)
 {
-	delete uc;
-
+	delete handler;
 	return UnrealModule::Success;
 }

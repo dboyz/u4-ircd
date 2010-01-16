@@ -26,7 +26,7 @@
 #ifndef _UNREALIRCD_HASH_HPP
 #define _UNREALIRCD_HASH_HPP
 
-#include "string.hpp"
+#include <string.hpp>
 
 /**
  * Secure Hash Algorithm (SHA) digest calculator wrapper.

@@ -23,48 +23,63 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#include "base.hpp"
-#include "cmdmap.hpp"
-#include "command.hpp"
-#include "limits.hpp"
-#include "module.hpp"
-#include "stringlist.hpp"
-#include <iostream>
+#include <base.hpp>
+#include <command.hpp>
+#include <limits.hpp>
+#include <stringlist.hpp>
 
-/** Module informations */
-UnrealModule::Info modinf =
+#include <cmd/nick.hpp>
+
+/** class instance */
+UnrealCH_nick* handler = NULL;
+
+/** allowed characters for nicks */
+const String allowed_nick_chars =
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	"abcdefghijklmnopqrstuvwxyz"
+	"0123456789-_|^()[]{}\\`´'";
+
+/**
+ * Unreal Command Handler for "NICK" - Constructor.
+ *
+ * @param mptr Module pointer
+ */
+UnrealCH_nick::UnrealCH_nick(UnrealModule* mptr)
 {
-	/** Module name */
-	"NICK command handler",
+	setInfo(&mptr->inf);
+	
+	/* allocate additional contents */
+	command_ = new UnrealUserCommand(CMD_NICK, &UnrealCH_nick::exec,
+		false, false);
+}
 
-	/** Module version */
-	"1.0",
-
-	/** Module author */
-	"(Packaged)"
-};
-
-/** Command Instance */
-UnrealUserCommand* uc = 0;
+/**
+ * Unreal Command Handler for "NICK" - Destructor.
+ */
+UnrealCH_nick::~UnrealCH_nick()
+{
+	delete command_;
+}
 
 /**
  * Checks whether the specified string represents a valid nick name.
  *
  * @return true when valid, otherwise false
  */
-bool is_valid_nick(const String& str)
+bool UnrealCH_nick::isValidNick(const String& str)
 {
-	String allowed = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234"
-					 "56789-_|^()[]{}\\`´'";
+	static String allowed("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+		"0123456789-_|^()[]{}\\`´'");
 
 	String trstr = str;
+
 	trstr = trstr.trimmed();
 
 	if (trstr.length() > U4_NICKLEN)
 		return false;
 
-	for (size_t i = 0; i < trstr.length(); i++)
-		if (allowed.find(trstr[i]) == String::npos)
+	for (String::Iterator ch = trstr.begin(); ch != trstr.end(); ++ch)
+		if (allowed.find(*ch) == String::npos)
 			return false;
 
 	return true;
@@ -79,7 +94,7 @@ bool is_valid_nick(const String& str)
  * @param uptr Originating user
  * @param argv Argument list
  */
-void uc_nick(UnrealUser* uptr, StringList* argv)
+void UnrealCH_nick::exec(UnrealUser* uptr, StringList* argv)
 {
 	if (argv->size() < 2)
 	{
@@ -93,7 +108,7 @@ void uc_nick(UnrealUser* uptr, StringList* argv)
 				String::format(MSG_NICKNAMEINUSE,
 						argv->at(1).c_str()));
 	}
-	else if (!is_valid_nick(argv->at(1)))
+	else if (!UnrealCH_nick::isValidNick(argv->at(1)))
 	{
 		uptr->sendreply(ERR_INVALIDNICK,
 				String::format(MSG_INVALIDNICK,
@@ -122,7 +137,7 @@ void uc_nick(UnrealUser* uptr, StringList* argv)
 		if (uptr->channels.size() > 0)
 		{
 			for (List<UnrealChannel*>::Iterator uci = uptr->channels.begin();
-					uci != uptr->channels.end(); uci++)
+					uci != uptr->channels.end(); ++uci)
 			{
 				UnrealChannel* chptr = *uci;
 
@@ -136,19 +151,28 @@ void uc_nick(UnrealUser* uptr, StringList* argv)
 }
 
 /**
+ * Updates the module information.
+ *
+ * @param inf Module information object pointer
+ */
+void UnrealCH_nick::setInfo(UnrealModuleInf* inf)
+{
+	inf->setAPIVersion( MODULE_API_VERSION );
+	inf->setAuthor("UnrealIRCd Development Team");
+	inf->setDescription("Command Handler for the /NICK command");
+	inf->setName("UnrealCH_nick");
+	inf->setVersion("1.0.0");
+}
+
+/**
  * Module initialization function.
  * Called when the Module is loaded.
  *
  * @param module Reference to Module
  */
-UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrInit(UnrealModule* mptr)
 {
-	/* update module info */
-	module.info = modinf;
-
-	/* register command */
-	uc = new UnrealUserCommand(CMD_NICK, &uc_nick, false, false);
-
+	handler = new UnrealCH_nick(mptr);
 	return UnrealModule::Success;
 }
 
@@ -156,9 +180,8 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
  * Module close function.
  * It's called before the Module is unloaded.
  */
-UNREAL_DLL UnrealModule::Result unrClose(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrClose(UnrealModule* mptr)
 {
-	delete uc;
-
+	delete handler;
 	return UnrealModule::Success;
 }

@@ -48,36 +48,10 @@ UnrealBase::UnrealBase(int cnt, char** vec)
 
 	for (int i = 0; i < cnt; i++)
 		argv << String(vec[i]);
-
-	/* library initializations */
+	
 	UnrealModule::init();
-	
-	/* check the command line arguments */
-	parseArgv();
 
-	/* start reading the initial config file */
-	config.startRead();
-
-	/* open log file */
-	initLog();
-
-	/* load modules */
-	initModules();
-
-	/* initialize mode tables */
-	initModes();
-
-	/* fix resource limits */
-	setupRlimit();
-	
-	/* setup Listeners */
-	setupListener();
-
-	/* build ISupport map */
-	setupISupport();
-
-	/* setup local server entry */
-	setupServer();
+	init();
 
 	if (fork_state_ == Daemon)
 	{
@@ -176,11 +150,39 @@ void UnrealBase::exit(int code)
  */
 void UnrealBase::finish()
 {
-	for (List<UnrealListener*>::Iterator li = listeners.begin();
-			li != listeners.end(); ++li)
-	{
+	/* close log file */
+	log.close();
+
+	/* destroy modules */
+	foreach (List<UnrealModule*>::Iterator, mod, modules)
+		delete *mod;
+	
+	modules.clear();
+
+	/* destroy listeners */
+	foreach (List<UnrealListener*>::Iterator, li, listeners)
 		delete *li;
-	}
+
+	listeners.clear();
+	
+	/* clear channel mode table */
+	UnrealChannelProperties::ModeTable.clear();
+
+	/* clear user mode table */
+	UnrealUserProperties::ModeTable.clear();
+
+	/* clear ISupport */
+	isupport.clear();
+
+	/* destroy servers */
+	for (Map<uint32_t, UnrealServer*>::Iterator si = servers.begin();
+			si != servers.end(); ++si)
+		delete si->second;
+	
+	servers.clear();
+	
+	/* `me' is deleted with the iteration above, just nullify it */
+	me = 0;
 }
 
 /**
@@ -189,6 +191,39 @@ void UnrealBase::finish()
 UnrealBase::FState UnrealBase::fstate()
 {
 	return fork_state_;
+}
+
+/**
+ * Initialization of subsystems.
+ */
+void UnrealBase::init()
+{
+	/* check the command line arguments */
+	parseArgv();
+
+	/* start reading the initial config file */
+	config.startRead();
+
+	/* open log file */
+	initLog();
+
+	/* load modules */
+	initModules();
+
+	/* initialize mode tables */
+	initModes();
+
+	/* fix resource limits */
+	setupRlimit();
+	
+	/* setup Listeners */
+	setupListener();
+
+	/* build ISupport map */
+	setupISupport();
+
+	/* setup local server entry */
+	setupServer();
 }
 
 /**
@@ -274,7 +309,9 @@ void UnrealBase::initModules()
 		{
 			String errStr = mptr->errorString();
 
-			log.write(UnrealLog::Normal, "Warning: Loading module failed: %s",
+			log.write(UnrealLog::Normal, "Warning: Loading module failed: %s "
+				"(%s)",
+					mptr->fileName().c_str(),
 					errStr.c_str());
 
 			delete mptr;
@@ -437,6 +474,18 @@ void UnrealBase::printVersion()
 UnrealReactor& UnrealBase::reactor()
 {
 	return reactor_;
+}
+
+/**
+ * Restart the server.
+ */
+void UnrealBase::restart()
+{
+	finish();
+
+	config.rehash();
+
+	init();
 }
 
 /**
@@ -611,25 +660,26 @@ void UnrealBase::setupRlimit()
  */
 void UnrealBase::setupServer()
 {
-	me.setName(config.get("Me::ServerName"));
+	me = new UnrealServer();
+	me->setName(config.get("Me::ServerName"));
 
-	if (me.name().empty())
+	if (me->name().empty())
 	{
 		log.write(UnrealLog::Normal, "Fatal: Me::ServerName not specified.");
 		exit(1);
 	}
 
-	me.setNumeric(config.get("Me::Numeric", "0").toUInt());
+	me->setNumeric(config.get("Me::Numeric", "0").toUInt());
 
-	if (me.numeric() == 0)
+	if (me->numeric() < 1 || me->numeric() > 4096)
 	{
 		log.write(UnrealLog::Normal, "Fatal: Me::Numeric is an invalid server "
 				"numeric. Please use a number between 1 and 4096.");
 		exit(1);
 	}
 
-	me.setBootTime(UnrealTime::now());
+	me->setBootTime(UnrealTime::now());
 
 	/* add into the server list */
-	servers.add(me.numeric(), &me);
+	servers.add(me->numeric(), me);
 }

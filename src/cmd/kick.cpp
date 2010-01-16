@@ -23,27 +23,36 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#include "base.hpp"
-#include "cmdmap.hpp"
-#include "command.hpp"
-#include "module.hpp"
-#include "stringlist.hpp"
+#include <base.hpp>
+#include <command.hpp>
+#include <module.hpp>
+#include <stringlist.hpp>
 
-/** Module informations */
-UnrealModule::Info modinf =
+#include <cmd/kick.hpp>
+
+/** class instance */
+UnrealCH_kick* handler = NULL;
+
+/**
+ * Unreal Command Handler for "KICK" - Constructor.
+ *
+ * @param mptr Module pointer
+ */
+UnrealCH_kick::UnrealCH_kick(UnrealModule* mptr)
 {
-	/** Module name */
-	"KICK command handler",
+	setInfo(&mptr->inf);
+	
+	/* allocate additional contents */
+	command_ = new UnrealUserCommand(CMD_KICK, &UnrealCH_kick::exec);
+}
 
-	/** Module version */
-	"1.0",
-
-	/** Module author */
-	"(Packaged)"
-};
-
-/** Command Instance */
-UnrealUserCommand* uc = 0;
+/**
+ * Unreal Command Handler for "KICK" - Destructor.
+ */
+UnrealCH_kick::~UnrealCH_kick()
+{
+	delete command_;
+}
 
 /**
  * KICK command handler for User connections.
@@ -57,7 +66,7 @@ UnrealUserCommand* uc = 0;
  * @param uptr Originating user
  * @param argv Argument list
  */
-void uc_kick(UnrealUser* uptr, StringList* argv)
+void UnrealCH_kick::exec(UnrealUser* uptr, StringList* argv)
 {
 	if (argv->size() < 3)
 	{
@@ -115,19 +124,28 @@ void uc_kick(UnrealUser* uptr, StringList* argv)
 }
 
 /**
+ * Updates the module information.
+ *
+ * @param inf Module information object pointer
+ */
+void UnrealCH_kick::setInfo(UnrealModuleInf* inf)
+{
+	inf->setAPIVersion( MODULE_API_VERSION );
+	inf->setAuthor("UnrealIRCd Development Team");
+	inf->setDescription("Command Handler for the /KICK command");
+	inf->setName("UnrealCH_kick");
+	inf->setVersion("1.0.0");
+}
+
+/**
  * Module initialization function.
  * Called when the Module is loaded.
  *
  * @param module Reference to Module
  */
-UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrInit(UnrealModule* mptr)
 {
-	/* update module info */
-	module.info = modinf;
-
-	/* register command */
-	uc = new UnrealUserCommand(CMD_KICK, &uc_kick);
-
+	handler = new UnrealCH_kick(mptr);
 	return UnrealModule::Success;
 }
 
@@ -135,9 +153,8 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
  * Module close function.
  * It's called before the Module is unloaded.
  */
-UNREAL_DLL UnrealModule::Result unrClose(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrClose(UnrealModule* mptr)
 {
-	delete uc;
-
+	delete handler;
 	return UnrealModule::Success;
 }

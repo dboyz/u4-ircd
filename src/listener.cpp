@@ -23,12 +23,12 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#include "base.hpp"
-#include "cmdmap.hpp"
-#include "command.hpp"
-#include "listener.hpp"
-#include "numeric.hpp"
-#include "user.hpp"
+#include <base.hpp>
+#include <command.hpp>
+#include <listener.hpp>
+#include <numeric.hpp>
+#include <user.hpp>
+#include <cmd/notice.hpp>
 #include <iostream>
 #include <boost/bind.hpp>
 

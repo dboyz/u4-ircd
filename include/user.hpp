@@ -26,19 +26,19 @@
 #ifndef _UNREALIRCD_USER_HPP
 #define _UNREALIRCD_USER_HPP
 
-#include "bitmask.hpp"
-#include "channel.hpp"
-#include "list.hpp"
-#include "listener.hpp"
-#include "mode.hpp"
-#include "modebuf.hpp"
-#include "numeric.hpp"
-#include "platform.hpp"
-#include "resolver.hpp"
-#include "string.hpp"
-#include "stringlist.hpp"
-#include "time.hpp"
-#include "timer.hpp"
+#include <bitmask.hpp>
+#include <channel.hpp>
+#include <list.hpp>
+#include <listener.hpp>
+#include <mode.hpp>
+#include <modebuf.hpp>
+#include <numeric.hpp>
+#include <platform.hpp>
+#include <resolver.hpp>
+#include <string.hpp>
+#include <stringlist.hpp>
+#include <time.hpp>
+#include <timer.hpp>
 #include <boost/asio.hpp>
 
 /**

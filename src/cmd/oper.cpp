@@ -23,30 +23,18 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#include "base.hpp"
-#include "cmdmap.hpp"
-#include "command.hpp"
-#include "hash.hpp"
-#include "module.hpp"
-#include "stringlist.hpp"
+#include <base.hpp>
+#include <command.hpp>
+#include <hash.hpp>
+#include <stringlist.hpp>
 
 #include <crypto++/sha.h>
 
-/** Module informations */
-UnrealModule::Info modinf =
-{
-	/** Module name */
-	"OPER command handler",
+#include <cmd/mode.hpp>
+#include <cmd/oper.hpp>
 
-	/** Module version */
-	"1.0",
-
-	/** Module author */
-	"(Packaged)"
-};
-
-/** Command Instance */
-UnrealUserCommand* uc = 0;
+/** class instance */
+UnrealCH_oper* handler = NULL;
 
 /**
  * Operator type.
@@ -78,6 +66,7 @@ struct OperatorType
 				ret.mask = mask;
 				ret.name = name;
 				ret.password = pass;
+
 				break;
 			}
 		}
@@ -128,6 +117,27 @@ struct OperatorType
 };
 
 /**
+ * Unreal Command Handler for "OPER" - Constructor.
+ *
+ * @param mptr Module pointer
+ */
+UnrealCH_oper::UnrealCH_oper(UnrealModule* mptr)
+{
+	setInfo(&mptr->inf);
+	
+	/* allocate additional contents */
+	command_ = new UnrealUserCommand(CMD_OPER, &UnrealCH_oper::exec);
+}
+
+/**
+ * Unreal Command Handler for "OPER" - Destructor.
+ */
+UnrealCH_oper::~UnrealCH_oper()
+{
+	delete command_;
+}
+
+/**
  * OPER command handler for User connections.
  *
  * Usage:
@@ -139,7 +149,7 @@ struct OperatorType
  * @param uptr Originating user
  * @param argv Argument list
  */
-void uc_oper(UnrealUser* uptr, StringList* argv)
+void UnrealCH_oper::exec(UnrealUser* uptr, StringList* argv)
 {
 	if (argv->size() < 3)
 	{
@@ -185,19 +195,28 @@ void uc_oper(UnrealUser* uptr, StringList* argv)
 }
 
 /**
+ * Updates the module information.
+ *
+ * @param inf Module information object pointer
+ */
+void UnrealCH_oper::setInfo(UnrealModuleInf* inf)
+{
+	inf->setAPIVersion( MODULE_API_VERSION );
+	inf->setAuthor("UnrealIRCd Development Team");
+	inf->setDescription("Command Handler for the /OPER command");
+	inf->setName("UnrealCH_oper");
+	inf->setVersion("1.0.0");
+}
+
+/**
  * Module initialization function.
  * Called when the Module is loaded.
  *
  * @param module Reference to Module
  */
-UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrInit(UnrealModule* mptr)
 {
-	/* update module info */
-	module.info = modinf;
-
-	/* register command */
-	uc = new UnrealUserCommand(CMD_OPER, &uc_oper);
-
+	handler = new UnrealCH_oper(mptr);
 	return UnrealModule::Success;
 }
 
@@ -205,9 +224,8 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
  * Module close function.
  * It's called before the Module is unloaded.
  */
-UNREAL_DLL UnrealModule::Result unrClose(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrClose(UnrealModule* mptr)
 {
-	delete uc;
-
+	delete handler;
 	return UnrealModule::Success;
 }

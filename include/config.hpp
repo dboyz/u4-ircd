@@ -26,9 +26,9 @@
 #ifndef _UNREALIRCD_CONFIG_HPP
 #define _UNREALIRCD_CONFIG_HPP
 
-#include "map.hpp"
-#include "string.hpp"
-#include "stringlist.hpp"
+#include <map.hpp>
+#include <string.hpp>
+#include <stringlist.hpp>
 
 /** max length per config line for buffer */
 #define CONFIG_LINE_LENGTH_LIMIT	1024

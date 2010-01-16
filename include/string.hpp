@@ -26,7 +26,7 @@
 #ifndef _UNREALIRCD_STRING_HPP
 #define _UNREALIRCD_STRING_HPP
 
-#include "platform.hpp"
+#include <platform.hpp>
 #include <string>
 
 /** define the String::sprintf() buffer size */

@@ -23,27 +23,37 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#include "base.hpp"
-#include "cmdmap.hpp"
-#include "command.hpp"
-#include "module.hpp"
-#include "stringlist.hpp"
+#include <base.hpp>
+#include <command.hpp>
+#include <module.hpp>
+#include <stringlist.hpp>
 
-/** Module informations */
-UnrealModule::Info modinf =
+#include <cmd/lsmod.hpp>
+#include <cmd/notice.hpp>
+
+/** class instance */
+UnrealCH_lsmod* handler = NULL;
+
+/**
+ * Unreal Command Handler for "LSMOD" - Constructor.
+ *
+ * @param mptr Module pointer
+ */
+UnrealCH_lsmod::UnrealCH_lsmod(UnrealModule* mptr)
 {
-	/** Module name */
-	"LSMOD command handler",
+	setInfo(&mptr->inf);
+	
+	/* allocate additional contents */
+	command_ = new UnrealUserCommand(CMD_LSMOD, &UnrealCH_lsmod::exec);
+}
 
-	/** Module version */
-	"1.0",
-
-	/** Module author */
-	"(Packaged)"
-};
-
-/** Command Instance */
-UnrealUserCommand* uc = 0;
+/**
+ * Unreal Command Handler for "LSMOD" - Destructor.
+ */
+UnrealCH_lsmod::~UnrealCH_lsmod()
+{
+	delete command_;
+}
 
 /**
  * LSMOD command handler for User connections.
@@ -51,17 +61,18 @@ UnrealUserCommand* uc = 0;
  * LSMOD lists all loaded modules that are loaded with the server.
  *
  * Usage:
- * LSMOD
+ * LSMOD [<server>]
  *
  * Message example:
- * RMMOD
+ * LSMOD
  *
  * @param uptr Originating user
  * @param argv Argument list
  */
-void uc_lsmod(UnrealUser* uptr, StringList* argv)
+void UnrealCH_lsmod::exec(UnrealUser* uptr, StringList* argv)
 {
-	bool is_oper_only = !unreal->config.get("Features/UserLsmod", "false").toBool();
+	bool is_oper_only = !unreal->config.get("Features::UserLsmod", "false")
+		.toBool();
 
 	/* first, look if the command is available to operators only */
 	if (is_oper_only && !uptr->isOper())
@@ -83,13 +94,27 @@ void uc_lsmod(UnrealUser* uptr, StringList* argv)
 			uptr->sendreply(CMD_NOTICE,
 				String::format(MSG_LSMOD,
 					mptr->fileName().c_str(),
-					mptr->info.name.c_str(),
-					mptr->info.version.c_str(),
-					mptr->info.author.c_str()));
+					mptr->inf.name().c_str(),
+					mptr->inf.version().c_str(),
+					mptr->inf.author().c_str()));
 		}
 
 		uptr->sendreply(CMD_NOTICE, MSG_LSMODEND);
 	}
+}
+
+/**
+ * Updates the module information.
+ *
+ * @param inf Module information object pointer
+ */
+void UnrealCH_lsmod::setInfo(UnrealModuleInf* inf)
+{
+	inf->setAPIVersion( MODULE_API_VERSION );
+	inf->setAuthor("UnrealIRCd Development Team");
+	inf->setDescription("Command Handler for the /LSMOD command");
+	inf->setName("UnrealCH_lsmod");
+	inf->setVersion("1.0.0");
 }
 
 /**
@@ -98,14 +123,9 @@ void uc_lsmod(UnrealUser* uptr, StringList* argv)
  *
  * @param module Reference to Module
  */
-UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrInit(UnrealModule* mptr)
 {
-	/* update module info */
-	module.info = modinf;
-
-	/* register command */
-	uc = new UnrealUserCommand(CMD_LSMOD, &uc_lsmod);
-
+	handler = new UnrealCH_lsmod(mptr);
 	return UnrealModule::Success;
 }
 
@@ -113,9 +133,8 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
  * Module close function.
  * It's called before the Module is unloaded.
  */
-UNREAL_DLL UnrealModule::Result unrClose(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrClose(UnrealModule* mptr)
 {
-	delete uc;
-
+	delete handler;
 	return UnrealModule::Success;
 }

@@ -23,27 +23,35 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#include "base.hpp"
-#include "cmdmap.hpp"
-#include "command.hpp"
-#include "module.hpp"
-#include "stringlist.hpp"
+#include <base.hpp>
+#include <command.hpp>
+#include <stringlist.hpp>
 
-/** Module informations */
-UnrealModule::Info modinf =
+#include <cmd/version.hpp>
+
+/** class instance */
+UnrealCH_version* handler = NULL;
+
+/**
+ * Unreal Command Handler for "VERSION" - Constructor.
+ *
+ * @param mptr Module pointer
+ */
+UnrealCH_version::UnrealCH_version(UnrealModule* mptr)
 {
-	/** Module name */
-	"VERSION command handler",
+	setInfo(&mptr->inf);
+	
+	/* allocate additional contents */
+	command_ = new UnrealUserCommand(CMD_VERSION, &UnrealCH_version::exec);
+}
 
-	/** Module version */
-	"1.0",
-
-	/** Module author */
-	"(Packaged)"
-};
-
-/** Command Instance */
-UnrealUserCommand* uc = 0;
+/**
+ * Unreal Command Handler for "VERSION" - Destructor.
+ */
+UnrealCH_version::~UnrealCH_version()
+{
+	delete command_;
+}
 
 /**
  * VERSION command handler for User connections.
@@ -57,22 +65,36 @@ UnrealUserCommand* uc = 0;
  * @param uptr Originating user
  * @param argv Argument list
  */
-void uc_version(UnrealUser* uptr, StringList* argv)
+void UnrealCH_version::exec(UnrealUser* uptr, StringList* argv)
 {
-	String target = unreal->me.name();
+	String target = unreal->me->name();
 
 	if (argv->size() >= 2)
 		target = argv->at(1);
 
-	if (target == unreal->me.name())
+	if (target == unreal->me->name())
 	{
 		uptr->sendreply(RPL_VERSION,
 			String::format(MSG_VERSION,
 				PACKAGE_VERSTR,
 				PACKAGE_PATCHLEVEL,
-				unreal->me.name().c_str(),
+				unreal->me->name().c_str(),
 				UnrealVersion::package_changeset.c_str() ));
 	}
+}
+
+/**
+ * Updates the module information.
+ *
+ * @param inf Module information object pointer
+ */
+void UnrealCH_version::setInfo(UnrealModuleInf* inf)
+{
+	inf->setAPIVersion( MODULE_API_VERSION );
+	inf->setAuthor("UnrealIRCd Development Team");
+	inf->setDescription("Command Handler for the /VERSION command");
+	inf->setName("UnrealCH_version");
+	inf->setVersion("1.0.0");
 }
 
 /**
@@ -81,14 +103,9 @@ void uc_version(UnrealUser* uptr, StringList* argv)
  *
  * @param module Reference to Module
  */
-UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrInit(UnrealModule* mptr)
 {
-	/* update module info */
-	module.info = modinf;
-
-	/* register command */
-	uc = new UnrealUserCommand(CMD_VERSION, &uc_version);
-
+	handler = new UnrealCH_version(mptr);
 	return UnrealModule::Success;
 }
 
@@ -96,9 +113,8 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
  * Module close function.
  * It's called before the Module is unloaded.
  */
-UNREAL_DLL UnrealModule::Result unrClose(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrClose(UnrealModule* mptr)
 {
-	delete uc;
-
+	delete handler;
 	return UnrealModule::Success;
 }

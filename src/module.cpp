@@ -26,6 +26,8 @@
 #include "base.hpp"
 #include "module.hpp"
 #include <assert.h>
+#include <iostream>
+#include <dlfcn.h>
 
 /**
  * lt_dladvise
@@ -49,6 +51,7 @@ UnrealModule::UnrealModule(const String& fname)
  */
 UnrealModule::~UnrealModule()
 {
+	std::cout<<"~UnrealModule\n";
 	unload();
 }
 
@@ -189,40 +192,38 @@ bool UnrealModule::isLoaded()
 bool UnrealModule::load()
 {
 	if (filename_.empty())
-		state_ = SNone;
+		setState(SNone);
 	else if (UnrealModule::find(filename_))
 	{
 		error_str_ = "Module already loaded";
-		state_ = SError;
+		setState(SError);
 	}
 	else if ( !(handle_ = lt_dlopenadvise(filename_.c_str(), dlflags_)) )
 	{
 		error_str_ = lt_dlerror();
-		state_ = SError;
+		setState(SError);
 	}
 	else
 	{
-		state_ = SLoaded;
+		setState(SLoaded);
 
 		InitFunc* initfn = (InitFunc*)resolve(MODULE_INIT_FN);
 
 		if (!initfn)
 		{
 			error_str_.sprintf("Entry symbol \"%s\" not found", MODULE_INIT_FN);
-			state_ = SError;
+			setState(SError);
 
 			lt_dlclose(handle_);
-			handle_ = 0;
 		}
 		else
 		{
-			if (initfn(*this) != Success)
+			if (initfn(this) != Success)
 			{
 				error_str_.sprintf("Init function did not succeed");
 				state_ = SError;
 
 				lt_dlclose(handle_);
-				handle_ = 0;
 			}
 		}
 	}
@@ -263,6 +264,16 @@ void UnrealModule::setFileName(const String& fname)
 }
 
 /**
+ * Update the module state.
+ *
+ * @param state New state
+ */
+void UnrealModule::setState(ModuleState state)
+{
+	state_ = state;
+}
+
+/**
  * Returns the module state.
  *
  * - SNone   when the module is not loaded yet
@@ -281,13 +292,15 @@ UnrealModule::ModuleState UnrealModule::state()
  */
 void UnrealModule::unload()
 {
-	if (isLoaded() && handle_)
+std::cout<<String::format("UnrealModule::unload(%p) [%s]\n", handle_,
+	filename_.c_str());
+	if (isLoaded())
 	{
 		CloseFunc* clfn = reinterpret_cast<CloseFunc*>(resolve(MODULE_CLOSE_FN));
 
 		if (clfn)
 		{
-			if (clfn(*this) != Success)
+			if (clfn(this) != Success)
 			{
 				unreal->log.write(UnrealLog::Normal,
 						"UnrealModule::unload(): "
@@ -296,7 +309,115 @@ void UnrealModule::unload()
 		}
 
 		lt_dlclose(handle_);
-		handle_ = 0;
-		state_ = SNone;
+		setState(SNone);
 	}
+}
+
+// ---- UnrealModuleInf class ----
+
+/**
+ * ModuleInf constructor.
+ */
+UnrealModuleInf::UnrealModuleInf()
+	: api_version_(MODULE_API_VERSION)
+{ }
+
+/**
+ * Returns the module's API version.
+ *
+ * @return API version
+ */
+uint8_t UnrealModuleInf::apiVersion()
+{
+	return api_version_;
+}
+
+/**
+ * Returns the module's Author.
+ *
+ * @return Author
+ */
+const String& UnrealModuleInf::author()
+{
+	return author_;
+}
+
+/**
+ * Return the module's descriptive Information.
+ *
+ * @return Description
+ */
+const String& UnrealModuleInf::description()
+{
+	return description_;
+}
+
+/**
+ * Return the module's name.
+ *
+ * @return Name
+ */
+const String& UnrealModuleInf::name()
+{
+	return name_;
+}
+
+/**
+ * Update the module's API version.
+ *
+ * @param api_v New API version
+ */
+void UnrealModuleInf::setAPIVersion(const uint8_t& api_v)
+{
+	api_version_ = api_v;
+}
+
+/**
+ * Update the module's Author.
+ *
+ * @param author Author name
+ */
+void UnrealModuleInf::setAuthor(const String& author)
+{
+	author_ = author;
+}
+
+/**
+ * Update the module's Description
+ *
+ * @param descr New description
+ */
+void UnrealModuleInf::setDescription(const String& descr)
+{
+	description_ = descr;
+}
+
+/**
+ * Update the module's Name.
+ *
+ * @param name New name
+ */
+void UnrealModuleInf::setName(const String& name)
+{
+	name_ = name;
+}
+
+/**
+ * Update the module's version.
+ *
+ * @param version Version string
+ */
+void UnrealModuleInf::setVersion(const String& version)
+{
+	version_ = version;
+}
+
+/**
+ * Return the module's Version.
+ *
+ * @return Module version
+ */
+const String& UnrealModuleInf::version()
+{
+	return version_;
 }

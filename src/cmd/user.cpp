@@ -23,28 +23,37 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#include "base.hpp"
-#include "cmdmap.hpp"
-#include "command.hpp"
-#include "limits.hpp"
-#include "module.hpp"
-#include "stringlist.hpp"
+#include <base.hpp>
+#include <command.hpp>
+#include <limits.hpp>
+#include <stringlist.hpp>
 
-/** Module informations */
-UnrealModule::Info modinf =
+#include <cmd/user.hpp>
+
+/** class instance */
+UnrealCH_user* handler = NULL;
+
+/**
+ * Unreal Command Handler for "USER" - Constructor.
+ *
+ * @param mptr Module pointer
+ */
+UnrealCH_user::UnrealCH_user(UnrealModule* mptr)
 {
-	/** Module name */
-	"USER command handler",
+	setInfo(&mptr->inf);
+	
+	/* allocate additional contents */
+	command_ = new UnrealUserCommand(CMD_USER, &UnrealCH_user::exec,
+		false, false);
+}
 
-	/** Module version */
-	"1.0",
-
-	/** Module author */
-	"(Packaged)"
-};
-
-/** Command Instance */
-UnrealUserCommand* uc = 0;
+/**
+ * Unreal Command Handler for "USER" - Destructor.
+ */
+UnrealCH_user::~UnrealCH_user()
+{
+	delete command_;
+}
 
 /**
  * USER command handler for User connections.
@@ -55,7 +64,7 @@ UnrealUserCommand* uc = 0;
  * @param uptr Originating user
  * @param argv Argument list
  */
-void uc_user(UnrealUser* uptr, StringList* argv)
+void UnrealCH_user::exec(UnrealUser* uptr, StringList* argv)
 {
 	if (argv->size() < 5)
 	{
@@ -86,19 +95,28 @@ void uc_user(UnrealUser* uptr, StringList* argv)
 }
 
 /**
+ * Updates the module information.
+ *
+ * @param inf Module information object pointer
+ */
+void UnrealCH_user::setInfo(UnrealModuleInf* inf)
+{
+	inf->setAPIVersion( MODULE_API_VERSION );
+	inf->setAuthor("UnrealIRCd Development Team");
+	inf->setDescription("Command Handler for the /USER command");
+	inf->setName("UnrealCH_user");
+	inf->setVersion("1.0.0");
+}
+
+/**
  * Module initialization function.
  * Called when the Module is loaded.
  *
  * @param module Reference to Module
  */
-UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrInit(UnrealModule* mptr)
 {
-	/* update module info */
-	module.info = modinf;
-
-	/* register command */
-	uc = new UnrealUserCommand(CMD_USER, &uc_user, false, false);
-
+	handler = new UnrealCH_user(mptr);
 	return UnrealModule::Success;
 }
 
@@ -106,9 +124,8 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
  * Module close function.
  * It's called before the Module is unloaded.
  */
-UNREAL_DLL UnrealModule::Result unrClose(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrClose(UnrealModule* mptr)
 {
-	delete uc;
-
+	delete handler;
 	return UnrealModule::Success;
 }

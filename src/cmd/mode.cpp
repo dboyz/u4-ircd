@@ -23,27 +23,36 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#include "base.hpp"
-#include "cmdmap.hpp"
-#include "command.hpp"
-#include "module.hpp"
-#include "stringlist.hpp"
+#include <base.hpp>
+#include <command.hpp>
+#include <module.hpp>
+#include <stringlist.hpp>
 
-/** Module informations */
-UnrealModule::Info modinf =
+#include <cmd/mode.hpp>
+
+/** class instance */
+UnrealCH_mode* handler = NULL;
+
+/**
+ * Unreal Command Handler for "MODE" - Constructor.
+ *
+ * @param mptr Module pointer
+ */
+UnrealCH_mode::UnrealCH_mode(UnrealModule* mptr)
 {
-	/** Module name */
-	"MODE command handler",
+	setInfo(&mptr->inf);
+	
+	/* allocate additional contents */
+	command_ = new UnrealUserCommand(CMD_MODE, &UnrealCH_mode::exec);
+}
 
-	/** Module version */
-	"1.0",
-
-	/** Module author */
-	"(Packaged)"
-};
-
-/** Command Instance */
-UnrealUserCommand* uc = 0;
+/**
+ * Unreal Command Handler for "MODE" - Destructor.
+ */
+UnrealCH_mode::~UnrealCH_mode()
+{
+	delete command_;
+}
 
 /**
  * MODE command handler for User connections.
@@ -57,7 +66,7 @@ UnrealUserCommand* uc = 0;
  * @param uptr Originating user
  * @param argv Argument list
  */
-void uc_mode(UnrealUser* uptr, StringList* argv)
+void UnrealCH_mode::exec(UnrealUser* uptr, StringList* argv)
 {
 	if (argv->size() < 2)
 	{
@@ -129,19 +138,28 @@ void uc_mode(UnrealUser* uptr, StringList* argv)
 }
 
 /**
+ * Updates the module information.
+ *
+ * @param inf Module information object pointer
+ */
+void UnrealCH_mode::setInfo(UnrealModuleInf* inf)
+{
+	inf->setAPIVersion( MODULE_API_VERSION );
+	inf->setAuthor("UnrealIRCd Development Team");
+	inf->setDescription("Command Handler for the /MODE command");
+	inf->setName("UnrealCH_mode");
+	inf->setVersion("1.0.0");
+}
+
+/**
  * Module initialization function.
  * Called when the Module is loaded.
  *
  * @param module Reference to Module
  */
-UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrInit(UnrealModule* mptr)
 {
-	/* update module info */
-	module.info = modinf;
-
-	/* register command */
-	uc = new UnrealUserCommand(CMD_MODE, &uc_mode);
-
+	handler = new UnrealCH_mode(mptr);
 	return UnrealModule::Success;
 }
 
@@ -149,9 +167,8 @@ UNREAL_DLL UnrealModule::Result unrInit(UnrealModule& module)
  * Module close function.
  * It's called before the Module is unloaded.
  */
-UNREAL_DLL UnrealModule::Result unrClose(UnrealModule& module)
+UNREAL_DLL UnrealModule::Result unrClose(UnrealModule* mptr)
 {
-	delete uc;
-
+	delete handler;
 	return UnrealModule::Success;
 }

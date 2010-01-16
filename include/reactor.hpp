@@ -26,12 +26,14 @@
 #ifndef _UNREALIRCD_REACTOR_HPP
 #define _UNREALIRCD_REACTOR_HPP
 
-#include "binder.hpp"
-#include "platform.hpp"
-#include "string.hpp"
+#include <platform.hpp>
+#include <string.hpp>
 
 #include <boost/asio.hpp>
 
+/**
+ * Event reactor.
+ */
 class UnrealReactor
 	: public boost::asio::io_service
 { };

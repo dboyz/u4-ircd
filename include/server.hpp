@@ -26,9 +26,9 @@
 #ifndef _UNREALIRCD_SERVER_HPP
 #define _UNREALIRCD_SERVER_HPP
 
-#include "platform.hpp"
-#include "string.hpp"
-#include "time.hpp"
+#include <platform.hpp>
+#include <string.hpp>
+#include <time.hpp>
 
 /**
  * A server representation on the network.

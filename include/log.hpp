@@ -26,7 +26,7 @@
 #ifndef _UNREALIRCD_LOG_HPP
 #define _UNREALIRCD_LOG_HPP
 
-#include "string.hpp"
+#include <string.hpp>
 #include <fstream>
 
 class UnrealLog
@@ -38,6 +38,7 @@ public:
 	UnrealLog(const String& filename = String());
 	~UnrealLog();
 
+	void close();
 	const String& fileName();
 	bool open();
 	void setFileName(const String& filename);

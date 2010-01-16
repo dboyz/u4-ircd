@@ -26,6 +26,9 @@
 #ifndef _UNREALIRCD_ISUPPORT_HPP
 #define _UNREALIRCD_ISUPPORT_HPP
 
+#include <map.hpp>
+#include <string.hpp>
+
 class UnrealISupport
 	: public Map<String, String>
 {

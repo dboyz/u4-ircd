@@ -207,14 +207,10 @@ String String::mid(size_t start, size_t count)
 {
 	String result;
 
-	try
-	{
+	if (start < this->length())
 		result = this->substr(start, count);
-	}
-	catch (std::exception& ec)
-	{
-		std::cout<<"String::mid() EXCEPTION: "<<ec.what()<<"\n";
-	}
+	else
+		result = "substr:invalid";
 
 	return result;
 }

@@ -54,6 +54,14 @@ UnrealLog::~UnrealLog()
 }
 
 /**
+ * Close log file.
+ */
+void UnrealLog::close()
+{
+	stream_.close();
+}
+
+/**
  * Returns the log file name
  *
  * @return Log file name

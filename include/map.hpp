@@ -26,7 +26,7 @@
 #ifndef _UNREALIRCD_MAP_HPP
 #define _UNREALIRCD_MAP_HPP
 
-#include "list.hpp"
+#include <list.hpp>
 #include <map>
 
 /** STL container for the map */

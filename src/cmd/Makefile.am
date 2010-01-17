@@ -26,7 +26,6 @@ AM_DEFAULT_SOURCE_EXT = .cpp
 
 # http://www.flameeyes.eu/autotools-mythbuster/libtool/index.html#libtool.plugins.dlopen
 AM_LDFLAGS = -module -avoid-version -shared $(BOOST_LDFLAGS)
-AM_CPPFLAGS += -I$(top_srcdir)/src/cmd/include
 INCLUDES = -I$(top_srcdir)/include
 
 pkglib_LTLIBRARIES = \

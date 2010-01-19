@@ -128,6 +128,7 @@ public:
 
 public:
 	List<UnrealChannel*> channels;
+	uint8_t score;
 
 public:
 	/** signal emitted when a new user object is created */

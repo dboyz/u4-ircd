@@ -98,7 +98,10 @@ void UnrealListener::addConnection(UnrealSocket* sptr)
 			uptr->setListener(this);
 
 			/* add it into the userlist */
-			unreal->users.add(sptr, uptr);
+			unreal->users << uptr;
+
+			/* map it with the socket */
+			unreal->local_users.add(sptr, uptr);
 
 			/* initialize authentication process */
 			uptr->auth();
@@ -176,12 +179,33 @@ void UnrealListener::handleAccept(const ErrorCode& ec, UnrealSocket* sptr)
  */
 void UnrealListener::handleDataResponse(UnrealSocket* sptr, String& data)
 {
+	unreal->log.write(UnrealLog::Debug, ">> %s", data.c_str());
+
+	if (type_ == LClient)
+	{
+		UnrealUser* uptr = UnrealUser::find(sptr);
+		
+		if (!uptr)
+		{
+			unreal->log.write(UnrealLog::Error,
+				"UnrealListener: Socket %d not assigned with user (LClient)",
+				sptr->native());
+		}
+		else
+		{
+			uptr->score++;
+			
+			/* TODO:
+			 * Insert `data' into the user's receive queue (delimited by '\n').
+			 * Process the messages in queue with some delay if necessary.
+			 */
+		}
+	}
+
 	StringList tokens = splitLine(data);
 	size_t shift = 0;
 
-	unreal->log.write(UnrealLog::Debug, ">> %s", data.c_str());
-
-	// check prefix
+	/* check prefix */
 	if (tokens.at(0).at(0) == ':' && tokens.size() >= 2)
 		shift++;
 
@@ -266,9 +290,9 @@ void UnrealListener::removeConnection(UnrealSocket* sptr,
 	const UnrealSocket::ErrorCode& ec)
 {
 	/* if an user, remove it from the userlist */
-	if (unreal->users.contains(sptr))
+	if (unreal->local_users.contains(sptr))
 	{
-		UnrealUser* uptr = unreal->users[sptr];
+		UnrealUser* uptr = unreal->local_users[sptr];
 
 		if (ec)
 			uptr->exit( const_cast<UnrealSocket::ErrorCode&>(ec) );

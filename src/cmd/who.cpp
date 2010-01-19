@@ -133,13 +133,13 @@ void UnrealCH_who::exec(UnrealUser* uptr, StringList* argv)
 	}
 	else
 	{
-		Map<UnrealSocket*, UnrealUser*>::Iterator ui = unreal->users.begin();
 		UnrealChannel* chptr;
 		bool can_recv_inv;
-		
-		for (; ui != unreal->users.end(); ++ui)
+	
+
+		foreach (List<UnrealUser*>::Iterator, ui, unreal->users)
 		{
-			UnrealUser* tuptr = ui->second;
+			UnrealUser* tuptr = *ui;
 			
 			/* just list that user if it's visible to the other user in some
 			 * way; IRC operators can always see anyone

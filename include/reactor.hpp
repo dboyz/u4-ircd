@@ -36,6 +36,9 @@
  */
 class UnrealReactor
 	: public boost::asio::io_service
-{ };
+{
+public:
+	typedef boost::system::error_code ErrorCode;
+};
 
 #endif /* _UNREALIRCD_REACTOR_HPP */

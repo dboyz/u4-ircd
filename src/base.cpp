@@ -28,6 +28,7 @@
 #include "reactor.hpp"
 #include <cstdlib>
 #include <iostream>
+#include <boost/bind.hpp>
 #include <boost/version.hpp>
 #include <sys/resource.h>
 
@@ -495,7 +496,57 @@ void UnrealBase::restart()
  */
 void UnrealBase::run()
 {
+	timer_ = new UnrealTimer();
+
+	/* launch timer */
+	timer_->expires_from_now(boost::posix_time::seconds(1));
+	timer_->async_wait(
+		boost::bind(
+			&UnrealBase::run,
+			this,
+			boost::asio::placeholders::error));
+
+	/* run main loop */
 	reactor_.run();
+
+	/* once all necessary operations done, deallocate the timer */
+	delete timer_;
+}
+
+/**
+ * Timer callback function. Usually called every second to do outstanding work.
+ *
+ * @param ec Error code
+ */
+void UnrealBase::run(const UnrealReactor::ErrorCode& ec)
+{
+	if (ec)
+	{
+		UnrealReactor::ErrorCode edupl = ec;
+		unreal->log.write(UnrealLog::Fatal, "Main loop timer canceled with an "
+			"error: %s", edupl.message().c_str());
+	}
+	else
+	{
+		/* flood protection; check for local user connections only */
+		for (Map<UnrealSocket*, UnrealUser*>::Iterator ui = local_users.begin();
+				ui != local_users.end(); ++ui)
+		{
+			UnrealUser* uptr = ui->second;
+
+			/* decrease flood score every second */
+			if (uptr->score > 0)
+				uptr->score--;
+		}
+
+		/* reset the timer */
+		timer_->expires_from_now(boost::posix_time::seconds(1));
+		timer_->async_wait(
+			boost::bind(
+				&UnrealBase::run,
+				this,
+				boost::asio::placeholders::error));
+	}
 }
 
 /**

@@ -41,6 +41,7 @@
 #include <string.hpp>
 #include <stringlist.hpp>
 #include <time.hpp>
+#include <timer.hpp>
 #include <user.hpp>
 #include <version.hpp>
 
@@ -87,8 +88,11 @@ public:
 	/** list with listeners */
 	List<UnrealListener*> listeners;
 
+	/** local user mapping */
+	Map<UnrealSocket*, UnrealUser*> local_users;
+
 	/** user mapping */
-	Map<UnrealSocket*, UnrealUser*> users;
+	List<UnrealUser*> users;
 
 	/** nick mapping */
 	Map<String, UnrealUser*> nicks;
@@ -123,6 +127,7 @@ private:
 	void printConfig();
 	void printUsage();
 	void printVersion();
+	void run(const UnrealReactor::ErrorCode& ec);
 	void setupISupport();
 	void setupListener();
 	void setupRlimit();
@@ -134,6 +139,9 @@ private:
 
 	/** Reactor */
 	UnrealReactor reactor_;
+
+	/* Timer */
+	UnrealTimer* timer_;
 };
 
 extern UnrealBase* unreal;

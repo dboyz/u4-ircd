@@ -84,7 +84,7 @@ void UnrealCH_lusers::exec(UnrealUser* uptr, StringList* argv)
 				unreal->channels.size()));
 	uptr->sendreply(RPL_LUSERME,
 		String::format(MSG_LUSERME,
-			st.users_local_cur,
+			unreal->local_users.size(),
 			st.servers_local));
 	uptr->sendreply(CMD_NOTICE,
 		String::format(MSG_LUSERHIGHEST,

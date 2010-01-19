@@ -80,7 +80,7 @@ namespace UnrealUserProperties
  * @param sptr Socket pointer if attached to the server directly.
  */
 UnrealUser::UnrealUser(UnrealSocket* sptr)
-	: socket_(sptr), connection_time_(UnrealTime::now())
+	: score(0), socket_(sptr), connection_time_(UnrealTime::now())
 {
 	UnrealUser::onCreate(this);
 }
@@ -293,8 +293,11 @@ void UnrealUser::destroy(UnrealUser* uptr)
 		if (!ln.empty() && unreal->nicks.contains(ln))
 			unreal->nicks.remove(ln);
 
-		/* remove from user list */
-		unreal->users.remove(uptr->socket());
+		/* remove from local user list */
+		unreal->local_users.remove(uptr->socket());
+
+		/* and global user list */
+		unreal->users.remove(uptr);
 
 		delete uptr;
 	}
@@ -386,13 +389,15 @@ void UnrealUser::exit(const String& message)
 
 /**
  * Lookup a user entry by socket.
+ * Note: This works for local users only, as we don't know about the file
+ *       descriptors for remote servers.
  *
  * @param sptr UnrealSocket pointer
  */
 UnrealUser* UnrealUser::find(UnrealSocket* sptr)
 {
-	if (unreal->users.contains(sptr))
-		return unreal->users[sptr];
+	if (unreal->local_users.contains(sptr))
+		return unreal->local_users[sptr];
 	else
 		return 0;
 }
@@ -929,13 +934,13 @@ const String& UnrealUser::nick()
  */
 void UnrealUser::notifyOpers(const String& msg)
 {
-	Map<UnrealSocket*, UnrealUser*>::Iterator ui;
+	List<UnrealUser*>::Iterator ui;
 	UnrealUser* uptr;
 	String preparedMsg = ":*** Notice -- " + msg;
 
 	for (ui = unreal->users.begin(); ui != unreal->users.end(); ++ui)
 	{
-		uptr = ui->second;
+		uptr = *ui;
 
 		if (!uptr->isOper())
 			continue;

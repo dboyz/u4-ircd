@@ -121,9 +121,9 @@ void UnrealCH_privmsg::exec(UnrealUser* uptr, StringList* argv)
 				String pattern = target.mid(1);
 				String mask;
 
-				for (ui = unreal->users.begin(); ui != unreal->users.end();++ui)
+				foreach (List<UnrealUser*>::Iterator, ui, unreal->users)
 				{
-					UnrealUser* user = ui->second;
+					UnrealUser* user = *ui;
 
 					if (user->match(pattern))
 					{

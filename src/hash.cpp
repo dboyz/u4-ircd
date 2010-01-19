@@ -23,9 +23,16 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
+#include "config.h"
 #include "hash.hpp"
+
+#ifndef HAVE_CRYPTOPP
 #include <crypto++/hex.h>
 #include <crypto++/sha.h>
+#else
+#include <cryptopp/hex.h>
+#include <cryptopp/sha.h>
+#endif
 
 /**
  * Calculate the hash of the specified message and type and returns it

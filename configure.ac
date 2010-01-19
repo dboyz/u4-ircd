@@ -87,14 +87,21 @@ AC_LINK_IFELSE(
   [AC_MSG_RESULT([yes])
 	CRYPTOPP_LIBS="-lcrypto++"],
   [AC_MSG_RESULT([no])
-	AC_MSG_ERROR([I need crypto++ ( http://cryptopp.org/ )])])
+dnl try cryptopp instead of crypto++
+	AC_LINK_IFELSE(
+		[AC_LANG_PROGRAM(
+			[[#include <cryptopp/hex.h>]],
+			[[CryptoPP:HexEncoder he; return 0;]])],
+		[AC_MSG_RESULT([yes])
+			CRYPTOPP_LIBS="-lcryptopp"
+			AC_DEFINE([HAVE_CRYPTOPP], [1], [Define if crypto++'s include direcgtory is cryptopp instead of crypto++])],
+		[AC_MSG_RESULT([no])
+			AC_MSG_ERROR([I need crypto++ ( http://cryptopp.org/ )])])
+			])			
+	
 LIBS="${SAVED_LIBS}"
 CXXFLAGS="${SAVED_CXXFLAGS}"
 AC_LANG_POP([C++])
-
-#
-# epoll()/select() implementation choice
-#
 
 # boost modules
 AX_BOOST_BASE([1.35])
@@ -104,7 +111,7 @@ AX_BOOST_SYSTEM
 
 # Common Makefile.am substitutions:
 LIBS="${BOOST_ASIO_LIB} ${BOOST_SYSTEM_LIB} ${BOOST_SIGNALS_LIB} ${CRYPTOPP_LIBS} ${LTDL_LIBS} ${PTHREAD_LIBS}"
-AC_SUBST([AM_CPPFLAGS], ["${BOOST_CPPFLAGS} -DSYSCONFDIR='\"\$(sysconfdir)\"'"])
+AC_SUBST([AM_CPPFLAGS], ["${BOOST_CPPFLAGS} -DSYSCONFDIR='\"\$(sysconfdir)\"' -DPKGLIBDIR='\"\$(pkglibdir)\"'"])
 AC_SUBST([AM_CXXFLAGS], ["${PTHREAD_CFLAGS} -Wall"]) # someday: -std=c++0x
 
 AC_CONFIG_FILES([Makefile

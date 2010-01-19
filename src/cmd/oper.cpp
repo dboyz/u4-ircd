@@ -28,7 +28,11 @@
 #include <hash.hpp>
 #include <stringlist.hpp>
 
+#ifndef HAVE_CRYPTOPP
 #include <crypto++/sha.h>
+#else
+#include <cryptopp/sha.h>
+#endif
 
 #include <cmd/mode.hpp>
 #include <cmd/oper.hpp>

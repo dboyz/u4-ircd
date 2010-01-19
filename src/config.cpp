@@ -195,6 +195,7 @@ void UnrealConfig::initDefaults()
 
 	/* prepare default variable contents */
 	entries_.add("DLLSuffix", OS_DLLSUFFIX);
+	entries_.add("MODDIR", PKGLIBDIR);
 	entries_.add("OSName", OS_NAME);
 	entries_.add("Version", PACKAGE_VERSION);
 }

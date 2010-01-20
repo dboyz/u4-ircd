@@ -34,6 +34,7 @@
 #include <modebuf.hpp>
 #include <numeric.hpp>
 #include <platform.hpp>
+#include <recvq.hpp>
 #include <resolver.hpp>
 #include <string.hpp>
 #include <stringlist.hpp>
@@ -77,6 +78,7 @@ public:
 	const String& awayMessage();
 	UnrealTime connectionTime();
 	static void destroy(UnrealUser* uptr);
+	void drop(const String& message);
 	void exit(UnrealSocket::ErrorCode& ec, const String& msg = String());
 	void exit(const String& message);
 	static UnrealUser* find(UnrealSocket* sptr);
@@ -105,6 +107,9 @@ public:
 	void parseModeChange(StringList* argv);
 	const String& realHostname();
 	const String& realname();
+	void recvqAdd(const String& str);
+	String recvqGetLine();
+	size_t recvqSize();
 	void registerUser();
 	void send(const String& data);
 	void send(const char* fmt, ...);
@@ -129,6 +134,7 @@ public:
 public:
 	List<UnrealChannel*> channels;
 	uint8_t score;
+	UnrealRecvQueue recvQ;
 
 public:
 	/** signal emitted when a new user object is created */

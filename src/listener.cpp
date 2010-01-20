@@ -193,70 +193,40 @@ void UnrealListener::handleDataResponse(UnrealSocket* sptr, String& data)
 		}
 		else
 		{
-			uptr->score++;
-			
-			/* TODO:
-			 * Insert `data' into the user's receive queue (delimited by '\n').
-			 * Process the messages in queue with some delay if necessary.
-			 */
-		}
-	}
+			/* check wheter we can override flood checks */
+			bool fc = unreal->config.get("Features::FloodCheck",
+				"true").toBool();
 
-	StringList tokens = splitLine(data);
-	size_t shift = 0;
+			if (fc)
+				uptr->score++;
 
-	/* check prefix */
-	if (tokens.at(0).at(0) == ':' && tokens.size() >= 2)
-		shift++;
+			/* add message to recvQ */
+			uptr->recvQ.add(data);
 
-	String cmd = tokens.at(shift + 0).toUpper();
-
-	if (type_ == LClient)
-	{
-		UnrealUser* uptr = UnrealUser::find(sptr);
-
-		if (!uptr)
-		{
-			unreal->log.write(UnrealLog::Normal,
-					"UnrealListener::handleDataResponse(): "
-					"Error: Socket %d not assigned with User?",
-					sptr->native());
-		}
-		else
-		{
-			UnrealUserCommand* ucptr = UnrealUserCommand::find(cmd);
-
-			if (ucptr)
+			if (!fc)
+				processRecvQueue(uptr);
+			else if (uptr->recvQ.length() >
+				uptr->recvQ.limit(UnrealRecvQueue::RQL_HARD))
 			{
-				/* command that require users to be fully registered
-				 * are checked here
-				 */
-				if (ucptr->isRegistered() && !uptr->isIntroduced())
-					uptr->sendreply(ERR_NOTREGISTERED, MSG_NOTREGISTERED);
-
-				/* look if the command is suspended */
-				else if (!ucptr->isActive())
-					uptr->sendreply(CMD_NOTICE,
-							String::format(MSG_CMDNOTAVAILABLE,
-									cmd.c_str()));
-				/* ... or oper-only */
-				else if (ucptr->isOperOnly() && !uptr->isOper())
-					uptr->sendreply(ERR_NOPRIVILEGES, MSG_NOPRIVILEGES);
-				else
-				{
-					UnrealUserCommand::Function fn = ucptr->fn();
-
-					/* call the command function */
-					fn(uptr, &tokens);
-				}
+				/* instant disconnect */
+				uptr->drop("recvQ exceeded");
+			}
+			else if (uptr->recvQ.length() >
+				uptr->recvQ.limit(UnrealRecvQueue::RQL_SOFT))
+			{
+				/* issue a message to the user */
+				uptr->sendreply(CMD_NOTICE,
+					":Warning: You are flooding the server.");
 			}
 			else
-				uptr->sendreply(ERR_UNKNOWNCOMMAND,
-						String::format(MSG_UNKNOWNCOMMAND,
-								cmd.c_str()));
+			{
+				uint8_t sl = unreal->config.get("Limits::FloodPenalty", "5")
+					.toUInt8();
 
-			/* update last action timestamp */
-			uptr->setLastActionTime(UnrealTime::now());
+				/* process messsages if the score hasn't been reached yet */
+				if (uptr->score < sl)
+					processRecvQueue(uptr);
+			}
 		}
 	}
 }
@@ -279,6 +249,63 @@ uint32_t UnrealListener::maxConnections()
 uint32_t UnrealListener::pingFrequency()
 {
 	return ping_freq_;
+}
+
+/**
+ * Process messages in user's receive queue.
+ *
+ * @param uptr User pointer
+ */
+void UnrealListener::processRecvQueue(UnrealUser* uptr, bool process_multi)
+{
+	while (uptr->recvQ.size() > 0)
+	{
+		String data = uptr->recvQ.getline();
+		StringList tokens = splitLine(data);
+		size_t shift = 0;
+
+		/* check prefix */
+		if (tokens.at(0).at(0) == ':' && tokens.size() >= 2)
+			shift++;
+
+		String cmd = tokens.at(shift + 0).toUpper();
+		UnrealUserCommand* ucptr = UnrealUserCommand::find(cmd);
+
+		if (ucptr)
+		{
+			/* command that require users to be fully registered
+			 * are checked here
+			 */
+			if (ucptr->isRegistered() && !uptr->isIntroduced())
+				uptr->sendreply(ERR_NOTREGISTERED, MSG_NOTREGISTERED);
+
+			/* look if the command is suspended */
+			else if (!ucptr->isActive())
+				uptr->sendreply(CMD_NOTICE,
+						String::format(MSG_CMDNOTAVAILABLE,
+								cmd.c_str()));
+			/* ... or oper-only */
+			else if (ucptr->isOperOnly() && !uptr->isOper())
+				uptr->sendreply(ERR_NOPRIVILEGES, MSG_NOPRIVILEGES);
+			else
+			{
+				UnrealUserCommand::Function fn = ucptr->fn();
+
+				/* call the command function */
+				fn(uptr, &tokens);
+			}
+		}
+		else
+			uptr->sendreply(ERR_UNKNOWNCOMMAND,
+					String::format(MSG_UNKNOWNCOMMAND,
+							cmd.c_str()));
+
+		/* update last action timestamp */
+		uptr->setLastActionTime(UnrealTime::now());
+
+		if (!process_multi)
+			break; /* just process a single message */
+	}
 }
 
 /**

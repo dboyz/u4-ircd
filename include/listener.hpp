@@ -59,6 +59,7 @@ public:
 	uint16_t bindPort();
 	uint32_t maxConnections();
 	uint32_t pingFrequency();
+	void processRecvQueue(UnrealUser* uptr, bool process_multi = true);
 	void removeConnection(UnrealSocket* sptr,
 		const UnrealSocket::ErrorCode& ec);
 	void run();

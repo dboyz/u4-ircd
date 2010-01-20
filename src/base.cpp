@@ -537,6 +537,13 @@ void UnrealBase::run(const UnrealReactor::ErrorCode& ec)
 			/* decrease flood score every second */
 			if (uptr->score > 0)
 				uptr->score--;
+
+			/* process outstanding messages in recvQ */
+			uint8_t sl = unreal->config.get("Limits::FloodPenalty", "5")
+					.toUInt8();
+
+			if (uptr->score < sl)
+				uptr->listener()->processRecvQueue(uptr, false);
 		}
 
 		/* reset the timer */

@@ -71,6 +71,7 @@ pkginclude_HEADERS = \
 	include/numeric.hpp \
 	include/platform.hpp \
 	include/reactor.hpp \
+	include/recvq.hpp \
 	include/resolver.hpp \
 	include/server.hpp \
 	include/socket.hpp \
@@ -91,6 +92,7 @@ unrealircd4_SOURCES = \
 	src/listener.cpp \
 	src/log.cpp \
 	src/module.cpp \
+	src/recvq.cpp \
 	src/resolver.cpp \
 	src/server.cpp \
 	src/socket.cpp \

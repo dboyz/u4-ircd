@@ -329,6 +329,23 @@ void UnrealUser::destroyIdentRequest()
 }
 
 /**
+ * Drop client from the network. Generates a quit message to all channels
+ * and close the socket connection.
+ *
+ * @param message Quit message
+ */
+void UnrealUser::drop(const String& message)
+{
+	UnrealSocket::ErrorCode ec;
+
+	/* propagate QUIT message to all channels the user may be on */
+	exit(ec, message);
+
+	/* close socket */
+	exit(message);
+}
+
+/**
  * Exit client with an specific error code as given by the networking
  * subsystem.
  *

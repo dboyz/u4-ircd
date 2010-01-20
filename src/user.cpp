@@ -113,10 +113,11 @@ void UnrealUser::auth()
 {
 	auth_flags_ << AFNick
 				<< AFUser
-				<< AFDNS;
+				<< AFDNS
+				<< AFRDNS;
 
 	send(":%s NOTICE AUTH :*** Looking up your hostname",
-	    unreal->config.get("Me::ServerName").c_str());
+	    unreal->me->name().c_str());
 
 	/* resolve remote host */
 	resolveHostname();
@@ -558,6 +559,8 @@ void UnrealUser::handleIdentCheckRead(UnrealSocket* sptr, String& data)
 void UnrealUser::handleResolveResponse(const UnrealResolver::ErrorCode& ec,
 	UnrealResolver::Iterator response)
 {
+	String address = socket_->remote_endpoint().address().to_string();
+
 	if (ec)
 	{
 		send(":%s NOTICE AUTH :Couldn't look up your hostname",
@@ -565,22 +568,58 @@ void UnrealUser::handleResolveResponse(const UnrealResolver::ErrorCode& ec,
 	}
 	else
 	{
-		String tmp = (*response).host_name();
+		UnrealResolver::Endpoint endpoint = *response;
 
-		setHostname(tmp);
-		setRealHostname(tmp);
+		if (auth_flags_.isset(AFDNS))
+		{
+			UnrealResolver* rq = resolver_queries[socket_];
 
-		/* let the user know about the success */
-		send(":%s NOTICE AUTH :*** Retrieved hostname (%s)",
-                unreal->me->name().c_str(),
-				hostname_.c_str());
+			/* store the resolved hostname somewhere */
+			setHostname((*response).host_name());
+			setRealHostname(hostname_);
+
+			auth_flags_.revoke(AFDNS);
+
+			if (!rq)
+			{
+				unreal->log.write(UnrealLog::Error, "handleResolveResponse: "
+					"Can't locate resolver query");
+			}
+			else
+			{
+				/* query hostname -> address */
+				rq->query((*response).host_name(), endpoint.port());
+				
+				return;
+			}
+		}
+		else
+		{
+			if (endpoint.address() != socket_->remote_endpoint().address())
+			{
+				send(":%s NOTICE AUTH :*** Forward and reverse hostname do not "
+					"match, using IP-Address instead",
+					unreal->me->name().c_str());
+			}
+			else
+			{
+				send(":%s NOTICE AUTH :*** Retrieved hostname (%s)",
+                	unreal->me->name().c_str(),
+					hostname_.c_str());
+				
+				address = hostname_;
+			}
+
+			auth_flags_.revoke(AFRDNS);
+		}
 	}
+
+	/* update entries */
+	setHostname(address);
+	setRealHostname(address);
 
 	/* remove the previously allocated resolver */
 	socket_->destroyResolverQuery();
-
-	/* revoke auth flag for DNS lookup */
-	auth_flags_.revoke(AFDNS);
 
 	/* check for destruction request, as asyncronous DNS request is done */
 	if (user_destructs.contains(this))
@@ -588,8 +627,6 @@ void UnrealUser::handleResolveResponse(const UnrealResolver::ErrorCode& ec,
 		UnrealUser::destroy(this);
 		return;
 	}
-
-	// TODO: perform reverse DNS lookup
 
 	if (auth_flags_.value() == 0)
 		sendPing();

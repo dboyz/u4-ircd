@@ -63,8 +63,11 @@ public:
 		/** awaiting forward DNS lookup response */
 		AFDNS	= 0x04,
 
+		/** awaiting reverse DNS lookup response */
+		AFRDNS 	= 0x08,
+
 		/** awaiting ident request response */
-		AFIdent = 0x08
+		AFIdent = 0x10
 	};
 
 	/** alias the mode buffer type for user modes */

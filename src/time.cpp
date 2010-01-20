@@ -23,7 +23,8 @@
  * GNU General Public License for more details.
  ******************************************************************/
 
-#include "time.hpp"
+#include <base.hpp>
+#include <time.hpp>
 
 /**
  * UnrealTime constructor.
@@ -45,6 +46,20 @@ UnrealTime& UnrealTime::addSeconds(const std::time_t& sec)
 {
 	timestamp_ += sec;
 	return *this;
+}
+
+/**
+ * Returns the global network time.
+ * If we have not received any remote time yet, the local time is returned.
+ *
+ * @return Network time
+ */
+UnrealTime UnrealTime::nettime()
+{
+	if (unreal->nettime.toTS() > 0)
+		return unreal->nettime;
+	else
+		return UnrealTime::now();
 }
 
 /**

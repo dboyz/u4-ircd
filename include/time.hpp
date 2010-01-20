@@ -38,6 +38,7 @@ public:
 	UnrealTime(const std::time_t& ts = 0);
 
 	UnrealTime& addSeconds(const std::time_t& sec);
+	static UnrealTime nettime();
 	static UnrealTime now();
 	void setTS(const std::time_t& ts);
 	void sync();

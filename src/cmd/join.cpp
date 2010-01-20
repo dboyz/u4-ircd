@@ -135,6 +135,14 @@ void UnrealCH_join::exec(UnrealUser* uptr, StringList* argv)
 					String::format(MSG_TOOMANYCHANNELS,
 						tmp_chan.c_str()));
 			}
+			else if (!UnrealChannel::find(tmp_chan) &&
+					(!unreal->config.get("Features::ChannelCreation", "true")
+						.toBool() && !uptr->isOper()))
+			{
+				uptr->sendreply(ERR_BANNEDFROMCHAN,
+					String::format(MSG_BANNEDFROMCHAN,
+						tmp_chan.c_str()));
+			}
 			else
 				uptr->joinChannel(tmp_chan, key);
 		}

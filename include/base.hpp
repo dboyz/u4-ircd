@@ -115,6 +115,9 @@ public:
 	/** local server entry */
 	UnrealServer* me;
 
+	/** global network time */
+	UnrealTime nettime;
+
 private:
 	void checkConfig();
 	void checkPermissions();

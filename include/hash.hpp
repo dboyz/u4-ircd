@@ -38,7 +38,7 @@ public:
 
 public:
 	static String calculate(const String& message, Type type = Plain);
-	static const size_t digest_size(Type type);
+	static size_t digest_size(Type type);
 	static Type strtotype(const String& str);
 };
 

@@ -33,6 +33,7 @@
 #if !defined(_GLIBXX_USE_C99)
 #define _GLIBXX_USE_C99
 #include <cstdio>
+#endif
 
 /**
  * Construct a string, copying the contents of a zero-terminated char pointer.

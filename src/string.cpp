@@ -25,10 +25,14 @@
 
 #include "string.hpp"
 #include "stringlist.hpp"
-#include <cstdio>
 #include <cstdarg>
 #include <sstream>
 #include <iostream>
+
+/** vsnprintf() workaround, embed stdio contents into std namespace  */
+#if !defined(_GLIBXX_USE_C99)
+#define _GLIBXX_USE_C99
+#include <cstdio>
 
 /**
  * Construct a string, copying the contents of a zero-terminated char pointer.

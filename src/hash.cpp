@@ -123,7 +123,7 @@ String UnrealHash::calculate(const String& message, Type type)
  * @param type Hash type
  * @return Digest size
  */
-const size_t UnrealHash::digest_size(Type type)
+size_t UnrealHash::digest_size(Type type)
 {
 	switch (type)
 	{

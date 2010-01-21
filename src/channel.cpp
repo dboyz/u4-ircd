@@ -125,7 +125,7 @@ UnrealChannel::Ban* UnrealChannel::addBan(const String& mask,
 	{
 		cbptr = new Ban();
 		cbptr->mask = mask;
-		cbptr->originator = mask;
+		cbptr->originator = origin;
 		cbptr->lastmod = UnrealTime::now();
 
 		/* add it into the ban list */
@@ -176,7 +176,9 @@ UnrealChannel::Member* UnrealChannel::addMember(UnrealUser* uptr,
  */
 bool UnrealChannel::canSend(UnrealUser* uptr, String& text)
 {
-	if (uptr->isOper())
+	if (text.empty())
+		return false; /* don't permit empty messages */
+	else if (uptr->isOper())
 		return true; /* opers can always send to channels */
 	else if (isModerated())
 	{

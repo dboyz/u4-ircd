@@ -102,7 +102,7 @@ public:
 				if (ma == end())
 					return false;
 			
-				for (--m; (m > pattern.begin()) && (*m == '?'); --m);
+				for (--m; (m > pattern.begin()) && (*m == '?'); --m) ;
 			
 				if (*m == '*')
 					return true;

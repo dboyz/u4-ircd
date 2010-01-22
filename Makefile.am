@@ -83,6 +83,43 @@ pkginclude_HEADERS = \
 	include/user.hpp \
 	include/version.hpp
 
+cmdpkgincludedir = $(pkgincludedir)/cmd
+cmdpkginclude_HEADERS = \
+	include/cmd/admin.hpp \
+	include/cmd/away.hpp \
+	include/cmd/help.hpp \
+	include/cmd/info.hpp \
+	include/cmd/insmod.hpp \
+	include/cmd/invite.hpp \
+	include/cmd/ison.hpp \
+	include/cmd/join.hpp \
+	include/cmd/kick.hpp \
+	include/cmd/kill.hpp \
+	include/cmd/list.hpp \
+	include/cmd/lsmod.hpp \
+	include/cmd/lusers.hpp \
+	include/cmd/mode.hpp \
+	include/cmd/motd.hpp \
+	include/cmd/names.hpp \
+	include/cmd/nick.hpp \
+	include/cmd/notice.hpp \
+	include/cmd/oper.hpp \
+	include/cmd/part.hpp \
+	include/cmd/ping.hpp \
+	include/cmd/pong.hpp \
+	include/cmd/privmsg.hpp \
+	include/cmd/quit.hpp \
+	include/cmd/rehash.hpp \
+	include/cmd/restart.hpp \
+	include/cmd/rmmod.hpp \
+	include/cmd/topic.hpp \
+	include/cmd/user.hpp \
+	include/cmd/userhost.hpp \
+	include/cmd/version.hpp \
+	include/cmd/who.hpp \
+	include/cmd/whois.hpp \
+	include/cmd/whowas.hpp
+
 unrealircd4_SOURCES = \
 	src/base.cpp \
 	src/channel.cpp \

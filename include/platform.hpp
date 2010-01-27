@@ -31,6 +31,7 @@
  */
 
 // OS related
+#define OS_DLLSUFFIX "la" /*< with ltdl, la should work on any platform */
 #if defined(_WIN32)
 #  include <windows.h>
 #  include "windows.hpp"
@@ -46,9 +47,7 @@
 #elif defined(__linux__) || defined(__linux)
 #  define OS_LINUX
 #  define OS_NAME "Linux"
-#  define OS_DLLSUFFIX "so"
 #elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
-#  define OS_DLLSUFFIX "so"
 #  if defined(__FreeBSD__)
 #    define OS_FREEBSD
 #    define OS_NAME "FreeBSD"

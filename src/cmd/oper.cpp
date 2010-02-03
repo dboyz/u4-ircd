@@ -29,7 +29,7 @@
 #include <stringlist.hpp>
 
 #ifndef HAVE_CRYPTOPP
-#include <crypto++/sha.h>
+#include <cryptopp/sha.h>
 #else
 #include <cryptopp/sha.h>
 #endif

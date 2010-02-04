@@ -565,6 +565,7 @@ void UnrealUser::handleResolveResponse(const UnrealResolver::ErrorCode& ec,
 	{
 		send(":%s NOTICE AUTH :Couldn't look up your hostname",
 		    unreal->me->name().c_str());
+		auth_flags_.revoke(AFRDNS);
 	}
 	else
 	{

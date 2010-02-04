@@ -30,7 +30,7 @@
 #include <cmd/quit.hpp>
 
 /** class instance */
-UnrealCH_quit* handler = NULL;
+static UnrealCH_quit* handler = NULL;
 
 /**
  * Unreal Command Handler for "QUIT" - Constructor.

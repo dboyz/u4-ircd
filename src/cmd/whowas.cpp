@@ -33,7 +33,7 @@
 std::multimap<String, WhowasEntry_t> UnrealCH_whowas::entries;
 
 /** class instance */
-UnrealCH_whowas* handler = NULL;
+static UnrealCH_whowas* handler = NULL;
 
 /**
  * Unreal Command Handler for "WHOWAS" - Constructor.

@@ -31,7 +31,7 @@
 #include <cmd/user.hpp>
 
 /** class instance */
-UnrealCH_user* handler = NULL;
+static UnrealCH_user* handler = NULL;
 
 /**
  * Unreal Command Handler for "USER" - Constructor.

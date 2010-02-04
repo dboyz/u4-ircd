@@ -31,7 +31,7 @@
 #include <cmd/ison.hpp>
 
 /** class instance */
-UnrealCH_ison* handler = NULL;
+static UnrealCH_ison* handler = NULL;
 
 /**
  * Unreal Command Handler for "ISON" - Constructor.

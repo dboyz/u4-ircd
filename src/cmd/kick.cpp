@@ -31,7 +31,7 @@
 #include <cmd/kick.hpp>
 
 /** class instance */
-UnrealCH_kick* handler = NULL;
+static UnrealCH_kick* handler = NULL;
 
 /**
  * Unreal Command Handler for "KICK" - Constructor.

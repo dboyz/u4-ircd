@@ -31,7 +31,7 @@
 #include <cmd/invite.hpp>
 
 /** class instance */
-UnrealCH_invite* handler = NULL;
+static UnrealCH_invite* handler = NULL;
 
 /**
  * Unreal Command Handler for "INVITE" - Constructor.

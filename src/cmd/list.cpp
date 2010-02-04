@@ -31,7 +31,7 @@
 #include <cmd/list.hpp>
 
 /** class instance */
-UnrealCH_list* handler = NULL;
+static UnrealCH_list* handler = NULL;
 
 /**
  * Unreal Command Handler for "LIST" - Constructor.

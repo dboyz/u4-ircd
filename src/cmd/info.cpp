@@ -31,7 +31,7 @@
 #include <cmd/info.hpp>
 
 /** class instance */
-UnrealCH_info* handler = NULL;
+static UnrealCH_info* handler = NULL;
 
 /**
  * Unreal Command Handler for "INFO" - Constructor.

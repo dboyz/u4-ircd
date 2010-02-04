@@ -30,7 +30,7 @@
 #include <cmd/topic.hpp>
 
 /** class instance */
-UnrealCH_topic* handler = NULL;
+static UnrealCH_topic* handler = NULL;
 
 /**
  * Unreal Command Handler for "TOPIC" - Constructor.

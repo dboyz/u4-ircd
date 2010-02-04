@@ -30,7 +30,7 @@
 #include <cmd/who.hpp>
 
 /** class instance */
-UnrealCH_who* handler = NULL;
+static UnrealCH_who* handler = NULL;
 
 /**
  * Unreal Command Handler for "WHO" - Constructor.

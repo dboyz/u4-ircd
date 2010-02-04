@@ -31,7 +31,7 @@
 #include <cmd/names.hpp>
 
 /** class instance */
-UnrealCH_names* handler = NULL;
+static UnrealCH_names* handler = NULL;
 
 /**
  * Unreal Command Handler for "NAMES" - Constructor.

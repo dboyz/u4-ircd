@@ -32,7 +32,7 @@
 #include <cmd/notice.hpp>
 
 /** class instance */
-UnrealCH_insmod* handler = NULL;
+static UnrealCH_insmod* handler = NULL;
 
 /**
  * Unreal Command Handler for "INSMOD" - Constructor.

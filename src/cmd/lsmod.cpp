@@ -32,7 +32,7 @@
 #include <cmd/notice.hpp>
 
 /** class instance */
-UnrealCH_lsmod* handler = NULL;
+static UnrealCH_lsmod* handler = NULL;
 
 /**
  * Unreal Command Handler for "LSMOD" - Constructor.

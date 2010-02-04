@@ -31,7 +31,7 @@
 #include <cmd/rmmod.hpp>
 
 /** class instance */
-UnrealCH_rmmod* handler = NULL;
+static UnrealCH_rmmod* handler = NULL;
 
 /**
  * Unreal Command Handler for "RMMOD" - Constructor.

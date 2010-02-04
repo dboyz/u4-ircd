@@ -30,7 +30,7 @@
 #include <cmd/whois.hpp>
 
 /** class instance */
-UnrealCH_whois* handler = NULL;
+static UnrealCH_whois* handler = NULL;
 
 /**
  * Unreal Command Handler for "WHOIS" - Constructor.

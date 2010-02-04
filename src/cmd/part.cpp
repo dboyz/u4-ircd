@@ -30,7 +30,7 @@
 #include <cmd/part.hpp>
 
 /** class instance */
-UnrealCH_part* handler = NULL;
+static UnrealCH_part* handler = NULL;
 
 /**
  * Unreal Command Handler for "PART" - Constructor.

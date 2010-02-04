@@ -31,7 +31,7 @@
 #include <cmd/restart.hpp>
 
 /** class instance */
-UnrealCH_restart* handler = NULL;
+static UnrealCH_restart* handler = NULL;
 
 /**
  * Unreal Command Handler for "RESTART" - Constructor.

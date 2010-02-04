@@ -38,7 +38,7 @@
 #include <cmd/oper.hpp>
 
 /** class instance */
-UnrealCH_oper* handler = NULL;
+static UnrealCH_oper* handler = NULL;
 
 /**
  * Operator type.

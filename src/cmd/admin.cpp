@@ -31,7 +31,7 @@
 #include <cmd/admin.hpp>
 
 /** class instance */
-UnrealCH_admin* handler = NULL;
+static UnrealCH_admin* handler = NULL;
 
 /**
  * Unreal Command Handler for "ADMIN" - Constructor.

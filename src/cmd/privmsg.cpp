@@ -30,7 +30,7 @@
 #include <cmd/privmsg.hpp>
 
 /** class instance */
-UnrealCH_privmsg* handler = NULL;
+static UnrealCH_privmsg* handler = NULL;
 
 /**
  * Unreal Command Handler for "PRIVMSG" - Constructor.

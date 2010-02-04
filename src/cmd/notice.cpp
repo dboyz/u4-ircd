@@ -30,7 +30,7 @@
 #include <cmd/notice.hpp>
 
 /** class instance */
-UnrealCH_notice* handler = NULL;
+static UnrealCH_notice* handler = NULL;
 
 /**
  * Unreal Command Handler for "NOTICE" - Constructor.

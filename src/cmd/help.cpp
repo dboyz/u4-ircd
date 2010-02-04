@@ -32,7 +32,7 @@
 #include <cmd/notice.hpp>
 
 /** class instance */
-UnrealCH_help* handler = NULL;
+static UnrealCH_help* handler = NULL;
 
 /**
  * Unreal Command Handler for "HELP" - Constructor.

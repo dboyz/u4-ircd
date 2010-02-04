@@ -31,7 +31,7 @@
 #include <cmd/nick.hpp>
 
 /** class instance */
-UnrealCH_nick* handler = NULL;
+static UnrealCH_nick* handler = NULL;
 
 /** allowed characters for nicks */
 const String allowed_nick_chars =

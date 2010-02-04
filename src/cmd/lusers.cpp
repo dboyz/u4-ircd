@@ -32,7 +32,7 @@
 #include <cmd/notice.hpp>
 
 /** class instance */
-UnrealCH_lusers* handler = NULL;
+static UnrealCH_lusers* handler = NULL;
 
 /**
  * Unreal Command Handler for "LUSERS" - Constructor.

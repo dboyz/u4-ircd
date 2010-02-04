@@ -31,7 +31,7 @@
 #include <cmd/away.hpp>
 
 /** class instance */
-UnrealCH_away* handler = NULL;
+static UnrealCH_away* handler = NULL;
 
 /**
  * Unreal Command Handler for "AWAY" - Constructor.

@@ -31,7 +31,7 @@
 #include <cmd/motd.hpp>
 
 /** class instance */
-UnrealCH_motd* handler = NULL;
+static UnrealCH_motd* handler = NULL;
 
 /**
  * Unreal Command Handler for "MOTD" - Constructor.

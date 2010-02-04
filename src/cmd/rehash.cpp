@@ -30,7 +30,7 @@
 #include <cmd/rehash.hpp>
 
 /** class instance */
-UnrealCH_rehash* handler = NULL;
+static UnrealCH_rehash* handler = NULL;
 
 /**
  * Unreal Command Handler for "REHASH" - Constructor.

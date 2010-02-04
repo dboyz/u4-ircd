@@ -31,7 +31,7 @@
 #include <cmd/kill.hpp>
 
 /** class instance */
-UnrealCH_kill* handler = NULL;
+static UnrealCH_kill* handler = NULL;
 
 /**
  * Unreal Command Handler for "KILL" - Constructor.

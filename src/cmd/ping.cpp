@@ -31,7 +31,7 @@
 #include <cmd/pong.hpp>
 
 /** class instance */
-UnrealCH_ping* handler = NULL;
+static UnrealCH_ping* handler = NULL;
 
 /**
  * Unreal Command Handler for "PING" - Constructor.

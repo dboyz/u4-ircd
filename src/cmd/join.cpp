@@ -32,7 +32,7 @@
 #include <cmd/part.hpp>
 
 /** class instance */
-UnrealCH_join* handler = NULL;
+static UnrealCH_join* handler = NULL;
 
 /**
  * Unreal Command Handler for "JOIN" - Constructor.

@@ -31,7 +31,7 @@
 #include <cmd/mode.hpp>
 
 /** class instance */
-UnrealCH_mode* handler = NULL;
+static UnrealCH_mode* handler = NULL;
 
 /**
  * Unreal Command Handler for "MODE" - Constructor.

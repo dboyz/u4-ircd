@@ -30,7 +30,7 @@
 #include <cmd/version.hpp>
 
 /** class instance */
-UnrealCH_version* handler = NULL;
+static UnrealCH_version* handler = NULL;
 
 /**
  * Unreal Command Handler for "VERSION" - Constructor.

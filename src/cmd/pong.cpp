@@ -30,7 +30,7 @@
 #include <cmd/pong.hpp>
 
 /** class instance */
-UnrealCH_pong* handler = NULL;
+static UnrealCH_pong* handler = NULL;
 
 /**
  * Unreal Command Handler for "PONG" - Constructor.

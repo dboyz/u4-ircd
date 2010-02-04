@@ -30,7 +30,7 @@
 #include <cmd/userhost.hpp>
 
 /** class instance */
-UnrealCH_userhost* handler = NULL;
+static UnrealCH_userhost* handler = NULL;
 
 /**
  * Unreal Command Handler for "USERHOST" - Constructor.

@@ -58,11 +58,11 @@ Legend:
     [ ] +i
     [ ] +k
     [ ] +l
-    [ ] +m
+    [X] +m
     [ ] +n
-    [ ] +o
+    [X] +o
     [ ] +p
     [ ] +s
     [ ] +t
-    [ ] +v
+    [X] +v
 [ ] Make sure each function has a Pre-Event and regular event associated with it.

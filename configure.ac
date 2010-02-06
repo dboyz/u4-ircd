@@ -101,10 +101,15 @@ AX_BOOST_ASIO
 AX_BOOST_SIGNALS
 AX_BOOST_SYSTEM
 
+# c-ares
+# before 1.5.*, there were API changes. Syzop consideres that
+# 1.6.0 is a good minimum.
+PKG_CHECK_MODULES([CARES], libcares >= 1.6.0)
+
 # Common Makefile.am substitutions:
-LIBS="${BOOST_ASIO_LIB} ${BOOST_SYSTEM_LIB} ${BOOST_SIGNALS_LIB} ${CRYPTOPP_LIBS} ${LTDL_LIBS} ${PTHREAD_LIBS}"
+LIBS="${BOOST_ASIO_LIB} ${BOOST_SYSTEM_LIB} ${BOOST_SIGNALS_LIB} ${CRYPTOPP_LIBS} ${LTDL_LIBS} ${PTHREAD_LIBS} ${CARES_LIBS}"
 AC_SUBST([AM_CPPFLAGS], ["${BOOST_CPPFLAGS} -DSYSCONFDIR='\"\$(sysconfdir)\"' -DPKGLIBDIR='\"\$(pkglibdir)\"'"])
-AC_SUBST([AM_CXXFLAGS], ["${PTHREAD_CFLAGS} -Wall -Wextra -Wno-unused"])
+AC_SUBST([AM_CXXFLAGS], ["${PTHREAD_CFLAGS} ${CARES_CFLAGS} -Wall -Wextra -Wno-unused"])
 
 AC_CONFIG_FILES([Makefile
 src/cmd/Makefile])

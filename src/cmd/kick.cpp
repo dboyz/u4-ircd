@@ -113,6 +113,9 @@ void UnrealCH_kick::exec(UnrealUser* uptr, StringList* argv)
 			if (argv->size() > 3)
 				message = argv->at(3);
 
+			if(!message.length())
+				message = uptr->nick();
+
 			chptr->sendlocalreply(uptr, CMD_KICK,
 				String::format("%s :%s",
 					tuptr->nick().c_str(),

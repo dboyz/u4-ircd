@@ -37,7 +37,7 @@ EXTRA_DIST = src/version.cpp.in \
 	$(top_srcdir)/tools/versionblast.sh
 
 # config file:
-dist_sysconf_DATA = etc/unrealircd4.conf
+dist_sysconf_DATA = etc/unrealircd4.conf.dist
 
 # docs:
 dist_doc_DATA = docs/codingstyle.txt \

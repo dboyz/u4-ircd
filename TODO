@@ -22,7 +22,7 @@ Legend:
     [X] INVITE
     [X] ISON
     [X] JOIN   
-    [X] KICK
+    [~] KICK (present, but needs fixing)
     [ ] KILL
     [ ] KNOCK
     [ ] LINKS (to be provided by linking module)
@@ -48,15 +48,16 @@ Legend:
     [X] USER
     [X] USERHOST
     [X] VERSION
-    [X] WHO
+    [ ] WALLOPS
+    [~] WHO (needs to be fixed)
     [X] WHOIS
     [~] WHOWAS (done, perhaps partially needs, testing)
     [ ] WATCH
     [ ] ZLINE
-[ ] Channel for the core:
-    [ ] +b
+[ ] Channelmodes for the core:
+    [X] +b
     [ ] +i
-    [ ] +k
+    [X] +k
     [ ] +l
     [X] +m
     [ ] +n
@@ -65,4 +66,9 @@ Legend:
     [ ] +s
     [ ] +t
     [X] +v
+[ ] Usermodes for the core:
+    [X] +i (needs testing)
+    [ ] +o
+    [ ] +s
+    [X] +w
 [ ] Make sure each function has a Pre-Event and regular event associated with it.

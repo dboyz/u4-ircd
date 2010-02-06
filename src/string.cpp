@@ -212,7 +212,7 @@ String String::mid(size_t start, size_t count)
 {
 	String result;
 
-	if (start < this->length())
+	if (start <= this->length())
 		result = this->substr(start, count);
 	else
 		result = "substr:invalid";

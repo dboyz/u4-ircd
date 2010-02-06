@@ -13,8 +13,11 @@ Legend:
 [ ] Work on user management
 [ ] Create 3.2-style numeric sending
 [~] Main core
-[X] Configuration parser (3.2-style, core directives are in doc/configuration.txt)
-[ ] Commands needed in the core:
+[ ] Configuration
+    [X] Configuration parser (3.2-style, core directives are in doc/configuration.txt)
+    [ ] New internal configuration API: calling toBool(), toInt(), and the like should
+        only happen during parsing.
+[~] Commands needed in the core:
     [X] ADMIN
     [X] AWAY
     [ ] CLOSE

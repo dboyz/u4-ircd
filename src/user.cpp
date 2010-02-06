@@ -852,10 +852,6 @@ void UnrealUser::leaveChannel(const String& chname, const String& message,
 			if (type == CMD_PART)
 			{
 				chptr->sendlocalreply(this, type, msg);
-				chptr->removeMember(this);
-				
-				if (chptr->members.size() == 0)
-					delete chptr;
 			}
 			else if (type == CMD_QUIT)
 			{
@@ -883,7 +879,14 @@ void UnrealUser::leaveChannel(const String& chname, const String& message,
 					UnrealUser* uptr = cm->first;
 					uptr->send(reply);
 				}
+				return;
 			}
+
+			/* common stuff */
+			chptr->removeMember(this);
+
+			if(chptr->members.size() == 0)
+				delete chptr;
 		}
 	}
 }

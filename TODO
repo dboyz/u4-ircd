@@ -19,16 +19,16 @@ Legend:
     [X] AWAY
     [ ] CLOSE
     [ ] GLINE
-    [ ] INVITE
+    [X] INVITE
     [X] ISON
     [X] JOIN   
     [X] KICK
     [ ] KILL
     [ ] KNOCK
-    [ ] LINKS
+    [ ] LINKS (to be provided by linking module)
     [X] LIST
     [X] LUSERS
-    [ ] MAP
+    [ ] MAP (to be provided by linking module)
     [X] MODE
     [ ] MODULES
     [X] MOTD
@@ -50,7 +50,19 @@ Legend:
     [X] VERSION
     [X] WHO
     [X] WHOIS
-    [ ] WHOWAS
+    [~] WHOWAS (done, perhaps partially needs, testing)
     [ ] WATCH
     [ ] ZLINE
+[ ] Channel for the core:
+    [ ] +b
+    [ ] +i
+    [ ] +k
+    [ ] +l
+    [ ] +m
+    [ ] +n
+    [ ] +o
+    [ ] +p
+    [ ] +s
+    [ ] +t
+    [ ] +v
 [ ] Make sure each function has a Pre-Event and regular event associated with it.

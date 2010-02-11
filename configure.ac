@@ -63,7 +63,7 @@ AC_CHECK_HEADER([ltdl.h],
     [LIBLTDL=-lltdl], [LIBLTDL=])],
   [LIBLTDL=])
 AS_IF([test -z "${LIBLTDL}"],
-  [AC_MSG_ERROR([I need ltdl (provided by libtool)])])
+  [AC_MSG_ERROR([I need ltdl (provided by libtool). If you are using FreeBSD or have otherwise installed libltdl into an uncommon prefix, add the proper flags to CPPFLAGS and LDFLAGS. If ltdl is in the /usr/local prefix, for example, use export CPPFLAGS="-I/usr/local/include" LDFLAGS="-L/usr/local/lib"])])
 AC_SUBST([LTDL_LIBS], [${LIBLTDL}])
 
 # pthreads

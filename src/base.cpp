@@ -24,8 +24,10 @@
  ******************************************************************/
 
 #include "base.hpp"
+#include "exception.hpp"
 #include "limits.hpp"
 #include "reactor.hpp"
+
 #include <cstdlib>
 #include <iostream>
 #include <boost/bind.hpp>
@@ -380,6 +382,7 @@ void UnrealBase::parseArgv()
 		else
 		{
 			std::cerr << *sli << ": unrecognized option" << std::endl;
+			throw UnrealException<void*>(String("unrecognized option: ").append(*sli));
 		}
 	}
 }

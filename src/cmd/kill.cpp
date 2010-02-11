@@ -73,6 +73,7 @@ void UnrealCH_kill::exec(UnrealUser* uptr, StringList* argv)
 		uptr->sendreply(ERR_NEEDMOREPARAMS,
 			String::format(MSG_NEEDMOREPARAMS,
 				CMD_KILL));
+		return;
 	}
 
 	UnrealUser* victim = UnrealUser::find(argv->at(1));

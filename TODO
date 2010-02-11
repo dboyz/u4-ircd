@@ -26,7 +26,7 @@ Legend:
     [X] ISON
     [X] JOIN   
     [X] KICK
-    [ ] KILL
+    [X] KILL
     [ ] KNOCK
     [ ] LINKS (to be provided by linking module)
     [X] LIST

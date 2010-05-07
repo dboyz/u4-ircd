@@ -114,7 +114,7 @@ void UnrealCH_topic::exec(UnrealUser* uptr, StringList* argv)
 				if (!cmptr)
 					chptr->sendreply(uptr, ERR_NOTONCHANNEL, MSG_NOTONCHANNEL);
 				else if (chptr->isTopicOpsOnly() && !cmptr->isChanOp()
-						&& cmptr->isHalfOp())
+						&& !cmptr->isHalfOp())
 					chptr->sendreply(uptr, ERR_CHANOPRIVSNEEDED,
 						MSG_CHANOPRIVSNEEDED);
 				else

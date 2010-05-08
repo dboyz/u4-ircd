@@ -154,7 +154,7 @@ enum IRCNumeric
 #define MSG_NOTOPIC				":No topic is set."
 #define MSG_TOPIC				":%s"
 #define MSG_TOPICLASTCHANGED	"%s %d"
-#define MSG_VERSION				"%s%s %s :%s"
+#define MSG_VERSION				"%s.%d %s :%s"
 #define MSG_WHOREPLY			"%s %s %s %s %s %s :%d %s"
 #define MSG_NAMREPLY			"%c %s :%s"
 #define MSG_ENDOFNAMES			"%s :End of /NAMES list."

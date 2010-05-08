@@ -443,8 +443,7 @@ void UnrealBase::printConfig()
 void UnrealBase::printVersion()
 {
 	std::cout << "UnrealIRCd "
-			  << VERSION
-			  << PACKAGE_PATCHLEVEL
+			  << PACKAGE_VERSION
 			  << ", Built "
 			  << __DATE__
 			  << " "

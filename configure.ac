@@ -39,11 +39,6 @@ AS_IF([test -e .hg],[
 	AC_DEFINE([HAVE_PACKAGE_CHANGESET], [1], [Define if PACKAGE_CHANGESET should be used])
 ])
 
-# versioning
-AC_DEFINE([PACKAGE_VERSION_MAJOR], [4], [Major version number])
-AC_DEFINE([PACKAGE_VERSION_MINOR], [0], [Minor version number])
-AC_DEFINE([PACKAGE_VERSION_RELEASE], [0], [Release number. i.e., bugfix release number])
-
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_LIBTOOL

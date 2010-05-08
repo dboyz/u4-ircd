@@ -30,13 +30,9 @@
    Most definitions that would be found in this file
    are defined in configure.ac. The defined variables include:
    
-   Integer macros testable by modules:
-   PACKAGE_VERSION_MAJOR
-   PACKAGE_VERSION_MINOR
-   PACKAGE_VERSINO_RELEASE
-
    Generic, possibly useful macros:
-   PACKAGE the name of this package
+   PACKAGE_NAME the name of this package
+   PACKAGE_TARNAME the name of this package without spaces
    PACKAGE_VERSION the version as a string
  */
 
@@ -69,6 +65,5 @@ public:
    A replacement for PACKAGE_STRING which contains no spaces
  */
 #define PACKAGE_VERSTR 		PACKAGE_TARNAME "-" PACKAGE_VERSION
-#define PACKAGE_PATCHLEVEL	"+alpha_hgrev-tip"
 
 #endif /* _UNREALIRCD_VERSION_HPP */

@@ -77,7 +77,7 @@ void UnrealCH_version::exec(UnrealUser* uptr, StringList* argv)
 		uptr->sendreply(RPL_VERSION,
 			String::format(MSG_VERSION,
 				PACKAGE_VERSTR,
-				PACKAGE_PATCHLEVEL,
+				0,
 				unreal->me->name().c_str(),
 				UnrealVersion::package_changeset.c_str() ));
 	}

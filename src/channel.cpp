@@ -659,7 +659,23 @@ void UnrealChannel::parseModeChange(UnrealUser* uptr, StringList* argv)
 				if (cmo == UnrealChannelProperties::Key)
 					setKey(argv->at(par++));
 				else if (cmo == UnrealChannelProperties::Limit)
-					setLimit(argv->at(par++).toUInt());
+				{
+					/* silently drop the limit change if the arg is invalid */
+					String newlimit = argv->at(par++);
+					bool bad = false;
+					for (String::iterator newlimit_iter = newlimit.begin();
+						newlimit_iter != newlimit.end(); ++newlimit_iter)
+					{
+						if (!isdigit(*newlimit_iter))
+						{
+							bad = true;
+							break;
+						}
+					}
+					/* bad is true if we saw non-digit characters in newlimit */
+					if (!bad)
+						setLimit(newlimit);
+				}
 				else if (cmo == UnrealChannelProperties::Ban)
 				{
 					String mask = argv->at(par++);

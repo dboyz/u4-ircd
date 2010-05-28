@@ -26,6 +26,7 @@
 #include "string.hpp"
 #include "stringlist.hpp"
 #include <cstdarg>
+#include <cctype>
 #include <sstream>
 #include <iostream>
 

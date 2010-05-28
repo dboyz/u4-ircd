@@ -742,8 +742,30 @@ void UnrealUser::joinChannel(const String& chname, const String& key)
 
 	/* invited users may override almost anything */
 	bool force = chptr->isInvited(this);
-
-	if (chptr->isKey() && key != chptr->key() && !isOper() && !force)
+	/**
+	 * Order of things to check when joining channel:
+	 * This list is structured so that channels with multiple modes
+	 * will give the least amount of information regarding that channel
+	 * should a user be unable to join said channel
+	 * 1. check for invite-only channel
+	 * 2. check for channel key
+	 * 3. check for channel limit
+	 * 4. check for ban
+	 * We insert a check to see if the user is already in the channel
+	 * before all of the above so that we don't print out error messages
+	 * for a user already in a channel trying to join it again
+	 */
+	if (chptr->findMember(this))
+	{
+		return; /* ignore this join-attempt */
+	}
+	else if (chptr->isInviteOnly() && !isOper() && !force)
+	{
+		sendreply(ERR_INVITEONLYCHAN,
+			String::format(MSG_INVITEONLYCHAN,
+				chptr->name().c_str()));
+	}
+	else if (chptr->isKey() && key != chptr->key() && !isOper() && !force)
 	{
 		sendreply(ERR_BADCHANNELKEY,
 			String::format(MSG_BADCHANNELKEY,
@@ -756,8 +778,6 @@ void UnrealUser::joinChannel(const String& chname, const String& key)
 			String::format(MSG_CHANNELISFULL,
 				chptr->name().c_str()));
 	}
-	else if (chptr->findMember(this))
-		return; /* ignore this join-attempt */
 	else if (chptr->isBanned(this) && !force)
 	{
 		sendreply(ERR_BANNEDFROMCHAN,

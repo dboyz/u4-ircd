@@ -674,7 +674,7 @@ void UnrealChannel::parseModeChange(UnrealUser* uptr, StringList* argv)
 					}
 					/* bad is true if we saw non-digit characters in newlimit */
 					if (!bad)
-						setLimit(newlimit);
+						setLimit(newlimit.toUInt());
 				}
 				else if (cmo == UnrealChannelProperties::Ban)
 				{

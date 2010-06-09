@@ -30,6 +30,9 @@
 #include <fstream>
 #include <iostream>
 #include <cstdlib>
+#include <cstdio>
+#include <sys/types.h>
+#include <dirent.h>
 
 /**
  * Full documentation of the configuration system can be found at
@@ -470,7 +473,35 @@ bool UnrealConfig::read(const String& file)
 				continue;
 			}
 
-			modules_ << r;
+			if (r.contains("*")) {
+				DIR *dp;
+				struct dirent *ep;
+				StringList sl = r.split("*");
+				String filePattern = sl.takeAt(1);
+				String dirPath = sl.takeFirst();
+
+				dp = opendir(dirPath.c_str());
+				if (dp != NULL) {
+					ep = readdir(dp);
+					while (ep) {
+						String dirItem(ep->d_name);
+
+						if (dirItem == "." || dirItem == "..") {
+							ep = readdir(dp);
+							continue;
+						}
+
+						if (dirItem.mid(dirItem.length() - filePattern.length(), filePattern.length()) == filePattern) {
+							modules_ << dirPath + dirItem;
+						}
+						ep = readdir(dp);
+					}
+					closedir(dp);
+				}
+			}
+			else {
+				modules_ << r;
+			}
 		}
 		else if (line.left(9) == "Sequence ") //< Sequence directive
 		{

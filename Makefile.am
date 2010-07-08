@@ -25,6 +25,8 @@
 # The following is:
 # somewhat based off of unieject-6
 
+ACLOCAL_AMFLAGS = -I m4 --install
+
 SUBDIRS = . src/cmd
 
 INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/src/cmd/include
